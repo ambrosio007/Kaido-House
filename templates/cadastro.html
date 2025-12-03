@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/cadastro.css">
+    <title>Cadastre-se</title>
+</head>
+<body>
+    <div class="container">
+        <form action="#" method="post">
+            <fieldset>
+                <legend><b>Cadastro</b></legend>
+                <div class="inputBox">
+                <input type="text" name="nome" id="nomeID" class="inputUser" required>
+                <label for="nomeID" class="labelInput">Nome completo</label>
+                </div>
+                <br><br>
+                <div class="inputBox">
+                <input type="text" name="cpf" id="cpfID" class="inputUser" required min="11" max="11">
+                <label for="cpfID" class="labelInput">CPF</label>
+                </div>
+                <br><br>
+                <div class="inputBox">
+                <input type="text" name="cep" id="cepID" class="inputUser" required min="8" max="8">
+                <label for="cepID" class="labelInput">CEP</label>
+                </div>
+                <br><br>
+                <div class="inputBox">
+                <label for="dateID" class="labelInput"><b>Data de Nascimento</b></label>
+                <input type="date" name="date" id="dateID" class="inputUser" required>
+                </div>
+                <br><br>
+                <div class="inputBox">
+                <input type="email" name="email" id="emailID" class="inputUser" required>
+                <label for="emailID" class="labelInput">Email</label>
+                </div>
+                <br><br>
+                <div class="inputBox">
+                <input type="password" name="senha" id="senhaID" class="inputUser" required min="8">
+                <label for="senhaID" class="labelInput">Senha</label>
+                </div>
+                <br><br>
+                <div class="inputBox">
+                <input type="password" name="confirma_senha" id="confirma_senhaID" class="inputUser" required min="8">
+                <label for="confirma_senhaID" class="labelInput">Confime a senha</label>
+                </div>
+                <br><br>
+                <input type="submit" id="submit" value="Cadastrar">
+                <a href="logim.html">Login</a>
+            </fieldset>
+        </form>
+    </div>
+</body>
+</html>
