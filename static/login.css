@@ -1,88 +1,129 @@
+/* 🚗 Login CSS - Dark Theme (Adaptado para Fieldset e Label Flutuante) */
+
+/* 1. Reset e Configurações Básicas */
 * {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: Arial, sans-serif; /* Fonte moderna e legível */
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
+/* 2. Estilo do Corpo (Fundo) */
 body {
-    background-image: linear-gradient(to right, #2b2b2b, rgb(59, 59, 59));
+    /* Gradiente escuro sutil para o fundo */
+    background: linear-gradient(135deg, #121212, #000000); 
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white; /* Cor padrão do texto */
 }
 
+/* 3. Container Principal (Formulário) */
 .container {
-    color: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(134, 134, 134, 0.8);
-    padding: 15px 30px;
-    border-radius: 10px;
-    width: 20%;
+    /* Fundo preto semi-transparente */
+    background-color: rgba(0, 0, 0, 0.8); 
+    padding: 30px; 
+    border-radius: 8px; 
+    width: 90%;
+    max-width: 400px; /* Largura máxima para desktop */
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.2); /* Sombra sutil vermelha para destaque */
 }
 
+/* 4. Estilos do Fieldset e Legend */
 fieldset {
-    border: 3px solid black;
+    border: 1px solid #444; /* Borda sutil */
+    padding: 20px;
+    border-radius: 6px;
 }
 
 legend {
-    border: 1px solid white;
-    padding: 10px;
+    border: none;
+    padding: 5px 10px;
     text-align: center;
-    background-color: cadetblue;
-    border-radius: 8px;
+    background-color: #FF0000; /* Destaque vermelho */
+    color: white;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1.2em;
 }
 
+/* 5. Estilo dos Campos de Entrada (Efeito Flutuante) */
 .inputBox {
     position: relative;
+    margin-bottom: 30px;
 }
 
 .inputUser {
     background: none;
     border: none;
-    border-bottom: 1px solid black;
+    border-bottom: 2px solid #666; /* Linha de baixo sutil */
     outline: none;
-    color: black;
-    font-size: 15px;
+    color: white; 
+    font-size: 16px;
     width: 100%;
-    letter-spacing: 2px;
+    padding: 8px 0;
+    letter-spacing: 1px;
+    transition: border-bottom-color 0.3s;
 }
 
+.inputUser:focus {
+    border-bottom-color: #FF0000; /* Linha vermelha ao focar */
+}
+
+/* Label (O que flutua) */
 .labelInput {
     position: absolute;
-    top: 0px;
+    top: 10px; 
     left: 0px;
     pointer-events: none;
     transition: .5s;
+    color: #AAA; /* Cor cinza para o label */
+    font-size: 16px;
 }
 
+/* Label flutuando ao focar ou ter conteúdo (valid) */
 .inputUser:focus ~ .labelInput,
 .inputUser:valid ~ .labelInput {
-    top: -20px;
+    top: -10px; /* Posição flutuada */
     font-size: 12px;
-    color: black;
+    color: #FF0000; /* Cor vermelha para destacar o campo ativo */
 }
 
+/* 6. Estilo do Botão de Envio (Login) */
 #submit {
-    background-image: linear-gradient(to right, #2b2b2b, rgb(59, 59, 59));
+    background-color: #FF0000; /* Vermelho vibrante */
     width: 100%;
     border: none;
     padding: 15px;
     color: white;
-    font-size: 15px;
+    font-size: 18px; 
+    font-weight: bold;
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: 4px; 
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
 }
 
 #submit:hover {
-    background-color: #1e90ff;
+    background-color: #CC0000; /* Vermelho mais escuro */
 }
 
+/* 7. Estilo dos Links (Cadastre-se e Esqueci a senha) */
 .link {
     display: block;
     width: 100%;
-    padding: 0.001px 0;
     text-align: center;
-    color: red;
-    font-size: 15px;
-    cursor: pointer;
-    border-radius: 10px;
-    margin-top: 15px;
+    color: #FF0000; /* Links em vermelho vibrante */
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 5px 0;
+    transition: color 0.3s;
+    margin-top: 5px; /* Adicionado um pequeno espaçamento entre os links */
+}
+
+.link:hover {
+    text-decoration: underline;
+    color: #EE5555;
 }

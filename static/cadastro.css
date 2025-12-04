@@ -1,84 +1,147 @@
+/* 🚗 CSS Adaptado para o Formulário de Cadastro (HTML com Fieldset) */
+
+/* Reset simples da fonte */
 * {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
 }
 
+/* 1. Estilo do Corpo (Fundo) */
 body {
-    background-image: linear-gradient(to right, #2b2b2b, rgb(59, 59, 59));
+    /* Gradiente escuro sutil para o fundo */
+    background: linear-gradient(135deg, #121212, #000000); 
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white; /* Cor padrão do texto */
 }
 
+/* 2. Container Principal */
 .container {
-    color: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(134, 134, 134, 0.8);
-    padding: 15px 30px;
-    border-radius: 10px;
-    width: 20%;
+    background-color: rgba(0, 0, 0, 0.7); 
+    padding: 30px; 
+    border-radius: 8px; 
+    width: 90%; /* Ajuste a largura para ser responsivo */
+    max-width: 400px; /* Limite máximo para desktop */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
 }
 
+/* 3. Estilos do Fieldset e Legend */
 fieldset {
-    border: 3px solid black;
+    border: 1px solid #444; /* Borda sutil */
+    padding: 20px;
+    border-radius: 6px;
 }
 
 legend {
-    border: 1px solid white;
-    padding: 10px;
+    border: none;
+    padding: 5px 10px;
     text-align: center;
-    background-color: cadetblue;
-    border-radius: 8px;
+    background-color: #FF0000; /* Destaque vermelho */
+    color: white;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1.2em;
 }
 
+/* 4. Estilo dos Campos de Entrada (Input Boxes) */
 .inputBox {
     position: relative;
+    margin-bottom: 30px; /* Espaço para o label flutuar */
 }
 
 .inputUser {
-    background: none;
+    /* Estilo do fundo e borda dos campos (inspirado no KAIDO HOUSE) */
+    background: none; /* Fundo transparente */
     border: none;
-    border-bottom: 1px solid black;
+    border-bottom: 2px solid #666; /* Linha de baixo sutil */
     outline: none;
-    color: black;
-    font-size: 15px;
+    color: white; /* Texto digitado é branco */
+    font-size: 16px;
     width: 100%;
-    letter-spacing: 2px;
+    padding: 8px 0; /* Padding vertical para o texto */
+    letter-spacing: 1px;
+    transition: border-bottom-color 0.3s;
 }
 
+.inputUser:focus {
+    border-bottom-color: #FF0000; /* Linha vermelha ao focar */
+}
+
+/* 5. Estilo dos Labels (Efeito flutuante) */
 .labelInput {
     position: absolute;
-    top: 0px;
+    top: 10px; /* Posição inicial */
     left: 0px;
     pointer-events: none;
     transition: .5s;
+    color: #AAA; /* Cor cinza para o label */
 }
 
+/* Regra para o label flutuar (usada no seu HTML) */
 .inputUser:focus ~ .labelInput,
 .inputUser:valid ~ .labelInput {
-    top: -20px;
+    top: -10px; /* Posição flutuada */
     font-size: 12px;
-    color: black;
+    color: #FF0000; /* Cor vermelha para destacar o campo ativo */
 }
 
+/* 6. Estilo específico para a Data de Nascimento */
 #dateID {
-    border: none;
+    /* Como o input date não tem o efeito flutuante de label no seu HTML, estilizei ele fixo */
+    border: 1px solid #444;
     padding: 8px;
-    border-radius: 10px;
+    border-radius: 4px;
     outline: none;
-    font-size: 15px;
+    font-size: 16px;
+    background-color: #333; /* Fundo escuro */
+    color: white;
+    /* Para a seta do calendário aparecer, dependendo do browser */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+/* Estilo para o label fixo da data (o seu HTML tem um label flutuante com 'top: 0px' que não funciona bem) */
+.inputBox label[for="dateID"] {
+    position: static;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #AAA;
+    font-weight: normal;
 }
 
+
+/* 7. Estilo do Botão de Envio (Cadastrar) */
 #submit {
-    background-image: linear-gradient(to right, #2b2b2b, rgb(59, 59, 59));
+    /* Fundo vermelho vibrante da imagem */
+    background-color: #FF0000; 
     width: 100%;
     border: none;
     padding: 15px;
     color: white;
-    font-size: 15px;
+    font-size: 18px; 
+    font-weight: bold;
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: 4px; 
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
 }
 
 #submit:hover {
-    background-image: linear-gradient(to right, cadetblue, darkcyan);
+    background-color: #CC0000; /* Vermelho mais escuro */
+}
+
+/* 8. Estilo do Link Login */
+.container a {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #FF0000; /* O link Login é vermelho */
+    text-decoration: none;
+    font-weight: bold;
+}
+.container a:hover {
+    text-decoration: underline;
 }
