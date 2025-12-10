@@ -1,0 +1,173 @@
+/* 1. Reset Básico e Tipografia */
+* {
+    /* Define a caixa de modelo para incluir padding e borda na largura/altura */
+    box-sizing: border-box; 
+    margin: 0;
+    padding: 0;
+    /* Fonte moderna e legível, melhorando a anterior */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+}
+
+/* --- */
+
+/* 2. Estilo do Corpo (Fundo e Layout Centralizado) */
+body {
+    /* Gradiente mais profundo, dark mode padrão */
+    background: linear-gradient(135deg, #0a0a0a, #1a1a1a); 
+    min-height: 100vh; /* Usa min-height para permitir rolagem se o conteúdo for grande */
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    color: #f0f0f0; /* Cor padrão do texto (branco suave) */
+    padding: 20px; /* Adiciona padding para evitar que o conteúdo toque as bordas em telas pequenas */
+}
+
+/* --- */
+
+/* 3. Container Principal (Formulário) */
+.container {
+    /* Fundo preto ligeiramente mais opaco */
+    background-color: rgba(18, 18, 18, 0.95); 
+    padding: 30px; 
+    border-radius: 12px; /* Aumenta um pouco o raio da borda */
+    width: 100%;
+    max-width: 400px; 
+    /* Sombra vermelha mais refinada */
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3), 0 0 5px rgba(255, 0, 0, 0.1); 
+    /* Adiciona efeito de transição para a sombra (sutil) */
+    transition: all 0.3s ease; 
+}
+
+/* Efeito de leve destaque ao passar o mouse */
+.container:hover {
+    box-shadow: 0 4px 20px rgba(255, 0, 0, 0.4), 0 0 10px rgba(255, 0, 0, 0.2); 
+}
+
+/* --- */
+
+/* 4. Estilos do Fieldset e Legend */
+fieldset {
+    border: 1px solid #333; /* Borda mais discreta */
+    padding: 25px 20px 15px; /* Ajusta o padding */
+    border-radius: 8px;
+}
+
+legend {
+    border: none;
+    padding: 6px 15px;
+    text-align: center;
+    background-color: #ff0000; /* Vermelho vibrante */
+    color: #ffffff;
+    border-radius: 6px;
+    font-weight: 700; /* Bolder */
+    font-size: 1.3em; /* Levemente maior */
+    /* Adiciona uma pequena sombra interna para profundidade */
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); 
+}
+
+/* Estilo para a mensagem de instrução (Enviaremos um codigo...) */
+fieldset > b {
+    display: block; /* Garante que o texto ocupe toda a largura */
+    text-align: center;
+    margin-bottom: 20px;
+    color: #bbbbbb; /* Cinza claro */
+    font-weight: 400; /* Normal */
+    font-size: 0.95em;
+    line-height: 1.4;
+}
+
+/* --- */
+
+/* 5. Estilo dos Campos de Entrada (Efeito Flutuante) */
+.inputBox {
+    position: relative;
+    margin-bottom: 35px; /* Aumenta o espaçamento para o label flutuante */
+}
+
+.inputUser {
+    background: none;
+    border: none;
+    /* Usa uma cor de linha inicial mais escura */
+    border-bottom: 2px solid #3a3a3a; 
+    outline: none;
+    color: #f0f0f0; 
+    font-size: 17px; /* Levemente maior */
+    width: 100%;
+    padding: 10px 0; /* Aumenta o padding vertical */
+    letter-spacing: 0.8px;
+    /* Transição para a linha e para a cor do texto */
+    transition: border-bottom-color 0.3s, color 0.3s; 
+}
+
+.inputUser:focus {
+    border-bottom-color: #ff3333; /* Vermelho mais suave ao focar */
+}
+
+/* Label (O que flutua) */
+.labelInput {
+    position: absolute;
+    top: 13px; /* Posição inicial */
+    left: 0px;
+    pointer-events: none;
+    transition: .4s ease-out; /* Transição mais suave e com função de tempo */
+    color: #999; 
+    font-size: 16px;
+}
+
+/* Label flutuando ao focar ou ter conteúdo (valid) */
+.inputUser:focus ~ .labelInput,
+.inputUser:valid ~ .labelInput {
+    top: -15px; /* Posição flutuada */
+    font-size: 13px;
+    color: #ff0000; /* Vermelho vibrante */
+    font-weight: 600;
+}
+
+/* --- */
+
+/* 6. Estilo do Botão de Envio */
+#submit {
+    background-color: #ff0000; 
+    width: 100%;
+    border: none;
+    padding: 14px;
+    color: white;
+    font-size: 17px; 
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 6px; /* Borda arredondada */
+    margin-top: 15px;
+    /* Transição para o hover */
+    transition: background-color 0.3s ease, transform 0.1s; 
+    letter-spacing: 1px;
+}
+
+#submit:hover {
+    background-color: #e60000; /* Vermelho escuro no hover */
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); /* Adiciona um brilho sutil */
+}
+
+#submit:active {
+    transform: scale(0.99); /* Pequeno efeito de clique */
+}
+
+/* --- */
+
+/* 7. Estilo dos Links */
+.link {
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: #ff5555; /* Links em vermelho mais claro */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 5px 0;
+    transition: color 0.3s, text-decoration 0.3s;
+    margin-top: 15px; /* Ajusta o espaçamento superior */
+}
+
+.link:hover {
+    text-decoration: underline;
+    color: #ffffff; /* Brilha em branco no hover */
+}

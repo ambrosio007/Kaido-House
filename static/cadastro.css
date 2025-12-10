@@ -1,36 +1,29 @@
-/* 🚗 CSS Adaptado para o Formulário de Cadastro (HTML com Fieldset) */
-
-/* Reset simples da fonte */
 * {
     font-family: Arial, sans-serif;
     box-sizing: border-box;
 }
 
-/* 1. Estilo do Corpo (Fundo) */
 body {
-    /* Gradiente escuro sutil para o fundo */
     background: linear-gradient(135deg, #121212, #000000); 
     height: 100vh;
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white; /* Cor padrão do texto */
+    color: white; 
 }
 
-/* 2. Container Principal */
 .container {
     background-color: rgba(0, 0, 0, 0.7); 
     padding: 30px; 
     border-radius: 8px; 
-    width: 90%; /* Ajuste a largura para ser responsivo */
-    max-width: 400px; /* Limite máximo para desktop */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
+    width: 90%; 
+    max-width: 400px; 
+    box-shadow: 0 4px 20px rgba(255, 0, 0, 0.2); 
 }
 
-/* 3. Estilos do Fieldset e Legend */
 fieldset {
-    border: 1px solid #444; /* Borda sutil */
+    border: 1px solid #444; 
     padding: 20px;
     border-radius: 6px;
 }
@@ -39,29 +32,27 @@ legend {
     border: none;
     padding: 5px 10px;
     text-align: center;
-    background-color: #FF0000; /* Destaque vermelho */
+    background-color: #FF0000; 
     color: white;
     border-radius: 4px;
     font-weight: bold;
     font-size: 1.2em;
 }
 
-/* 4. Estilo dos Campos de Entrada (Input Boxes) */
 .inputBox {
     position: relative;
-    margin-bottom: 30px; /* Espaço para o label flutuar */
+    margin-bottom: 30px;
 }
 
 .inputUser {
-    /* Estilo do fundo e borda dos campos (inspirado no KAIDO HOUSE) */
-    background: none; /* Fundo transparente */
+    background: none;
     border: none;
-    border-bottom: 2px solid #666; /* Linha de baixo sutil */
+    border-bottom: 2px solid #666; 
     outline: none;
-    color: white; /* Texto digitado é branco */
+    color: white;
     font-size: 16px;
     width: 100%;
-    padding: 8px 0; /* Padding vertical para o texto */
+    padding: 8px 0; 
     letter-spacing: 1px;
     transition: border-bottom-color 0.3s;
 }
