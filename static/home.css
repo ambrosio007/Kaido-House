@@ -1,15 +1,24 @@
-/* Estilos Gerais (Para o Rodapé) */
+/* ====================================
+   ESTILOS GERAIS E BODY
+   ==================================== */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #121212; /* Fundo escuro */
     color: #f0f0f0;
+    min-height: 100vh; /* Garante que o body ocupe toda a altura */
+    display: flex;
+    flex-direction: column; /* Necessário para o footer fixar no final */
+}
+
+main {
+    flex-grow: 1; /* Faz com que o conteúdo principal ocupe o espaço restante */
 }
 
 /* 1. ESTILO DO HEADER / NAVBAR */
 header {
-    background-color: #0d0d0d; /* Fundo do cabeçalho */
+    background-color: #0d0d0d;
     padding: 15px 5%;
     display: flex;
     justify-content: space-between;
@@ -20,12 +29,22 @@ header {
     z-index: 1000;
 }
 
+/* Estilos para a Imagem da Logo */
 .logo {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #ff0000; /* Destaque vermelho */
+    /* Remove os estilos de texto antigos */
     text-decoration: none;
-    letter-spacing: 1px;
+    display: flex; /* Para alinhar a imagem se necessário */
+    align-items: center;
+}
+
+.logo-img {
+    height: 40px; /* Tamanho da logo em desktop. Ajuste conforme sua imagem. */
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-img {
+    transform: scale(1.05);
 }
 
 .navbar a {
@@ -49,24 +68,67 @@ header {
     display: none; /* Escondido por padrão em desktop */
 }
 
+/* ESTILOS DA ÁREA DE PERFIL/LOGIN */
+.profile-area {
+    display: flex; 
+    align-items: center;
+    margin-left: 20px;
+}
+
+/* Estilos para os containers do ícone (círculo) */
+.auth-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #ff0000; /* Cor vermelha de destaque */
+    overflow: hidden; 
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.auth-icon-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+}
+
+.login-state i {
+    font-size: 22px;
+    color: #ff0000;
+}
+
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Classe de utilidade (para esconder o avatar de perfil se deslogado, e vice-versa) */
+.hidden {
+    display: none !important;
+}
+
+
 /* 2. ESTILO DO FOOTER */
 footer {
-    background-color: #1a1a1a; /* Cor de fundo do rodapé */
+    background-color: #1a1a1a;
     padding: 40px 5%;
     color: #cccccc;
-    border-top: 3px solid #ff0000; /* Linha de destaque vermelha */
+    border-top: 3px solid #ff0000;
 }
 
 .footer-content {
     display: flex;
     justify-content: space-between;
-    flex-wrap: wrap; /* Permite quebrar linha em mobile */
+    flex-wrap: wrap;
     max-width: 1200px;
     margin: 0 auto 30px;
 }
 
 .footer-section {
-    flex-basis: 30%; /* Ocupa cerca de 30% em telas grandes */
+    flex-basis: 30%;
     margin-bottom: 20px;
     padding: 0 15px;
 }
@@ -79,7 +141,6 @@ footer {
     padding-bottom: 5px;
 }
 
-/* Estilo para links do rodapé */
 .footer-section a, .footer-section p {
     color: #cccccc;
     text-decoration: none;
@@ -144,8 +205,14 @@ footer {
         text-align: center;
         padding: 10px 0;
         border-top: 1px solid #333;
+        transition: 0.3s ease-out;
     }
     
+    /* Regra para exibir o menu quando o JS adiciona a classe 'active' */
+    .navbar.active {
+        display: flex;
+    }
+
     .navbar a {
         margin: 10px 0;
         font-size: 1.1em;
@@ -157,10 +224,20 @@ footer {
     #menu-btn {
         display: block;
     }
+    
+    /* Oculta a área de perfil do HEADER em mobile, o JS deve movê-lo para o menu */
+    .profile-area {
+        display: none;
+    }
+
+    /* Ajuste de tamanho da logo em mobile */
+    .logo-img {
+        height: 35px;
+    }
 
     /* Footer Responsivo */
     .footer-section {
-        flex-basis: 100%; /* Ocupa 100% da largura em mobile */
+        flex-basis: 100%;
         text-align: center;
         margin-bottom: 30px;
     }
@@ -171,8 +248,198 @@ footer {
     }
 }
 
-/* JavaScript necessário para toggle da navbar em mobile:
-document.querySelector('#menu-btn').onclick = () => {
-    document.querySelector('.navbar').classList.toggle('active');
+/* ====================================
+   4. ESTILOS DO CARROSSEL SWIPER
+   ==================================== */
+.home-banner-carousel {
+    width: 100%;
+    margin-bottom: 40px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
-*/
+
+.banner-slider {
+    width: 100%;
+    height: 400px; /* Altura do banner principal */
+}
+
+.banner-slide {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+.banner-slide .content {
+    padding: 0 5%;
+    max-width: 600px;
+}
+
+.banner-slide span {
+    color: #ff0000;
+    font-size: 1.2em;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.banner-slide h3 {
+    color: #f0f0f0;
+    font-size: 3em;
+    margin-bottom: 15px;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+}
+
+.banner-slide p {
+    color: #cccccc;
+    font-size: 1em;
+    margin-bottom: 20px;
+}
+
+/* Botão de Banner (Estilize conforme o seu padrão de botão) */
+.btn-banner {
+    display: inline-block;
+    padding: 10px 25px;
+    background: #ff0000;
+    color: #f0f0f0;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.btn-banner:hover {
+    background: #e60000;
+}
+
+/* ====================================
+   5. ESTILOS DOS CARROSSEIS DE CARDS
+   ==================================== */
+.card-carousel-section {
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 1.8em;
+    color: #f0f0f0;
+    margin-bottom: 25px;
+    padding: 0 5%;
+    border-left: 5px solid #ff0000;
+    padding-left: 15px;
+}
+
+.card-slider {
+    padding: 10px 5%; /* Padding para as setas de navegação */
+}
+
+/* Estilo do Card de Produto/Veículo */
+.product-card, .vehicle-card {
+    background: #1a1a1a;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    max-width: 300px; /* Limite a largura para caberem vários na tela */
+    transition: transform 0.3s;
+    border: 1px solid #333;
+}
+
+.product-card:hover, .vehicle-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 0, 0, 0.3);
+}
+
+.card-image {
+    position: relative;
+    height: 180px; /* Altura fixa para a imagem do card */
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.discount-tag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff0000;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.8em;
+}
+
+.card-content {
+    padding: 15px;
+    text-align: center;
+}
+
+.card-content h3 {
+    font-size: 1.1em;
+    color: #ff0000;
+    margin-bottom: 5px;
+}
+
+.card-content .price {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.card-content del {
+    color: #999;
+    font-size: 0.9em;
+    margin-right: 10px;
+}
+
+/* Botão de Card (Estilize conforme o seu padrão de botão) */
+.btn-card {
+    display: block;
+    width: 100%;
+    padding: 8px 0;
+    background: #2a2a2a;
+    color: #f0f0f0;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.btn-card:hover {
+    background: #ff0000;
+}
+
+/* Estilos de Navegação (Setas) do Swiper */
+.swiper-button-next, .swiper-button-prev {
+    color: #ff0000 !important;
+    transform: scale(0.8);
+    background-color: rgba(26, 26, 26, 0.7); /* Fundo sutil para melhor visibilidade */
+    border-radius: 50%;
+    padding: 15px;
+    top: 50%;
+}
+
+.swiper-button-next:hover, .swiper-button-prev:hover {
+    background-color: rgba(26, 26, 26, 1);
+}
+
+/* Estilos de Paginação (Bolhas) */
+.swiper-pagination-bullet-active {
+    background: #ff0000 !important;
+}
+
+/* Media Query Específica para Carrossel */
+@media (max-width: 600px) {
+    .banner-slider {
+        height: 300px;
+    }
+    .banner-slide h3 {
+        font-size: 2em;
+    }
+    .swiper-button-next, .swiper-button-prev {
+        display: none !important; /* Oculta setas em telas muito pequenas */
+    }
+}

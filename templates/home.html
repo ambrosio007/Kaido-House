@@ -1,64 +1,208 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaido-House</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/home.css">
-    </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaido-House</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/home.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+</head>
 <body>
-    
-    <header>
-        <a href="home.html" class="logo">Kaido-House</a>
+    
+   <header>
+        <a href="home.html" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House RX-7" class="logo-img">
+        </a>
 
-        <div id="menu-btn" class="fas fa-bars"></div>
+        <i id="menu-btn" class="fas fa-bars"></i>
 
-        <nav class="navbar">
-            <a href="#inicio">Inicio</a>
-            <a href="#pecas">Peças</a>
-            <a href="#veiculos">Veiculos</a>
-            <a href="#customizacao">Customização</a> <a href="#contato">Contato</a> </nav>
-    </header>
+        <nav class="navbar">
+            <a href="#inicio">Início</a>
+            <a href="#pecas">Peças</a>
+            <a href="#veiculos">Veículos</a>
+            <a href="#customizacao">Customização</a>
+            <a href="#contato">Contato</a>
+        </nav>
 
-    <main style="min-height: 50vh; padding: 20px; text-align: center;">
-        <h1>Bem-vindo à Kaido-House</h1>
-        <p>Espaço reservado para o conteúdo principal da sua página.</p>
-    </main>
+        <div class="profile-area">
+            <a href="/templates/login.html" class="auth-icon-container login-state" id="mobile-profile-target">
+                <i class="fas fa-user-circle"></i>
+            </a>
+            <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden"
+                id="mobile-profile-target-logged">
+                <img src="/static/images/default-avatar.jpg" alt="Foto de Perfil" class="profile-avatar">
+            </a>
+        </div>
+    </header>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section about">
-                <h3>Kaido-House</h3>
-                <p>Sua loja de confiança para peças JDM, veículos e customização de alta performance. Construindo lendas.</p>
-                <div class="socials">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                </div>
-            </div>
+    <main style="min-height: 50vh; padding: 20px; text-align: center;">
+        <section class="home-banner-carousel">
+            <div class="swiper-container banner-slider">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide banner-slide" style="background: url(/static/images/banner1.jpg) no-repeat;">
+                        <div class="content">
+                            <span>Promoção da Semana</span>
+                            <h3>Pneus de Alta Performance</h3>
+                            <p>Descontos de até 30% nas marcas JDM mais procuradas!</p>
+                            <a href="#" class="btn-banner">Ver Ofertas</a>
+                        </div>
+                    </div>
+                    <div class="swiper-slide banner-slide" style="background: url(/static/images/banner2.jpg) no-repeat;">
+                        <div class="content">
+                            <span>Novo Estoque</span>
+                            <h3>Kits de Turbo Garrett</h3>
+                            <p>Aumente a potência do seu projeto com o melhor do mercado.</p>
+                            <a href="#" class="btn-banner">Compre Agora</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination banner-pagination"></div>
+            </div>
+        </section>
 
-            <div class="footer-section links">
-                <h3>Links Rápidos</h3>
-                <ul>
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#pecas">Peças</a></li>
-                    <li><a href="#veiculos">Veículos</a></li>
-                    <li><a href="#blog">Blog/Notícias</a></li>
-                </ul>
-            </div>
+        <section class="card-carousel-section" id="promocoes">
+            <h2 class="section-title">🔥 Promoções Imperdíveis</h2>
+            <div class="swiper-container card-slider promotions-slider">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide product-card">
+                        <div class="card-image">
+                            <img src="/static/images/card-promo1.jpg" alt="Produto em Promoção">
+                            <span class="discount-tag">30% OFF</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Filtro K&N</h3>
+                            <p class="price"><del>R$ 250,00</del> R$ 175,00</p>
+                            <a href="#" class="btn-card">Detalhes</a>
+                        </div>
+                    </div>
+                                    </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </section>
 
-            <div class="footer-section contact">
-                <h3>Contate-nos</h3>
-                <p><i class="fas fa-envelope"></i> email@kaidohouse.com</p>
-                <p><i class="fas fa-phone"></i> +55 (XX) XXXX-XXXX</p>
-            </div>
-        </div>
+        <section class="card-carousel-section" id="pecas-novas">
+            <h2 class="section-title">✨ Peças Recém-Chegadas</h2>
+            <div class="swiper-container card-slider new-parts-slider">
+                <div class="swiper-wrapper">
+                                        <div class="swiper-slide product-card">
+                        <div class="card-image">
+                            <img src="/static/images/new-part-1.jpg" alt="Kit Coilover Tein">
+                            <span class="discount-tag" style="background: #007bff;">NOVO</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Kit Coilover Tein Flex Z</h3>
+                            <p class="price">R$ 5.800,00</p>
+                            <a href="#" class="btn-card">Detalhes</a>
+                        </div>
+                    </div>
+                                        <div class="swiper-slide product-card">
+                        <div class="card-image">
+                            <img src="/static/images/new-part-2.jpg" alt="Volante Nardi">
+                            <span class="discount-tag" style="background: #007bff;">NOVO</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Volante Nardi Clássico</h3>
+                            <p class="price">R$ 1.950,00</p>
+                            <a href="#" class="btn-card">Detalhes</a>
+                        </div>
+                    </div>
+                                    </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </section>
 
-        <div class="footer-bottom">
-            &copy; 2025 Kaido-House | Todos os direitos reservados.
-        </div>
-    </footer>
+        <section class="card-carousel-section" id="pecas-usadas">
+            <h2 class="section-title">♻️ Peças Usadas e Seminovas</h2>
+            <div class="swiper-container card-slider used-parts-slider">
+                <div class="swiper-wrapper">
+                                        <div class="swiper-slide product-card">
+                        <div class="card-image">
+                            <img src="/static/images/used-part-1.jpg" alt="Banco Bride Usado">
+                            <span class="discount-tag" style="background: #00a651;">USADO</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Par de Bancos Bride Low Max</h3>
+                            <p class="price">R$ 6.200,00</p>
+                            <a href="#" class="btn-card">Detalhes</a>
+                        </div>
+                    </div>
+                                        <div class="swiper-slide product-card">
+                        <div class="card-image">
+                            <img src="/static/images/used-part-2.jpg" alt="Escape HKS Usado">
+                            <span class="discount-tag" style="background: #00a651;">USADO</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Escape HKS Hi-Power</h3>
+                            <p class="price">R$ 3.500,00</p>
+                            <a href="#" class="btn-card">Detalhes</a>
+                        </div>
+                    </div>
+                                    </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </section>
+        
+        <section class="card-carousel-section" id="veiculos-usados">
+            <h2 class="section-title">🚗 Veículos JDM Disponíveis</h2>
+            <div class="swiper-container card-slider used-vehicles-slider">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide vehicle-card">
+                        <div class="card-image">
+                            <img src="/static/images/vehicle-rx7.jpg" alt="Mazda RX-7 Usado">
+                        </div>
+                        <div class="card-content">
+                            <h3>Mazda RX-7 FD3S</h3>
+                            <p class="specs">1999 | 60.000km</p>
+                            <p class="price">R$ 150.000</p>
+                            <a href="#" class="btn-card">Ver Veículo</a>
+                        </div>
+                    </div>
+                                    </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </section>
+    </main>
 
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section about">
+                <h3>Kaido-House</h3>
+                <p>Sua loja de confiança para peças JDM, veículos e customização de alta performance. Construindo lendas.</p>
+                <div class="socials">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-section links">
+                <h3>Links Rápidos</h3>
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#pecas">Peças</a></li>
+                    <li><a href="#veiculos">Veículos</a></li>
+                    <li><a href="#blog">Blog/Notícias</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section contact">
+                <h3>Contate-nos</h3>
+                <p><i class="fas fa-envelope"></i> email@kaidohouse.com</p>
+                <p><i class="fas fa-phone"></i> +55 (XX) XXXX-XXXX</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2025 Kaido-House | Todos os direitos reservados.
+        </div>
+    </footer>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="/static/js/nav_bar.js"></script>
+    <script src="/static/js/carrossel.js"></script>
 </body>
 </html>
