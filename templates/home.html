@@ -10,31 +10,37 @@
 </head>
 <body>
     
-   <header>
-        <a href="home.html" class="logo">
-            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House RX-7" class="logo-img">
-        </a>
+<header>
+    <a href="home.html" class="logo">
+        <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
+    </a>
 
-        <i id="menu-btn" class="fas fa-bars"></i>
+    <nav class="navbar">
+        <a href="#inicio">Início</a>
+        <a href="#pecas">Peças</a>
+        <a href="/templates/carros_pg.html">Veículos</a>
+        <a href="#customizacao">Customização</a>
+        <a href="#contato">Contato</a>
+    </nav>
 
-        <nav class="navbar">
-            <a href="#inicio">Início</a>
-            <a href="#pecas">Peças</a>
-            <a href="#veiculos">Veículos</a>
-            <a href="#customizacao">Customização</a>
-            <a href="#contato">Contato</a>
-        </nav>
+    <div class="header-icons">
+        <a href="/templates/carrinho.html" class="icon-link cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge">0</span>
+        </a>
 
-        <div class="profile-area">
-            <a href="/templates/login.html" class="auth-icon-container login-state" id="mobile-profile-target">
-                <i class="fas fa-user-circle"></i>
-            </a>
-            <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden"
-                id="mobile-profile-target-logged">
-                <img src="/static/images/default-avatar.jpg" alt="Foto de Perfil" class="profile-avatar">
-            </a>
-        </div>
-    </header>
+        <div class="profile-area">
+            <a href="/templates/login.html" class="auth-icon-container login-state" id="profile-target">
+                <i class="fas fa-user-circle"></i>
+            </a>
+            <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden" id="profile-target-logged">
+                <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
+            </a>
+        </div>
+
+        <i id="menu-btn" class="fas fa-bars"></i>
+    </div>
+</header>
 
     <main style="min-height: 50vh; padding: 20px; text-align: center;">
         <section class="home-banner-carousel">
@@ -169,38 +175,44 @@
     </main>
 
     <footer>
-        <div class="footer-content">
-            <div class="footer-section about">
-                <h3>Kaido-House</h3>
-                <p>Sua loja de confiança para peças JDM, veículos e customização de alta performance. Construindo lendas.</p>
-                <div class="socials">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                </div>
-            </div>
+    <div class="footer-container">
+        <div class="footer-brand">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
+            <p>A maior autoridade em cultura JDM e performance de Joinville Sul. Transformando sonhos em projetos reais.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+            </div>
+        </div>
 
-            <div class="footer-section links">
-                <h3>Links Rápidos</h3>
-                <ul>
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#pecas">Peças</a></li>
-                    <li><a href="#veiculos">Veículos</a></li>
-                    <li><a href="#blog">Blog/Notícias</a></li>
-                </ul>
-            </div>
+        <div class="footer-nav">
+            <h3>Navegação</h3>
+            <ul>
+                <li><a href="#">Catálogo de Peças</a></li>
+                <li><a href="#">Estoque de Veículos</a></li>
+                <li><a href="#">Oficina de Customização</a></li>
+                <li><a href="#">Blog Kaido</a></li>
+            </ul>
+        </div>
 
-            <div class="footer-section contact">
-                <h3>Contate-nos</h3>
-                <p><i class="fas fa-envelope"></i> email@kaidohouse.com</p>
-                <p><i class="fas fa-phone"></i> +55 (XX) XXXX-XXXX</p>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            &copy; 2025 Kaido-House | Todos os direitos reservados.
-        </div>
-    </footer>
+        <div class="footer-contact">
+            <h3>Atendimento</h3>
+            <p><i class="fas fa-map-marker-alt"></i> Joinville, SC - Unidade Sul</p>
+            <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
+            <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
+            <div class="payment-methods">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-pix"></i>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Kaido-House. Desenvolvido para SENAI/SC.</p>
+    </div>
+</footer>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="/static/js/nav_bar.js"></script>
     <script src="/static/js/carrossel.js"></script>
