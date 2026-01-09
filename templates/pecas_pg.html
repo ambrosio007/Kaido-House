@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peças JDM | Kaido-House</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/home.css">
+    <link rel="stylesheet" href="/static/pecas.css">
+</head>
+<body>
+
+    <header>
+        <a href="home.html" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="logo-img">
+        </a>
+        <nav class="navbar">
+            <a href="home.html">Início</a>
+            <a href="#" class="active">Peças</a>
+            <a href="/templates/carros_pg.html">Veículos</a>
+            <a href="#customizacao">Customização</a>
+        </nav>
+        <div class="header-icons">
+            <a href="#" class="icon-link"><i class="fas fa-shopping-cart"></i><span class="cart-badge">0</span></a>
+            <div class="profile-area">
+                <a href="/templates/login.html" class="auth-icon-container login-state"><i class="fas fa-user-circle"></i></a>
+            </div>
+            <i id="menu-btn" class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main class="parts-container">
+        <section class="parts-header">
+            <h1>Performance <span>Parts</span></h1>
+            <p>De upgrades de motor a acessórios raros, encontre o que seu projeto precisa.</p>
+        </section>
+
+        <div class="parts-control">
+            <div class="condition-selector">
+                <button class="filter-btn active" onclick="filterCondition('all')">Todas</button>
+                <button class="filter-btn" onclick="filterCondition('new')">Peças Novas</button>
+                <button class="filter-btn" onclick="filterCondition('used')">Peças Usadas</button>
+            </div>
+            
+            <div class="category-scroll">
+                <button class="cat-link active">Motor</button>
+                <button class="cat-link">Suspensão</button>
+                <button class="cat-link">Interior</button>
+                <button class="cat-link">Exterior</button>
+                <button class="cat-link">Rodas</button>
+            </div>
+        </div>
+
+        <div class="parts-grid">
+            
+            <div class="part-card" data-condition="new">
+                <div class="part-image">
+                    <img src="/static/images/new-part-1.jpg" alt="Coilovers">
+                    <span class="tag new-tag">Novo</span>
+                </div>
+                <div class="part-info">
+                    <span class="brand">Tein</span>
+                    <h3>Kit Coilover Flex Z - Supra MK4</h3>
+                    <p class="part-price">R$ 8.450,00</p>
+                    <button class="add-to-cart"><i class="fas fa-cart-plus"></i> Adicionar</button>
+                </div>
+            </div>
+
+            <div class="part-card" data-condition="used">
+                <div class="part-image">
+                    <img src="/static/images/used-part-1.jpg" alt="Bancos Bride">
+                    <span class="tag used-tag">Usado</span>
+                </div>
+                <div class="part-info">
+                    <span class="brand">Bride</span>
+                    <h3>Par de Bancos Low Max (Original Japão)</h3>
+                    <p class="part-price">R$ 5.200,00</p>
+                    <button class="add-to-cart"><i class="fas fa-cart-plus"></i> Adicionar</button>
+                </div>
+            </div>
+
+            <div class="part-card" data-condition="new">
+                <div class="part-image">
+                    <img src="/static/images/new-part-2.jpg" alt="Filtro K&N">
+                    <span class="tag new-tag">Novo</span>
+                </div>
+                <div class="part-info">
+                    <span class="brand">K&N</span>
+                    <h3>Filtro de Ar Esportivo High Flow</h3>
+                    <p class="part-price">R$ 450,00</p>
+                    <button class="add-
