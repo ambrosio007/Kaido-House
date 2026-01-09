@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veículos JDM | Kaido-House</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/home.css"> <link rel="stylesheet" href="/static/veiculos.css"> </head>
+<body>
+
+    <header>
+        <a href="home.html" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
+        </a>
+        <nav class="navbar">
+            <a href="home.html">Início</a>
+            <a href="home.html#pecas">Peças</a>
+            <a href="#" class="active">Veículos</a>
+            <a href="#customizacao">Customização</a>
+            <a href="#contato">Contato</a>
+        </nav>
+        <div class="header-icons">
+            <a href="#" class="icon-link cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge">0</span>
+            </a>
+            <div class="profile-area">
+                <a href="/templates/login.html" class="auth-icon-container login-state">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+            </div>
+            <i id="menu-btn" class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main class="container-veiculos">
+        <section class="page-title">
+            <h1>Estoque de Lendas <span>JDM</span></h1>
+            <p>Veículos selecionados, revisados e prontos para a pista.</p>
+        </section>
+
+        <div class="filter-bar">
+            <div class="search-box">
+                <input type="text" placeholder="Buscar modelo (ex: Skyline, RX7...)">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="filter-options">
+                <select>
+                    <option value="">Ano (Todos)</option>
+                    <option value="90">Anos 90</option>
+                    <option value="00">Anos 2000</option>
+                </select>
+                <select>
+                    <option value="">Ordenar por: Menor Preço</option>
+                    <option value="">Maior Preço</option>
+                    <option value="">Recém Chegados</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="vehicles-grid">
+            
+            <div class="vehicle-card">
+                <div class="card-image">
+                    <img src="/static/images/vehicle-rx7.jpg" alt="Mazda RX-7">
+                    <span class="status-tag">Disponível</span>
+                </div>
+                <div class="card-content">
+                    <span class="category">Coupe / Rotary</span>
+                    <h3>Mazda RX-7 FD3S Spirit R</h3>
+                    <div class="specs">
+                        <span><i class="fas fa-calendar-alt"></i> 2002</span>
+                        <span><i class="fas fa-tachometer-alt"></i> 45.000km</span>
+                    </div>
+                    <p class="price">R$ 480.000,00</p>
+                    <a href="#" class="btn-view">Ver Detalhes</a>
+                </div>
+            </div>
+
+            <div class="vehicle-card">
+                <div class="card-image">
+                    <img src="/static/images/skyline-r34.jpg" alt="Skyline R34">
+                    <span class="status-tag" style="background: #ffcc00; color: #000;">Reservado</span>
+                </div>
+                <div class="card-content">
+                    <span class="category">Coupe / AWD</span>
+                    <h3>Nissan Skyline GT-R R34 V-Spec II</h3>
+                    <div class="specs">
+                        <span><i class="fas fa-calendar-alt"></i> 1999</span>
+                        <span><i class="fas fa-tachometer-alt"></i> 62.000km</span>
+                    </div>
+                    <p class="price">R$ 1.200.000,00</p>
+                    <a href="#" class="btn-view">Ver Detalhes</a>
+                </div>
+            </div>
+
+            <div class="vehicle-card">
+                <div class="card-image">
+                    <img src="/static/images/supra-mk4.jpg" alt="Toyota Supra">
+                    <span class="status-tag">Disponível</span>
+                </div>
+                <div class="card-content">
+                    <span class="category">Coupe / Turbo</span>
+                    <h3>Toyota Supra MK4 2JZ-GTE</h3>
+                    <div class="specs">
+                        <span><i class="fas fa-calendar-alt"></i> 1994</span>
+                        <span><i class="fas fa-tachometer-alt"></i> 88.000km</span>
+                    </div>
+                    <p class="price">R$ 550.000,00</p>
+                    <a href="#" class="btn-view">Ver Detalhes</a>
+                </div>
+            </div>
+
+            <div class="vehicle-card">
+                <div class="card-image">
+                    <img src="/static/images/ae86.jpg" alt="Toyota AE86">
+                    <span class="status-tag">Disponível</span>
+                </div>
+                <div class="card-content">
+                    <span class="category">Hatch / Drift Classic</span>
+                    <h3>Toyota AE86 Trueno</h3>
+                    <div class="specs">
+                        <span><i class="fas fa-calendar-alt"></i> 1985</span>
+                        <span><i class="fas fa-tachometer-alt"></i> 110.000km</span>
+                    </div>
+                    <p class="price">R$ 220.000,00</p>
+                    <a href="#" class="btn-view">Ver Detalhes</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        </footer>
+
+    <script src="/static/js/nav_bar.js"></script>
+</body>
+</html>

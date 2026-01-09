@@ -1,0 +1,137 @@
+/* ====================================
+   ESTILOS GERAIS E BODY (SEU CÓDIGO)
+   ==================================== */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: #f0f0f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex-grow: 1;
+}
+
+/* 1. ESTILO DO HEADER / NAVBAR (SEU CÓDIGO) */
+header {
+    background-color: #0d0d0d;
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-img {
+    height: 40px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.navbar a {
+    color: #f0f0f0;
+    text-decoration: none;
+    font-size: 1em;
+    margin-left: 25px;
+    padding: 5px 0;
+    transition: color 0.3s, border-bottom 0.3s;
+}
+
+.navbar a:hover {
+    color: #ff5555;
+    border-bottom: 2px solid #ff0000;
+}
+
+/* ESTILOS DA ÁREA DE PERFIL/LOGIN (SEU CÓDIGO) */
+.auth-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #ff0000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* 5. ESTILOS DOS CARROSSEIS DE CARDS (ADAPTADO PARA GRID) */
+.section-title {
+    font-size: 1.8em;
+    color: #f0f0f0;
+    margin: 40px 0 25px;
+    padding: 0 5%;
+    border-left: 5px solid #ff0000;
+    padding-left: 15px;
+}
+
+.grid-veiculos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 0 5% 40px;
+}
+
+/* Seu estilo de Vehicle Card */
+.vehicle-card {
+    background: #1a1a1a;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    transition: transform 0.3s;
+    border: 1px solid #333;
+}
+
+.vehicle-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 0, 0, 0.3);
+}
+
+.card-image {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 15px;
+    text-align: center;
+}
+
+.btn-card {
+    display: block;
+    width: 100%;
+    padding: 8px 0;
+    background: #2a2a2a;
+    color: #f0f0f0;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.btn-card:hover {
+    background: #ff0000;
+}
+
+/* 2. ESTILO DO FOOTER (SEU CÓDIGO) */
+footer {
+    background-color: #1a1a1a;
+    padding: 40px 5%;
+    color: #cccccc;
+    border-top: 3px solid #ff0000;
+}
+/* ... (demais estilos de footer iguais ao seu original) */
