@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Seguro | Kaido-House</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/home.css">
+    <link rel="stylesheet" href="/static/pagamento.css">
+</head>
+<body>
+
+    <header>
+        <a href="home.html" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="logo-img">
+        </a>
+        <div class="step-indicator">
+            <div class="step completed"><i class="fas fa-check"></i> Carrinho</div>
+            <div class="step active">Pagamento</div>
+            <div class="step">Sucesso</div>
+        </div>
+    </header>
+
+    <main class="checkout-container">
+        <div class="checkout-grid">
+            
+            <section class="payment-methods">
+                <h2><i class="fas fa-shield-alt"></i> Finalizar <span>Pagamento</span></h2>
+                
+                <div class="method-selector">
+                    <button class="method-btn active" onclick="switchMethod('card')">
+                        <i class="fas fa-credit-card"></i> Cartão
+                    </button>
+                    <button class="method-btn" onclick="switchMethod('pix')">
+                        <i class="fab fa-pix"></i> PIX
+                    </button>
+                    <button class="method-btn" onclick="switchMethod('boleto')">
+                        <i class="fas fa-barcode"></i> Boleto
+                    </button>
+                </div>
+
+                <div id="card-form" class="payment-details">
+                    <div class="form-group full">
+                        <label>Número do Cartão</label>
+                        <input type="text" placeholder="0000 0000 0000 0000">
+                    </div>
+                    <div class="form-group full">
+                        <label>Nome Impresso no Cartão</label>
+                        <input type="text" placeholder="JOÃO R SILVA">
+                    </div>
+                    <div class="form-group half">
+                        <label>Validade</label>
+                        <input type="text" placeholder="MM/AA">
+                    </div>
+                    <div class="form-group half">
+                        <label>CVV <i class="fas fa-question-circle"></i></label>
+                        <input type="text" placeholder="123">
+                    </div>
+                    <div class="form-group full">
+                        <label>Parcelas</label>
+                        <select>
+                            <option>1x de R$ 8.625,00 (Sem juros)</option>
+                            <option>2x de R$ 4.312,50 (Sem juros)</option>
+                            <option>10x de R$ 862,50 (Sem juros)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="pix-panel" class="payment-details hidden">
+                    <div class="pix-info">
+                        <div class="qr-placeholder">
+                            <i class="fas fa-qrcode"></i>
+                            <p>O QR Code será gerado após clicar em concluir</p>
+                        </div>
+                        <ul>
+                            <li><i class="fas fa-bolt"></i> Pagamento aprovado instantaneamente</li>
+                            <li><i class="fas fa-gift"></i> 5% de desconto acumulativo no PIX</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="boleto-panel" class="payment-details hidden">
+                    <div class="boleto-info">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <p>O boleto será enviado para seu e-mail e poderá levar até 2 dias úteis para compensação.</p>
+                    </div>
+                </div>
+
+                <button class="btn-finalize">Concluir Pedido <i class="fas fa-lock"></i></button>
+            </section>
+
+            <aside class="order-summary">
+                <h3>Itens do Pedido</h3>
+                <div class="summary-items">
+                    <div class="small-item">
+                        <span>1x Kit Coilover Flex Z</span>
+                        <strong>R$ 8.450,00</strong>
+                    </div>
+                    <div class="small-item">
+                        <span>1x Filtro K&N High Flow</span>
+                        <strong>R$ 175,00</strong>
+                    </div>
+                </div>
+                <hr>
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span>R$ 8.625,00</span>
+                </div>
+                <div class="total-row total-highlight">
+                    <span>Total a Pagar</span>
+                    <span>R$ 8.625,00</span>
+                </div>
+                <div class="security-badges">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fas fa-shield-virus"></i>
+                    <span>Pagamento Seguro SSL</span>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <script>
+        function switchMethod(method) {
+            // Remove active dos botões
+            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Esconde todos os painéis
+            document.getElementById('card-form').classList.add('hidden');
+            document.getElementById('pix-panel').classList.add('hidden');
+            document.getElementById('boleto-panel').classList.add('hidden');
+
+            // Mostra o selecionado
+            if(method === 'card') document.getElementById('card-form').classList.remove('hidden');
+            if(method === 'pix') document.getElementById('pix-panel').classList.remove('hidden');
+            if(method === 'boleto') document.getElementById('boleto-panel').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
