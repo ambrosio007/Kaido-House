@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Carrinho | Kaido-House</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/home.css">
+    <link rel="stylesheet" href="/static/carrinho.css">
+</head>
+<body>
+
+    <header>
+        <a href="home.html" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="logo-img">
+        </a>
+        <nav class="navbar">
+            <a href="home.html">Início</a>
+            <a href="/templates/pecas.html">Peças</a>
+            <a href="/templates/carros_pg.html">Veículos</a>
+            <a href="#customizacao">Customização</a>
+        </nav>
+        <div class="header-icons">
+            <a href="#" class="icon-link active"><i class="fas fa-shopping-cart"></i><span class="cart-badge">2</span></a>
+            <div class="profile-area">
+                <a href="/templates/perfil.html" class="auth-icon-container"><img src="/static/images/default-avatar.jpg" class="profile-avatar"></a>
+            </div>
+            <i id="menu-btn" class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main class="cart-container">
+        <section class="cart-section">
+            <h1 class="main-title"><i class="fas fa-shopping-cart"></i> Meu <span>Carrinho</span></h1>
+
+            <div class="cart-content">
+                <div class="cart-items">
+                    
+                    <div class="cart-item" data-price="8450">
+                        <div class="item-img">
+                            <img src="/static/images/new-part-1.jpg" alt="Coilover">
+                        </div>
+                        <div class="item-details">
+                            <span class="item-category">Novo</span>
+                            <h3>Kit Coilover Flex Z - Supra MK4</h3>
+                            <p class="unit-price">Preço unitário: R$ 8.450,00</p>
+                        </div>
+                        <div class="item-quantity">
+                            <button class="qty-btn minus">-</button>
+                            <input type="number" value="1" min="1">
+                            <button class="qty-btn plus">+</button>
+                        </div>
+                        <div class="item-subtotal">
+                            R$ 8.450,00
+                        </div>
+                        <button class="remove-item"><i class="fas fa-trash"></i></button>
+                    </div>
+
+                    <div class="cart-item" data-price="175">
+                        <div class="item-img">
+                            <img src="/static/images/card-promo1.jpg" alt="Filtro">
+                        </div>
+                        <div class="item-details">
+                            <span class="item-category">Novo</span>
+                            <h3>Filtro K&N High Flow</h3>
+                            <p class="unit-price">Preço unitário: R$ 175,00</p>
+                        </div>
+                        <div class="item-quantity">
+                            <button class="qty-btn minus">-</button>
+                            <input type="number" value="1" min="1">
+                            <button class="qty-btn plus">+</button>
+                        </div>
+                        <div class="item-subtotal">
+                            R$ 175,00
+                        </div>
+                        <button class="remove-item"><i class="fas fa-trash"></i></button>
+                    </div>
+
+                </div>
+
+                <aside class="cart-summary">
+                    <h3>Resumo do Pedido</h3>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal-val">R$ 8.625,00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Frete (Joinville Sul)</span>
+                        <span class="free-shipping">Grátis</span>
+                    </div>
+                    <div class="summary-row coupon">
+                        <input type="text" placeholder="Cupom de Desconto">
+                        <button>Aplicar</button>
+                    </div>
+                    <hr>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="total-val">R$ 8.625,00</span>
+                    </div>
+                    <button class="btn-checkout">Finalizar Compra</button>
+                    <a href="pecas.html" class="keep-shopping">Continuar Comprando</a>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script src="/static/js/nav_bar.js"></script>
+    <script src="/static/js/carrinho.js"></script>
+</body>
+</html>
