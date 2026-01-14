@@ -65,7 +65,7 @@ def busc_user_json():
     return jsonify(UserService.lista())
 
 @user_bp.route('/users')
-def lista_usuarios():
+def lista_users():
     if "user_id" not in session:
         return redirect(url_for('user.login'))
     """ if session['user_id'] != 1:
