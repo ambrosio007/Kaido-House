@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/perfil.css">
+    <link rel="stylesheet" href="/static/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <title>Perfil do Usuário</title>
+</head>
+
+<body>
+    <!-- Header com Navbar da Home -->
+    <header>
+        <a href="/templates/index.html" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
+        </a>
+
+        <nav class="navbar">
+            <a href="/templates/index.html">Início</a>
+            <a href="/templates/produtos.html">Produtos</a>
+            <a href="/templates/sobre.html">Sobre</a>
+            <a href="/templates/contato.html">Contato</a>
+        </nav>
+
+        <div class="header-icons">
+            <a href="/templates/carrinho.html" class="icon-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge">3</span>
+            </a>
+
+        </div>
+
+        <div id="menu-btn" class="fas fa-bars"></div>
+    </header>
+
+    <!-- Conteúdo do Perfil -->
+    <main class="main-content">
+        <div class="container">
+            <div class="profile-header">
+                <div class="profile-photo">
+                    JD
+                </div>
+                <h1>João da Silva</h1>
+                <p>Membro desde Janeiro 2025</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="number">127</div>
+                    <div class="label">Pedidos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">4.8</div>
+                    <div class="label">Avaliação</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">23</div>
+                    <div class="label">Favoritos</div>
+                </div>
+            </div>
+
+            <div class="profile-info">
+                <div class="info-group">
+                    <label>Nome Completo</label>
+                    <div class="value">João da Silva</div>
+                </div>
+
+                <div class="info-group">
+                    <label>Email</label>
+                    <div class="value">joao.silva@email.com</div>
+                </div>
+
+                <div class="info-group">
+                    <label>CPF</label>
+                    <div class="value">123.456.789-00</div>
+                </div>
+
+                <div class="info-group">
+                    <label>Data de Nascimento</label>
+                    <div class="value">15/03/1990</div>
+                </div>
+
+                <div class="info-group">
+                    <label>CEP</label>
+                    <div class="value">57000-000</div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary">Editar Perfil</button>
+                <button class="btn btn-secondary">Alterar Senha</button>
+                <button class="btn btn-success" id="btnCadastrarVenda">
+                    <i class="fas fa-plus-circle"></i> Cadastrar para Vender
+                </button>
+                <button class="btn btn-danger">Sair</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Cadastro de Venda -->
+    <div id="modalCadastro" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>O que você deseja vender?</h2>
+
+            <div class="tipo-venda">
+                <button class="btn-tipo active" data-tipo="veiculo">
+                    <i class="fas fa-car"></i>
+                    <span>Veículo</span>
+                </button>
+                <button class="btn-tipo" data-tipo="peca">
+                    <i class="fas fa-cog"></i>
+                    <span>Peça</span>
+                </button>
+            </div>
+
+            <!-- Formulário de Veículo -->
+            <form id="formVeiculo" class="form-cadastro active">
+                <h3><i class="fas fa-car"></i> Cadastrar Veículo</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="veiculoMarca">Marca*</label>
+                        <input type="text" id="veiculoMarca" placeholder="Ex: Ford, Chevrolet, Fiat" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="veiculoModelo">Modelo*</label>
+                        <input type="text" id="veiculoModelo" placeholder="Ex: Focus, Onix, Palio" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="veiculoAno">Ano*</label>
+                        <input type="number" id="veiculoAno" placeholder="2020" min="1900" max="2025" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="veiculoKm">Quilometragem*</label>
+                        <input type="number" id="veiculoKm" placeholder="50000" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="veiculoCor">Cor*</label>
+                        <input type="text" id="veiculoCor" placeholder="Ex: Preto, Prata, Branco" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="veiculoPreco">Preço (R$)*</label>
+                        <input type="number" id="veiculoPreco" placeholder="35000" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="veiculoDescricao">Descrição*</label>
+                    <textarea id="veiculoDescricao" rows="4"
+                        placeholder="Descreva o veículo, opcionais, estado de conservação..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="veiculoFotos">Fotos do Veículo</label>
+                    <input type="file" id="veiculoFotos" multiple accept="image/*">
+                    <small>Você pode selecionar múltiplas fotos</small>
+                </div>
+
+                <button type="submit" class="btn btn-submit">
+                    <i class="fas fa-check-circle"></i> Cadastrar Veículo
+                </button>
+            </form>
+
+            <!-- Formulário de Peça -->
+            <form id="formPeca" class="form-cadastro">
+                <h3><i class="fas fa-cog"></i> Cadastrar Peça</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pecaNome">Nome da Peça*</label>
+                        <input type="text" id="pecaNome" placeholder="Ex: Motor, Parachoque, Farol" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pecaCategoria">Categoria*</label>
+                        <select id="pecaCategoria" required>
+                            <option value="">Selecione</option>
+                            <option value="motor">Motor e Transmissão</option>
+                            <option value="suspensao">Suspensão e Freios</option>
+                            <option value="carroceria">Carroceria</option>
+                            <option value="eletrica">Parte Elétrica</option>
+                            <option value="interior">Interior</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pecaMarca">Marca Compatível*</label>
+                        <input type="text" id="pecaMarca" placeholder="Ex: Ford, Chevrolet, Universal" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pecaModelo">Modelo Compatível</label>
+                        <input type="text" id="pecaModelo" placeholder="Ex: Focus, Onix">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pecaEstado">Estado*</label>
+                        <select id="pecaEstado" required>
+                            <option value="">Selecione</option>
+                            <option value="novo">Novo</option>
+                            <option value="seminovo">Semi-novo</option>
+                            <option value="usado">Usado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pecaPreco">Preço (R$)*</label>
+                        <input type="number" id="pecaPreco" placeholder="150" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pecaDescricao">Descrição*</label>
+                    <textarea id="pecaDescricao" rows="4" placeholder="Descreva a peça, condições, compatibilidade..."
+                        required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="pecaFotos">Fotos da Peça</label>
+                    <input type="file" id="pecaFotos" multiple accept="image/*">
+                    <small>Você pode selecionar múltiplas fotos</small>
+                </div>
+
+                <button type="submit" class="btn btn-submit">
+                    <i class="fas fa-check-circle"></i> Cadastrar Peça
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer da Home -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
+                <p>Seu site de confiança para os melhores produtos e serviços com qualidade e segurança.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-nav">
+                <h3>Links Rápidos</h3>
+                <ul>
+                    <li><a href="/templates/index.html">Início</a></li>
+                    <li><a href="/templates/produtos.html">Produtos</a></li>
+                    <li><a href="/templates/sobre.html">Sobre Nós</a></li>
+                    <li><a href="/templates/contato.html">Contato</a></li>
+                    <li><a href="/templates/politica.html">Política de Privacidade</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h3>Contato</h3>
+                <p><i class="fas fa-envelope"></i> contato@meusite.com</p>
+                <p><i class="fas fa-phone"></i> (82) 1234-5678</p>
+                <p><i class="fas fa-map-marker-alt"></i> Maceió, Alagoas, BR</p>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-pix"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 MeuSite. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="/static/js/nav_bar.js"></script>
+    <script src="/static/js/perfil.js"></script>
+</body>
+
+</html>
