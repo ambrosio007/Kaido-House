@@ -1,21 +1,14 @@
-import mysql.connector
-
-def get_connection():
-    return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='admin',
-        database='kaido-server'
-    )
+from config.database import get_connection, release_connection
+from psycopg2.extras import RealDictCursor
 
 class PecaRepository:
 
     @staticmethod
     def adicionar_peca(dados):
+        """Adiciona uma nova peça"""
         conn = get_connection()
-        cursor = conn.cursor()
-        
         try:
+            cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO pecas (id, user_id, nome, categoria, marca, modelo, estado, preco, descricao, fotos, data_cadastro, status)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -34,34 +27,37 @@ class PecaRepository:
                 dados['status']
             ))
             conn.commit()
+            cursor.close()
             return True
         except Exception as e:
+            conn.rollback()
             print(f"Erro ao adicionar peça: {e}")
             return False
         finally:
-            cursor.close()
-            conn.close()
+            release_connection(conn)
 
     @staticmethod
     def listar_por_usuario(user_id):
+        """Lista peças de um usuário específico"""
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
         try:
-            cursor.execute("SELECT * FROM pecas WHERE user_id = %s AND status = 'ativo'", (user_id,))
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            cursor.execute(
+                "SELECT * FROM pecas WHERE user_id = %s AND status = 'ativo'", 
+                (user_id,)
+            )
             pecas = cursor.fetchall()
-            return pecas
-        except Exception as e:
-            print(f"Erro ao listar peças: {e}")
-            return []
-        finally:
             cursor.close()
-            conn.close()
+            return [dict(p) for p in pecas]
+        finally:
+            release_connection(conn)
     
     @staticmethod
     def listar_todos(categoria=None, estado=None):
+        """Lista todas as peças ativas com filtros opcionais"""
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
         try:
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
             query = "SELECT * FROM pecas WHERE status = 'ativo'"
             params = []
             
@@ -75,49 +71,51 @@ class PecaRepository:
             
             cursor.execute(query, params if params else None)
             pecas = cursor.fetchall()
-            return pecas
-        except Exception as e:
-            print(f"Erro ao listar todas as peças: {e}")
-            return []
-        finally:
             cursor.close()
-            conn.close()
+            return [dict(p) for p in pecas]
+        finally:
+            release_connection(conn)
     
     @staticmethod
     def buscar_por_id(peca_id):
+        """Busca peça por ID"""
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
         try:
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
             cursor.execute("SELECT * FROM pecas WHERE id = %s", (peca_id,))
             peca = cursor.fetchone()
-            return peca
-        except Exception as e:
-            print(f"Erro ao buscar peça: {e}")
-            return None
-        finally:
             cursor.close()
-            conn.close()
+            return dict(peca) if peca else None
+        finally:
+            release_connection(conn)
     
     @staticmethod
     def deletar(peca_id):
+        """Deleta (inativa) uma peça"""
         conn = get_connection()
-        cursor = conn.cursor()
         try:
-            cursor.execute("UPDATE pecas SET status = 'inativo' WHERE id = %s", (peca_id,))
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE pecas SET status = 'inativo' WHERE id = %s", 
+                (peca_id,)
+            )
             conn.commit()
-            return cursor.rowcount > 0
+            updated = cursor.rowcount
+            cursor.close()
+            return updated > 0
         except Exception as e:
+            conn.rollback()
             print(f"Erro ao deletar peça: {e}")
             return False
         finally:
-            cursor.close()
-            conn.close()
+            release_connection(conn)
     
     @staticmethod
     def atualizar_peca(peca_id, dados):
+        """Atualiza dados da peça"""
         conn = get_connection()
-        cursor = conn.cursor()
         try:
+            cursor = conn.cursor()
             cursor.execute("""
                 UPDATE pecas
                 SET nome = %s, categoria = %s, marca = %s, modelo = %s,
@@ -134,10 +132,12 @@ class PecaRepository:
                 peca_id
             ))
             conn.commit()
-            return cursor.rowcount > 0
+            updated = cursor.rowcount
+            cursor.close()
+            return updated > 0
         except Exception as e:
+            conn.rollback()
             print(f"Erro ao atualizar peça: {e}")
             return False
         finally:
-            cursor.close()
-            conn.close()
+            release_connection(conn)
