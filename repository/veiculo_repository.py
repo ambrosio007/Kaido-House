@@ -1,21 +1,14 @@
-import mysql.connector
-
-def get_connection():
-    return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='admin',
-        database='kaido-server'
-    )
+from config.database import get_connection, release_connection
+from psycopg2.extras import RealDictCursor
 
 class VeiculoRepository:
 
     @staticmethod
     def adicionar_veiculo(dados):
+        """Adiciona um novo veículo"""
         conn = get_connection()
-        cursor = conn.cursor()
-        
         try:
+            cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO veiculos (id, user_id, marca, modelo, ano, km, cor, preco, descricao, fotos, data_cadastro, status)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -34,79 +27,84 @@ class VeiculoRepository:
                 dados['status']
             ))
             conn.commit()
+            cursor.close()
             return True
         except Exception as e:
+            conn.rollback()
             print(f"Erro ao adicionar veículo: {e}")
             return False
         finally:
-            cursor.close()
-            conn.close()
+            release_connection(conn)
 
     @staticmethod
     def listar_por_usuario(user_id):
+        """Lista veículos de um usuário específico"""
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
         try:
-            cursor.execute("SELECT * FROM veiculos WHERE user_id = %s AND status = 'ativo'", (user_id,))
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            cursor.execute(
+                "SELECT * FROM veiculos WHERE user_id = %s AND status = 'ativo'", 
+                (user_id,)
+            )
             veiculos = cursor.fetchall()
-            return veiculos
-        except Exception as e:
-            print(f"Erro ao listar veículos: {e}")
-            return []
-        finally:
             cursor.close()
-            conn.close()
+            return [dict(v) for v in veiculos]
+        finally:
+            release_connection(conn)
     
     @staticmethod
     def listar_todos():
+        """Lista todos os veículos ativos"""
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
         try:
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
             cursor.execute("SELECT * FROM veiculos WHERE status = 'ativo'")
             veiculos = cursor.fetchall()
-            return veiculos
-        except Exception as e:
-            print(f"Erro ao listar todos os veículos: {e}")
-            return []
-        finally:
             cursor.close()
-            conn.close()
+            return [dict(v) for v in veiculos]
+        finally:
+            release_connection(conn)
     
     @staticmethod
     def buscar_por_id(veiculo_id):
+        """Busca veículo por ID"""
         conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
         try:
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
             cursor.execute("SELECT * FROM veiculos WHERE id = %s", (veiculo_id,))
             veiculo = cursor.fetchone()
-            return veiculo
-        except Exception as e:
-            print(f"Erro ao buscar veículo: {e}")
-            return None
-        finally:
             cursor.close()
-            conn.close()
+            return dict(veiculo) if veiculo else None
+        finally:
+            release_connection(conn)
     
     @staticmethod
     def deletar(veiculo_id):
+        """Deleta (inativa) um veículo"""
         conn = get_connection()
-        cursor = conn.cursor()
         try:
-            cursor.execute("UPDATE veiculos SET status = 'inativo' WHERE id = %s", (veiculo_id,))
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE veiculos SET status = 'inativo' WHERE id = %s", 
+                (veiculo_id,)
+            )
             conn.commit()
-            return cursor.rowcount > 0
+            updated = cursor.rowcount
+            cursor.close()
+            return updated > 0
         except Exception as e:
+            conn.rollback()
             print(f"Erro ao deletar veículo: {e}")
             return False
         finally:
-            cursor.close()
-            conn.close()
+            release_connection(conn)
     
     @staticmethod
     def atualizar_veiculo(veiculo_id, dados):
+        """Atualiza dados do veículo"""
         conn = get_connection()
-        cursor = conn.cursor()
         try:
+            cursor = conn.cursor()
             cursor.execute("""
                 UPDATE veiculos
                 SET marca = %s, modelo = %s, ano = %s, km = %s, 
@@ -123,10 +121,12 @@ class VeiculoRepository:
                 veiculo_id
             ))
             conn.commit()
-            return cursor.rowcount > 0
+            updated = cursor.rowcount
+            cursor.close()
+            return updated > 0
         except Exception as e:
+            conn.rollback()
             print(f"Erro ao atualizar veículo: {e}")
             return False
         finally:
-            cursor.close()
-            conn.close()
+            release_connection(conn)
