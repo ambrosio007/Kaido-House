@@ -36,6 +36,10 @@ def pag_pecas():
 def pag_veiculos():
     return render_template('carros_pg.html')
 
+@user_bp.route('/receuperar-senha')
+def recuperar_senha():
+    return render_template('recupera_senha.html')
+
 
 
 @user_bp.route('/cadastro-user', methods=['POST'])

@@ -9,11 +9,11 @@ load_dotenv()
 
 # Configurações do banco de dados PostgreSQL
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'user': os.getenv('DB_USER', 'postgres'),
-    'password': os.getenv('DB_PASS', 'postgres'), # Pega do .env ou usa padrão
-    'database': os.getenv('DB_NAME', 'server_kaido_house'),
-    'port': int(os.getenv('DB_PORT', 5432))
+    'host': os.getenv('DB_HOST'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASS'), # Pega do .env ou usa padrão
+    'database': os.getenv('DB_NAME'),
+    'port': int(os.getenv('DB_PORT'))
 }
 
 # ... resto do código igual ...
