@@ -1,6 +1,9 @@
 from flask import Blueprint, render_template, jsonify, session, request, redirect, url_for
 from service.user_service import UserService
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
+from service.pecas_service import PecaService
+from service.veiculos_service import VeiculoService
+
 
 user_bp = Blueprint('user', __name__, template_folder='templates')
 
@@ -122,3 +125,45 @@ def atualiza_user():
     if UserService.atualizar_usuario(user_edit):
         return jsonify({"message": "Usuário atualizado com sucesso"}), 200
     return jsonify({"error": "Falha ao atualizar usuário"}), 400
+
+''' @user_bp.route('/api/home/vitrine')
+def vitrine_home():
+    try:
+        # Busca todos os itens
+        todas_pecas = PecaService.listar_todas() # Certifique-se que retorna uma lista de dicts
+        todos_veiculos = VeiculoService.listar_todos()
+
+        # Filtros de Peças
+        pecas_novas = [p for p in todas_pecas if p.get('estado', '').lower() == 'novo']
+        pecas_usadas = [p for p in todas_pecas if p.get('estado', '').lower() == 'usado']
+
+        # Filtros de Veículos
+        # Consideramos 'novo' como KM < 100 e seminovo/usado o restante
+        carros_novos = [v for v in todos_veiculos if int(v.get('km', 0)) <= 100]
+        carros_usados = [v for v in todos_veiculos if int(v.get('km', 0)) > 100]
+
+        return jsonify({
+            "pecas_novas": pecas_novas,
+            "pecas_usadas": pecas_usadas,
+            "carros_novos": carros_novos,
+            "carros_usados": carros_usados
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500 '''
+    
+@user_bp.route('/api/vitrine-home')
+def vitrine_home():
+    # Peças: limit 5, ordenado por random no banco
+    pecas_novas = PecaService.buscar_custom(estado='novo', limit=5)
+    pecas_usadas = PecaService.buscar_custom(estado='usado', limit=5)
+    
+    # Veículos: limit 5
+    carros_novos = VeiculoService.buscar_custom(novo=True, limit=5)
+    carros_usados = VeiculoService.buscar_custom(novo=False, limit=5)
+
+    return jsonify({
+        "pecas_novas": pecas_novas,
+        "pecas_usadas": pecas_usadas,
+        "carros_novos": carros_novos,
+        "carros_usados": carros_usados
+    })

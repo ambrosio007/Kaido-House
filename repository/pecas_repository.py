@@ -141,3 +141,25 @@ class PecaRepository:
             return False
         finally:
             release_connection(conn)
+
+@staticmethod
+def listar_aleatorio(limit=5, apenas_novos=True):
+    """Lista peças aleatórias, com opção para apenas novas"""
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        query = "SELECT * FROM pecas WHERE status = 'ativo'"
+        params = []
+        
+        if apenas_novos:
+            query += " AND estado = 'novo'"
+        
+        query += " ORDER BY RANDOM() LIMIT %s"
+        params.append(limit)
+        
+        cursor.execute(query, params)
+        pecas = cursor.fetchall()
+        cursor.close()
+        return [dict(p) for p in pecas]
+    finally:
+        release_connection(conn)

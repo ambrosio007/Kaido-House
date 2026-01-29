@@ -130,3 +130,22 @@ class VeiculoRepository:
             return False
         finally:
             release_connection(conn)
+
+@staticmethod
+def listar_aleatorio(limit=5, apenas_novos=True):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        # Filtro: km <= 100 para novos, km > 100 para usados
+        filtro_km = "AND km <= 100" if apenas_novos else "AND km > 100"
+        
+        cursor.execute(f"""
+            SELECT * FROM veiculos 
+            WHERE status = 'ativo' {filtro_km}
+            ORDER BY RANDOM() 
+            LIMIT %s
+        """, (limit,))
+        
+        return cursor.fetchall()
+    finally:
+        release_connection(conn)

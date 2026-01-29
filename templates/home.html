@@ -66,85 +66,31 @@
                 <div class="swiper-pagination banner-pagination"></div>
             </div>
         </section>
+            
+        <h2 class="section-title">✨ Peças Recém-Chegadas</h2>           
 
-        <section class="card-carousel-section" id="promocoes">
-            <h2 class="section-title">🔥 Promoções Imperdíveis</h2>
-            <div class="swiper-container card-slider promotions-slider">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide product-card">
-                        <div class="card-image">
-                            <img src="/static/images/card-promo1.jpg" alt="Produto em Promoção">
-                            <span class="discount-tag">30% OFF</span>
-                        </div>
-                        <div class="card-content">
-                            <h3>Filtro K&N</h3>
-                            <p class="price"><del>R$ 250,00</del> R$ 175,00</p>
-                            <a href="#" class="btn-card">Detalhes</a>
-                        </div>
-                    </div>
-                                    </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-            </div>
-        </section>
-
-        <section class="card-carousel-section" id="pecas-novas">
-            <h2 class="section-title">✨ Peças Recém-Chegadas</h2>
+        <section class="card-carousel-section hidden" id="pecas-novas">
+            
             <div class="swiper-container card-slider new-parts-slider">
                 <div class="swiper-wrapper">
-                                        <div class="swiper-slide product-card">
-                        <div class="card-image">
-                            <img src="/static/images/new-part-1.jpg" alt="Kit Coilover Tein">
-                            <span class="discount-tag" style="background: #007bff;">NOVO</span>
-                        </div>
-                        <div class="card-content">
-                            <h3>Kit Coilover Tein Flex Z</h3>
-                            <p class="price">R$ 5.800,00</p>
-                            <a href="#" class="btn-card">Detalhes</a>
-                        </div>
-                    </div>
-                                        <div class="swiper-slide product-card">
-                        <div class="card-image">
-                            <img src="/static/images/new-part-2.jpg" alt="Volante Nardi">
-                            <span class="discount-tag" style="background: #007bff;">NOVO</span>
-                        </div>
-                        <div class="card-content">
-                            <h3>Volante Nardi Clássico</h3>
-                            <p class="price">R$ 1.950,00</p>
-                            <a href="#" class="btn-card">Detalhes</a>
-                        </div>
-                    </div>
-                                    </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+                     <div class="swiper card-slider">
+                        <div class="swiper-wrapper" id="container-pecas-novas"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="card-carousel-section" id="pecas-usadas">
+        <section class="card-carousel-section hidden" id="pecas-usadas">
             <h2 class="section-title">♻️ Peças Usadas e Seminovas</h2>
             <div class="swiper-container card-slider used-parts-slider">
                 <div class="swiper-wrapper">
-                                        <div class="swiper-slide product-card">
-                        <div class="card-image">
-                            <img src="/static/images/used-part-1.jpg" alt="Banco Bride Usado">
-                            <span class="discount-tag" style="background: #00a651;">USADO</span>
-                        </div>
-                        <div class="card-content">
-                            <h3>Par de Bancos Bride Low Max</h3>
-                            <p class="price">R$ 6.200,00</p>
-                            <a href="#" class="btn-card">Detalhes</a>
-                        </div>
-                    </div>
-                                        <div class="swiper-slide product-card">
-                        <div class="card-image">
-                            <img src="/static/images/used-part-2.jpg" alt="Escape HKS Usado">
-                            <span class="discount-tag" style="background: #00a651;">USADO</span>
-                        </div>
-                        <div class="card-content">
-                            <h3>Escape HKS Hi-Power</h3>
-                            <p class="price">R$ 3.500,00</p>
-                            <a href="#" class="btn-card">Detalhes</a>
-                        </div>
+                               <div class="swiper card-slider">
+            <div class="swiper-wrapper" id="container-pecas-usadas"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
                     </div>
                                     </div>
                 <div class="swiper-button-next"></div>
@@ -152,24 +98,27 @@
             </div>
         </section>
         
-        <section class="card-carousel-section" id="veiculos-usados">
+        <section class="card-carousel-section hidden" id="veiculos-usados">
             <h2 class="section-title">🚗 Veículos JDM Disponíveis</h2>
             <div class="swiper-container card-slider used-vehicles-slider">
                 <div class="swiper-wrapper">
-                    <div class="swiper-slide vehicle-card">
-                        <div class="card-image">
-                            <img src="/static/images/vehicle-rx7.jpg" alt="Mazda RX-7 Usado">
-                        </div>
-                        <div class="card-content">
-                            <h3>Mazda RX-7 FD3S</h3>
-                            <p class="specs">1999 | 60.000km</p>
-                            <p class="price">R$ 150.000</p>
-                            <a href="#" class="btn-card">Ver Veículo</a>
-                        </div>
-                    </div>
-                                    </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+                    <div class="swiper card-slider">
+                        <div class="swiper-wrapper" id="container-carros-usadas"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+            </div>
+        </section>
+        
+        <section class="card-carousel-section hidden" id="veiculos-novo">
+            <h2 class="section-title">🚗 Veículos JDM Disponíveis</h2>
+            <div class="swiper-container card-slider used-vehicles-slider">
+                <div class="swiper-wrapper">
+                    <div class="swiper card-slider">
+                        <div class="swiper-wrapper" id="container-carros-novos"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
             </div>
         </section>
     </main>
@@ -217,5 +166,6 @@
     <script src="/static/js/nav_bar.js"></script>
     <script src="/static/js/carrossel.js"></script>
     <script src="/static/js/icone_ocult.js"></script>
+    <script src="/static/js/card.js"></script>
 </body>
 </html>
