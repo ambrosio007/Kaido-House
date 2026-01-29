@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/cadastro.css">
     <title>Cadastre-se</title>
 </head>
+
 <body>
     <div class="container">
         <form id="formCadastro">
@@ -42,7 +44,8 @@
                 </div>
                 <br><br>
                 <div class="inputBox">
-                    <input type="password" name="confirma_senha" id="confirma_senhaID" class="inputUser" required minlength="8">
+                    <input type="password" name="confirma_senha" id="confirma_senhaID" class="inputUser" required
+                        minlength="8">
                     <label for="confirma_senhaID" class="labelInput">Confirme a senha</label>
                 </div>
                 <br><br>
@@ -52,25 +55,14 @@
         </form>
     </div>
 
-    <script type="module">
-
-        const text = await response.text(); // Primeiro pega o texto puro
-        let data;
-        try {
-            data = JSON.parse(text); // Tenta transformar em JSON
-        } catch (e) {
-            console.error("Servidor respondeu algo que não é JSON:", text);
-            alert("Erro crítico no servidor. Verifique os logs.");
-            return;
-        }
-
-        // 2. Lógica de Envio via API (AJAX/Fetch)
-        document.getElementById('formCadastro').addEventListener('submit', async function(e) {
+    <script>
+        // Envio do formulário
+        document.getElementById('formCadastro').addEventListener('submit', async function (e) {
             e.preventDefault(); // Impede a página de recarregar
 
             const senha = document.getElementById('senhaID').value;
             const confirmaSenha = document.getElementById('confirma_senhaID').value;
-            
+
             if (senha !== confirmaSenha) {
                 alert('As senhas não coincidem!');
                 return;
@@ -82,10 +74,21 @@
             try {
                 const response = await fetch('/cadastro-user', {
                     method: 'POST',
-                    body: formData // Envia como formulário, mas via JS
+                    body: formData
                 });
 
-                const data = await response.json(); // Lê a resposta JSON do servidor
+                // Primeiro pega o texto puro
+                const text = await response.text();
+                
+                // Tenta transformar em JSON
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    console.error("Servidor respondeu algo que não é JSON:", text);
+                    alert("Erro crítico no servidor. Verifique os logs.");
+                    return;
+                }
 
                 if (response.ok) {
                     // Sucesso (HTTP 200 ou 201)
@@ -101,10 +104,10 @@
             }
         });
 
-        // --- Máscaras (Mantidas do seu código original) ---
+        // --- Máscaras ---
 
         // Máscara CPF
-        document.getElementById('cpfID').addEventListener('input', function(e) {
+        document.getElementById('cpfID').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length <= 11) {
                 value = value.replace(/(\d{3})(\d)/, '$1.$2');
@@ -115,7 +118,7 @@
         });
 
         // Máscara CEP
-        document.getElementById('cepID').addEventListener('input', function(e) {
+        document.getElementById('cepID').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length <= 8) {
                 value = value.replace(/(\d{5})(\d)/, '$1-$2');
@@ -124,4 +127,5 @@
         });
     </script>
 </body>
+
 </html>
