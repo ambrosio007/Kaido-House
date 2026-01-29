@@ -1,15 +1,22 @@
 import psycopg2
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
+import os
+from dotenv import load_dotenv # pip install python-dotenv
+
+# Carrega as variáveis do arquivo .env
+load_dotenv()
 
 # Configurações do banco de dados PostgreSQL
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'postgres',  # Usuário padrão do PostgreSQL
-    'password': 'postgres',  # ALTERE para sua senha
-    'database': 'server_kaido_house',  # Nome do banco (sem hífen)
-    'port': 5432  # Porta padrão do PostgreSQL
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'user': os.getenv('DB_USER', 'postgres'),
+    'password': os.getenv('DB_PASS', 'postgres'), # Pega do .env ou usa padrão
+    'database': os.getenv('DB_NAME', 'server_kaido_house'),
+    'port': int(os.getenv('DB_PORT', 5432))
 }
+
+# ... resto do código igual ...
 
 # Pool de conexões para melhor performance
 connection_pool = None

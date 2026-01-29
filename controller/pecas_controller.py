@@ -1,16 +1,20 @@
 from flask import Blueprint, render_template, jsonify, session, request, redirect, url_for
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from service.peca_service import PecaService
 
 peca_bp = Blueprint('peca', __name__)
 
+# --- ROTA PROTEGIDA: Cadastro ---
 @peca_bp.route('/cadastro-peca', methods=['POST'])
+@jwt_required()
 def cadastro_peca():
     """Cadastra uma nova peça"""
-    if "user_id" not in session:
-        return jsonify({"error": "Usuário não autenticado"}), 401
+    
+    # Obtém o ID do usuário através do Token
+    current_user_id = get_jwt_identity()
     
     dados = {
-        "user_id": session['user_id'],
+        "user_id": current_user_id, # Usamos o ID do token
         "nome": request.form.get('nome'),
         "categoria": request.form.get('categoria'),
         "marca": request.form.get('marca'),
@@ -26,22 +30,29 @@ def cadastro_peca():
     status, mensagem = PecaService.cadastrar_peca(dados, fotos)
     
     if status:
-        return jsonify({"success": True, "message": "Peça cadastrada com sucesso!"}), 200
+        return jsonify({"success": True, "message": "Peça cadastrada com sucesso!"}), 201
     else:
         return jsonify({"error": mensagem}), 400
 
+
+# --- ROTA PROTEGIDA: Minhas Peças ---
 @peca_bp.route('/minhas-pecas', methods=['GET'])
+@jwt_required()
 def minhas_pecas():
     """Lista todas as peças do usuário logado"""
-    if "user_id" not in session:
-        return jsonify({"error": "Usuário não autenticado"}), 401
     
-    pecas = PecaService.listar_por_usuario(session['user_id'])
+    current_user_id = get_jwt_identity()
+    
+    pecas = PecaService.listar_por_usuario(current_user_id)
     return jsonify(pecas), 200
 
+
+# --- ROTA PÚBLICA: Listagem Geral ---
 @peca_bp.route('/pecas', methods=['GET'])
 def listar_pecas():
     """Lista todas as peças ativas"""
+    # Não precisa de token para ver o catálogo
+    
     # Filtros opcionais
     categoria = request.args.get('categoria')
     estado = request.args.get('estado')
@@ -49,6 +60,7 @@ def listar_pecas():
     pecas = PecaService.listar_todos(categoria=categoria, estado=estado)
     return jsonify(pecas), 200
 
+# --- ROTA PÚBLICA: Detalhes ---
 @peca_bp.route('/peca/<peca_id>', methods=['GET'])
 def detalhes_peca(peca_id):
     """Retorna detalhes de uma peça específica"""
@@ -57,31 +69,39 @@ def detalhes_peca(peca_id):
         return jsonify(peca), 200
     return jsonify({"error": "Peça não encontrada"}), 404
 
+
+# --- ROTA PROTEGIDA: Deletar ---
 @peca_bp.route('/peca/<peca_id>', methods=['DELETE'])
+@jwt_required()
 def deletar_peca(peca_id):
     """Deleta (inativa) uma peça"""
-    if "user_id" not in session:
-        return jsonify({"error": "Usuário não autenticado"}), 401
     
-    # Verificar se a peça pertence ao usuário
+    current_user_id = get_jwt_identity()
+    
+    # Verificar se a peça existe
     peca = PecaService.buscar_por_id(peca_id)
-    if not peca or peca.get('user_id') != session['user_id']:
-        return jsonify({"error": "Peça não encontrada ou não autorizada"}), 403
+    
+    # VERIFICAÇÃO DE PROPRIEDADE:
+    # Só deleta se a peça existir E se o dono for o mesmo do token
+    if not peca or peca.get('user_id') != current_user_id:
+        return jsonify({"error": "Peça não encontrada ou você não tem permissão para apagá-la"}), 403
     
     if PecaService.deletar_peca(peca_id):
         return jsonify({"message": "Peça deletada com sucesso"}), 200
     return jsonify({"error": "Erro ao deletar peça"}), 400
 
+# --- ROTA PROTEGIDA: Atualizar ---
 @peca_bp.route('/peca/<peca_id>', methods=['PUT'])
+@jwt_required()
 def atualizar_peca(peca_id):
     """Atualiza informações de uma peça"""
-    if "user_id" not in session:
-        return jsonify({"error": "Usuário não autenticado"}), 401
+    
+    current_user_id = get_jwt_identity()
     
     # Verificar se a peça pertence ao usuário
     peca = PecaService.buscar_por_id(peca_id)
-    if not peca or peca.get('user_id') != session['user_id']:
-        return jsonify({"error": "Peça não encontrada ou não autorizada"}), 403
+    if not peca or peca.get('user_id') != current_user_id:
+        return jsonify({"error": "Peça não encontrada ou você não tem permissão para editá-la"}), 403
     
     dados = request.get_json()
     
@@ -89,9 +109,11 @@ def atualizar_peca(peca_id):
         return jsonify({"message": "Peça atualizada com sucesso"}), 200
     return jsonify({"error": "Erro ao atualizar peça"}), 400
 
+# --- ROTA PÚBLICA: Listas Auxiliares ---
 @peca_bp.route('/pecas/categorias', methods=['GET'])
 def listar_categorias():
     """Lista todas as categorias de peças disponíveis"""
+    # Dados estáticos não precisam de proteção
     categorias = [
         {"value": "motor", "label": "Motor e Transmissão"},
         {"value": "suspensao", "label": "Suspensão e Freios"},

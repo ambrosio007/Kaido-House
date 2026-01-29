@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, jsonify, session, request, redirect, url_for
 from service.user_service import UserService
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 
 user_bp = Blueprint('user', __name__, template_folder='templates')
 
@@ -18,6 +19,11 @@ def login():
 @user_bp.route('/perfil')
 def perfil():
     return render_template('perfil.html')
+
+# --- ROTA DE PÁGINA (HTML) ---
+@user_bp.route('/carrinho')
+def ver_carrinho():
+    return render_template('carrinho.html')    
 
 @user_bp.route('/cadastro-user', methods=['POST'])
 def cadastro_usuario():
@@ -41,17 +47,22 @@ def cadastro_usuario():
 
 @user_bp.route('/login-usuer', methods=['POST'])
 def login_usuario():
-    email = request.form.get('email')
-    senha = request.form.get('senha')
+    data = request.get_json() or request.form
+    email = data.get('email')
+    senha = data.get('senha')
 
     user = UserService.autenticar_usuario(email, senha)
 
     if user:
+        acces_token = create_access_token(identity={'id': user['id'], 'nome': user['nome'], 'email': user['email']})
         session['user_id'] = user['id']
-        session['user_name'] = user['nome']
-        return f"Login bem-sucedido! <a href='{url_for('user.dashboard')}'>Ir para o dashboard</a>"
-    return f"Falha no login. <a href='{url_for('user.login')}'>Tente novamente</a>"
-
+        session['user_nome'] = user['nome']
+        session['user_email'] = user['email']
+        return jsonify({
+            "message": "Login realizado com sucesso", 
+            "access_token": acces_token
+            }), 200
+    
 @user_bp.route('/logout')
 def logout():
     session.clear()
@@ -67,7 +78,10 @@ def busc_user_json():
 
 @user_bp.route('/users')
 def lista_users():
-    if "user_id" not in session:
+
+    current_user_id = get_jwt_identity()
+
+    if current_user_id is None:
         return redirect(url_for('user.login'))
     """ if session['user_id'] != 1:
         return "Acesso negado", 403 """
@@ -75,9 +89,13 @@ def lista_users():
     return render_template('usuarios.html', usuarios=usuarios)
 
 @user_bp.route('/users/<id>', methods=['DELETE'])
+@jwt_required()
 def delet_user(id):
-    if "user_id" not in session:
-        return jsonify({"error": "Usuário não autenticado"}), 401
+
+    current_user_id = get_jwt_identity()
+
+    if current_user_id != id:
+        return jsonify({"error": "Não permitido deletar"}), 401
     """ if session['user_id'] != 1:
         return jsonify({"error": "Acesso negado"}), 403 """
     if UserService.deletar_usuario(id):
