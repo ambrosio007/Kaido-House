@@ -8,30 +8,36 @@
     <link rel="stylesheet" href="/static/home.css"> <link rel="stylesheet" href="/static/veiculos.css"> </head>
 <body>
 
-    <header>
-        <a href="home.html" class="logo">
-            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
+<header>
+    <a href="/" class="logo">
+        <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
+    </a>
+
+    <nav class="navbar">
+        <a href="/">Início</a>
+        <a href="/pecas">Peças</a>
+        <a href="/veiculos">Veículos</a>
+        <a href="#contato">Contato</a>
+    </nav>
+
+    <div class="header-icons">
+        <a href="/templates/carrinho.html" class="icon-link cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge">0</span>
         </a>
-        <nav class="navbar">
-            <a href="home.html">Início</a>
-            <a href="home.html#pecas">Peças</a>
-            <a href="#" class="active">Veículos</a>
-            <a href="#customizacao">Customização</a>
-            <a href="#contato">Contato</a>
-        </nav>
-        <div class="header-icons">
-            <a href="#" class="icon-link cart-icon">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-badge">0</span>
+
+        <div class="profile-area">
+            <a onclick="window.location.href='/login'" class="auth-icon-container login-state" id="profile-target">
+                <i class="fas fa-user-circle"></i>
             </a>
-            <div class="profile-area">
-                <a href="/templates/login.html" class="auth-icon-container login-state">
-                    <i class="fas fa-user-circle"></i>
-                </a>
-            </div>
-            <i id="menu-btn" class="fas fa-bars"></i>
+            <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden" id="profile-target-logged">
+                <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
+            </a>
         </div>
-    </header>
+
+        <i id="menu-btn" class="fas fa-bars"></i>
+    </div>
+</header>
 
     <main class="container-veiculos">
         <section class="page-title">

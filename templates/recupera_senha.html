@@ -10,32 +10,36 @@
 </head>
 
 <body>
-    <header>
-        <a href="home.html" class="logo">
-            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House RX-7" class="logo-img">
+<header>
+    <a href="/" class="logo">
+        <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
+    </a>
+
+    <nav class="navbar">
+        <a href="/">Início</a>
+        <a href="/pecas">Peças</a>
+        <a href="/veiculos">Veículos</a>
+        <a href="#contato">Contato</a>
+    </nav>
+
+    <div class="header-icons">
+        <a href="/templates/carrinho.html" class="icon-link cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge">0</span>
         </a>
 
-        <i id="menu-btn" class="fas fa-bars"></i>
-
-        <nav class="navbar">
-            <a href="#inicio">Início</a>
-            <a href="#pecas">Peças</a>
-            <a href="#veiculos">Veículos</a>
-            <a href="#customizacao">Customização</a>
-            <a href="#contato">Contato</a>
-
-        </nav>
-
         <div class="profile-area">
-            <a href="/templates/login.html" class="auth-icon-container login-state" id="mobile-profile-target">
+            <a onclick="window.location.href='/login'" class="auth-icon-container login-state" id="profile-target">
                 <i class="fas fa-user-circle"></i>
             </a>
-            <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden"
-                id="mobile-profile-target-logged">
-                <img src="/static/images/default-avatar.jpg" alt="Foto de Perfil" class="profile-avatar">
+            <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden" id="profile-target-logged">
+                <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
             </a>
         </div>
-    </header>
+
+        <i id="menu-btn" class="fas fa-bars"></i>
+    </div>
+</header>
 
     <main class="password-recovery-page">
         <div class="form-card">

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+       
+    <meta charset="UTF-8">
+       
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Kaido-House</title>
+       
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+     <link rel="stylesheet" href="/static/produto.css">  
+    <link rel="stylesheet" href="/static/home.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+</head>
+
+<body>
+       
+    <header>
+        <a href="/" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
+        </a>
+
+        <nav class="navbar">
+            <a href="/">Início</a>
+            <a href="/pecas">Peças</a>
+            <a href="/veiculos">Veículos</a>
+            <a href="#contato">Contato</a>
+        </nav>
+
+        <div class="header-icons">
+            <a href="/templates/carrinho.html" class="icon-link cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge">0</span>
+            </a>
+
+            <div class="profile-area">
+                <a onclick="window.location.href='/login'" class="auth-icon-container login-state" id="profile-target">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+                <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden"
+                    id="profile-target-logged">
+                    <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
+                </a>
+            </div>
+
+            <i id="menu-btn" class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="product-detail-wrapper">
+            <div class="product-gallery">
+                <div class="main-image-container">
+                    <img id="main-img" src="placeholder.jpg" alt="Imagem Principal">
+                </div>
+                <div class="thumbnail-list" id="thumbnail-list">
+                </div>
+            </div>
+
+            <div class="product-info-section">
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> / <span id="breadcrumb-category">Categoria</span>
+                </nav>
+
+                <h1 id="product-title" class="product-name">Carregando...</h1>
+                <div class="status-badge" id="product-status">Estado</div>
+
+                <div class="price-container">
+                    <span class="currency">R$</span>
+                    <span id="product-price" class="price-value">0,00</span>
+                </div>
+
+                <div class="specs-grid" id="specs-grid">
+                </div>
+
+                <p class="description-text" id="product-description">
+                    Descrição do item carregando...
+                </p>
+
+                <div class="action-buttons">
+                    <button class="btn-buy" onclick="adicionarAoCarrinho()">
+                        <i class="fas fa-shopping-cart"></i> Adicionar ao Carrinho
+                    </button>
+                    <button class="btn-wishlist">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+
+                <div class="seller-info">
+                    <p><i class="fas fa-user"></i> Vendedor: <span id="seller-name">...</span></p>
+                    <p><i class="fas fa-map-marker-alt"></i> Localização: <span id="location">Brasil</span></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+        <footer>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
+                <p>A maior autoridade em cultura JDM e performance de Joinville Sul. Transformando sonhos em projetos
+                    reais.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-nav">
+                <h3>Navegação</h3>
+                <ul>
+                    <li><a href="#">Catálogo de Peças</a></li>
+                    <li><a href="#">Estoque de Veículos</a></li>
+                    <li><a href="#">Oficina de Customização</a></li>
+                    <li><a href="#">Blog Kaido</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h3>Atendimento</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Joinville, SC - Unidade Sul</p>
+                <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
+                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-pix"></i>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Kaido-House. Desenvolvido para SENAI/SC.</p>
+        </div>
+    </footer>
+       
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+       
+    <script src="/static/js/nav_bar.js"></script>
+       
+    <script src="/static/js/icone_ocult.js"></script>
+       
+    <script src="/static/js/adapte.js"></script>
+</body>
+
+</html>

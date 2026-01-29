@@ -12,28 +12,37 @@
 </head>
 
 <body>
-    <!-- Header com Navbar da Home -->
+
     <header>
-        <a href="/templates/index.html" class="logo">
+        <a href="/" class="logo">
             <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
         </a>
 
         <nav class="navbar">
-            <a href="/templates/index.html">Início</a>
-            <a href="/templates/produtos.html">Produtos</a>
-            <a href="/templates/sobre.html">Sobre</a>
-            <a href="/templates/contato.html">Contato</a>
+            <a href="/">Início</a>
+            <a href="/pecas">Peças</a>
+            <a href="/veiculos">Veículos</a>
+            <a href="#contato">Contato</a>
         </nav>
 
         <div class="header-icons">
-            <a href="/templates/carrinho.html" class="icon-link">
+            <a href="/templates/carrinho.html" class="icon-link cart-icon">
                 <i class="fas fa-shopping-cart"></i>
-                <span class="cart-badge">3</span>
+                <span class="cart-badge">0</span>
             </a>
 
-        </div>
+            <div class="profile-area">
+                <a onclick="window.location.href='/login'" class="auth-icon-container login-state" id="profile-target">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+                <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden"
+                    id="profile-target-logged">
+                    <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
+                </a>
+            </div>
 
-        <div id="menu-btn" class="fas fa-bars"></div>
+            <i id="menu-btn" class="fas fa-bars"></i>
+        </div>
     </header>
 
     <!-- Conteúdo do Perfil -->
