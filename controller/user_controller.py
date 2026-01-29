@@ -23,7 +23,17 @@ def perfil():
 # --- ROTA DE PÁGINA (HTML) ---
 @user_bp.route('/carrinho')
 def ver_carrinho():
-    return render_template('carrinho.html')    
+    return render_template('carrinho.html') 
+
+@user_bp.route('/pecas')
+def pag_pecas():
+    return render_template('pecas_pg.html')
+
+@user_bp.route('/veiculos')
+def pag_veiculos():
+    return render_template('carros_pg.html')
+
+
 
 @user_bp.route('/cadastro-user', methods=['POST'])
 def cadastro_usuario():

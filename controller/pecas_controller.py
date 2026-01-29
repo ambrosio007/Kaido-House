@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify, session, request, redirect, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from service.peca_service import PecaService
+from service.pecas_service import PecaService
 
 peca_bp = Blueprint('peca', __name__)
 
