@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <form action="/cadastro-user" method="post">
+        <form id="formCadastro">
             <fieldset>
                 <legend><b>Cadastro</b></legend>
                 <div class="inputBox">
@@ -47,22 +47,50 @@
                 </div>
                 <br><br>
                 <input type="submit" id="submit" value="Cadastrar">
-                <a onclick="window.location.href='/login'">Login</a>
+                <a href="/login">Já tem conta? Login</a>
             </fieldset>
         </form>
     </div>
 
     <script>
-        // Validação de senha
-        document.querySelector('form').addEventListener('submit', function(e) {
+        // 2. Lógica de Envio via API (AJAX/Fetch)
+        document.getElementById('formCadastro').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Impede a página de recarregar
+
             const senha = document.getElementById('senhaID').value;
             const confirmaSenha = document.getElementById('confirma_senhaID').value;
             
             if (senha !== confirmaSenha) {
-                e.preventDefault();
                 alert('As senhas não coincidem!');
+                return;
+            }
+
+            // Pega os dados do formulário automaticamente
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch('/cadastro-user', {
+                    method: 'POST',
+                    body: formData // Envia como formulário, mas via JS
+                });
+
+                const data = await response.json(); // Lê a resposta JSON do servidor
+
+                if (response.ok) {
+                    // Sucesso (HTTP 200 ou 201)
+                    alert('Cadastro realizado com sucesso! Você será redirecionado para o login.');
+                    window.location.href = '/login';
+                } else {
+                    // Erro (HTTP 400 ou 500)
+                    alert('Erro ao cadastrar: ' + (data.error || data.mensagem || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro de conexão com o servidor.');
             }
         });
+
+        // --- Máscaras (Mantidas do seu código original) ---
 
         // Máscara CPF
         document.getElementById('cpfID').addEventListener('input', function(e) {
