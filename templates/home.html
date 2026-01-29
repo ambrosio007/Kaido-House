@@ -1,170 +1,189 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaido-House</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/home.css">
+       
+    <meta charset="UTF-8">
+       
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Kaido-House</title>
+       
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+       
+    <link rel="stylesheet" href="/static/home.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 </head>
+
 <body>
-    
-<header>
-    <a href="/" class="logo">
-        <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
-    </a>
 
-    <nav class="navbar">
-        <a href="/">Início</a>
-        <a href="/pecas">Peças</a>
-        <a href="/veiculos">Veículos</a>
-        <a href="#contato">Contato</a>
-    </nav>
-
-    <div class="header-icons">
-        <a href="/templates/carrinho.html" class="icon-link cart-icon">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="cart-badge">0</span>
+    <header>
+        <a href="/" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
         </a>
 
-        <div class="profile-area">
-            <a onclick="window.location.href='/login'" class="auth-icon-container login-state" id="profile-target">
-                <i class="fas fa-user-circle"></i>
+        <nav class="navbar">
+            <a href="/">Início</a>
+            <a href="/pecas">Peças</a>
+            <a href="/veiculos">Veículos</a>
+            <a href="#contato">Contato</a>
+        </nav>
+
+        <div class="header-icons">
+            <a href="/templates/carrinho.html" class="icon-link cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge">0</span>
             </a>
-            <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden" id="profile-target-logged">
-                <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
-            </a>
+
+            <div class="profile-area">
+                <a href="/login" class="auth-icon-container login-state" id="profile-target">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+                <a href="/perfil" class="auth-icon-container profile-state hidden" id="profile-target-logged">
+                    <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
+                </a>
+            </div>
+
+            <i id="menu-btn" class="fas fa-bars"></i>
         </div>
+    </header>
 
-        <i id="menu-btn" class="fas fa-bars"></i>
-    </div>
-</header>
+        <main style="min-height: 50vh; padding: 20px; text-align: center;">
+                <section class="home-banner-carousel">
+                        <div class="swiper-container banner-slider">
+                                <div class="swiper-wrapper">
+                                        <div class="swiper-slide banner-slide"
+                        style="background: url(/static/images/banner1.jpg) no-repeat;">
+                                                <div class="content">
+                                                        <span>Promoção da Semana</span>
+                                                        <h3>Pneus de Alta Performance</h3>
+                                                        <p>Descontos de até 30% nas marcas JDM mais procuradas!</p>
+                                                        <a href="#" class="btn-banner">Ver Ofertas</a>
+                                                    </div>
+                                            </div>
+                                        <div class="swiper-slide banner-slide"
+                        style="background: url(/static/images/banner2.jpg) no-repeat;">
+                                                <div class="content">
+                                                        <span>Novo Estoque</span>
+                                                        <h3>Kits de Turbo Garrett</h3>
+                                                        <p>Aumente a potência do seu projeto com o melhor do mercado.
+                            </p>
+                                                        <a href="#" class="btn-banner">Compre Agora</a>
+                                                    </div>
+                                            </div>
+                                    </div>
+                                <div class="swiper-pagination banner-pagination"></div>
+                            </div>
+                    </section>
 
-    <main style="min-height: 50vh; padding: 20px; text-align: center;">
-        <section class="home-banner-carousel">
-            <div class="swiper-container banner-slider">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide banner-slide" style="background: url(/static/images/banner1.jpg) no-repeat;">
-                        <div class="content">
-                            <span>Promoção da Semana</span>
-                            <h3>Pneus de Alta Performance</h3>
-                            <p>Descontos de até 30% nas marcas JDM mais procuradas!</p>
-                            <a href="#" class="btn-banner">Ver Ofertas</a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide banner-slide" style="background: url(/static/images/banner2.jpg) no-repeat;">
-                        <div class="content">
-                            <span>Novo Estoque</span>
-                            <h3>Kits de Turbo Garrett</h3>
-                            <p>Aumente a potência do seu projeto com o melhor do mercado.</p>
-                            <a href="#" class="btn-banner">Compre Agora</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-pagination banner-pagination"></div>
-            </div>
-        </section>
-            
-        <h2 class="section-title">✨ Peças Recém-Chegadas</h2>           
+        <h2 class="section-title">✨ Peças Recém-Chegadas</h2>
 
-        <section class="card-carousel-section hidden" id="pecas-novas">
-            
-            <div class="swiper-container card-slider new-parts-slider">
-                <div class="swiper-wrapper">
-                     <div class="swiper card-slider">
+                <section class="card-carousel-section hidden" id="pecas-novas">
+                       
+                        <div class="swiper-container card-slider new-parts-slider">
+                                <div class="swiper-wrapper">
+                      <div class="swiper card-slider">
                         <div class="swiper-wrapper" id="container-pecas-novas"></div>
                         <div class="swiper-button-next"></div>
                         <div class="swiper-button-prev"></div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="card-carousel-section hidden" id="pecas-usadas">
-            <h2 class="section-title">♻️ Peças Usadas e Seminovas</h2>
-            <div class="swiper-container card-slider used-parts-slider">
-                <div class="swiper-wrapper">
-                               <div class="swiper card-slider">
-            <div class="swiper-wrapper" id="container-pecas-usadas"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-        </div>
-                    </div>
-                                    </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-            </div>
-        </section>
-        
-        <section class="card-carousel-section hidden" id="veiculos-usados">
-            <h2 class="section-title">🚗 Veículos JDM Disponíveis</h2>
-            <div class="swiper-container card-slider used-vehicles-slider">
-                <div class="swiper-wrapper">
+                                </div>
+                            </div>
+                    </section>
+                          <h2 class="section-title">♻️ Peças Usadas e Seminovas</h2>
+                <section class="card-carousel-section hidden" id="pecas-usadas">
+                 
+                        <div class="swiper-container card-slider used-parts-slider">
+                                <div class="swiper-wrapper">
+                                            <div class="swiper card-slider">
+                        <div class="swiper-wrapper" id="container-pecas-usadas"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                                        </div>
+                                                    </div>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                        </div>
+                    </section>
+               <h2 class="section-title">🚗 Veículos Novos Disponíveis</h2>
+                <section class="card-carousel-section hidden" id="veiculos-usados">
+                        
+                        <div class="swiper-container card-slider used-vehicles-slider">
+                                <div class="swiper-wrapper">
                     <div class="swiper card-slider">
                         <div class="swiper-wrapper" id="container-carros-usadas"></div>
                         <div class="swiper-button-next"></div>
                         <div class="swiper-button-prev"></div>
                     </div>
-            </div>
-        </section>
-        
+                               
+                </div>
+                        </section>
+               <h2 class="section-title">🚗 Veículos Acabados/Usados Disponíveis</h2>
         <section class="card-carousel-section hidden" id="veiculos-novo">
-            <h2 class="section-title">🚗 Veículos JDM Disponíveis</h2>
-            <div class="swiper-container card-slider used-vehicles-slider">
-                <div class="swiper-wrapper">
+                        
+                        <div class="swiper-container card-slider used-vehicles-slider">
+                                <div class="swiper-wrapper">
                     <div class="swiper card-slider">
                         <div class="swiper-wrapper" id="container-carros-novos"></div>
                         <div class="swiper-button-next"></div>
                         <div class="swiper-button-prev"></div>
                     </div>
-            </div>
-        </section>
-    </main>
+                               
+                </div>
+                        </section>
+           
+    </main>
 
-    <footer>
-    <div class="footer-container">
-        <div class="footer-brand">
-            <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
-            <p>A maior autoridade em cultura JDM e performance de Joinville Sul. Transformando sonhos em projetos reais.</p>
-            <div class="social-links">
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-facebook"></i></a>
-                <a href="#"><i class="fab fa-youtube"></i></a>
-                <a href="#"><i class="fab fa-tiktok"></i></a>
+        <footer>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
+                <p>A maior autoridade em cultura JDM e performance de Joinville Sul. Transformando sonhos em projetos
+                    reais.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-nav">
+                <h3>Navegação</h3>
+                <ul>
+                    <li><a href="#">Catálogo de Peças</a></li>
+                    <li><a href="#">Estoque de Veículos</a></li>
+                    <li><a href="#">Oficina de Customização</a></li>
+                    <li><a href="#">Blog Kaido</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h3>Atendimento</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Joinville, SC - Unidade Sul</p>
+                <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
+                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-pix"></i>
+                </div>
             </div>
         </div>
-
-        <div class="footer-nav">
-            <h3>Navegação</h3>
-            <ul>
-                <li><a href="#">Catálogo de Peças</a></li>
-                <li><a href="#">Estoque de Veículos</a></li>
-                <li><a href="#">Oficina de Customização</a></li>
-                <li><a href="#">Blog Kaido</a></li>
-            </ul>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Kaido-House. Desenvolvido para SENAI/SC.</p>
         </div>
-
-        <div class="footer-contact">
-            <h3>Atendimento</h3>
-            <p><i class="fas fa-map-marker-alt"></i> Joinville, SC - Unidade Sul</p>
-            <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
-            <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
-            <div class="payment-methods">
-                <i class="fab fa-cc-visa"></i>
-                <i class="fab fa-cc-mastercard"></i>
-                <i class="fab fa-pix"></i>
-            </div>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        <p>&copy; 2026 Kaido-House. Desenvolvido para SENAI/SC.</p>
-    </div>
-</footer>
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-    <script src="/static/js/nav_bar.js"></script>
-    <script src="/static/js/carrossel.js"></script>
-    <script src="/static/js/icone_ocult.js"></script>
-    <script src="/static/js/card.js"></script>
+    </footer>
+       
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+       
+    <script src="/static/js/nav_bar.js"></script>
+       
+    <script src="/static/js/carrossel.js"></script>
+       
+    <script src="/static/js/icone_ocult.js"></script>
+       
+    <script src="/static/js/card.js"></script>
 </body>
+
 </html>

@@ -55,77 +55,87 @@
         </form>
     </div>
 
-    <script>
-        // Envio do formulário
-        document.getElementById('formCadastro').addEventListener('submit', async function (e) {
-            e.preventDefault(); // Impede a página de recarregar
+<script>
+    // Envio do formulário
+    document.getElementById('formCadastro').addEventListener('submit', async function (e) {
+        e.preventDefault(); // Impede a página de recarregar
 
-            const senha = document.getElementById('senhaID').value;
-            const confirmaSenha = document.getElementById('confirma_senhaID').value;
+        const senha = document.getElementById('senhaID').value;
+        const confirmaSenha = document.getElementById('confirma_senhaID').value;
 
-            if (senha !== confirmaSenha) {
-                alert('As senhas não coincidem!');
+        if (senha !== confirmaSenha) {
+            alert('As senhas não coincidem!');
+            return;
+        }
+
+        // Pega os dados do formulário
+        const formData = new FormData(this);
+        
+        // IMPORTANTE: Remove o campo confirma_senha antes de enviar
+        formData.delete('confirma_senha');
+        
+        // Também mude 'date' para 'idade' se ainda não fez
+        if (formData.has('date')) {
+            const dataValue = formData.get('date');
+            formData.delete('date');
+            formData.append('idade', dataValue);
+        }
+
+        try {
+            const response = await fetch('/cadastro-user', {
+                method: 'POST',
+                body: formData
+            });
+
+            // Primeiro pega o texto puro
+            const text = await response.text();
+            
+            // Tenta transformar em JSON
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error("Servidor respondeu algo que não é JSON:", text);
+                alert("Erro crítico no servidor. Verifique os logs.");
                 return;
             }
 
-            // Pega os dados do formulário automaticamente
-            const formData = new FormData(this);
-
-            try {
-                const response = await fetch('/cadastro-user', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                // Primeiro pega o texto puro
-                const text = await response.text();
-                
-                // Tenta transformar em JSON
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    console.error("Servidor respondeu algo que não é JSON:", text);
-                    alert("Erro crítico no servidor. Verifique os logs.");
-                    return;
-                }
-
-                if (response.ok) {
-                    // Sucesso (HTTP 200 ou 201)
-                    alert('Cadastro realizado com sucesso! Você será redirecionado para o login.');
-                    window.location.href = '/login';
-                } else {
-                    // Erro (HTTP 400 ou 500)
-                    alert('Erro ao cadastrar: ' + (data.error || data.mensagem || 'Erro desconhecido'));
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro de conexão com o servidor.');
+            if (response.ok) {
+                // Sucesso (HTTP 200 ou 201)
+                alert('Cadastro realizado com sucesso! Você será redirecionado para o login.');
+                window.location.href = '/login';
+            } else {
+                // Erro (HTTP 400 ou 500)
+                alert('Erro ao cadastrar: ' + (data.error || data.mensagem || 'Erro desconhecido'));
             }
-        });
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro de conexão com o servidor.');
+        }
+    });
 
-        // --- Máscaras ---
+    // --- Máscaras ---
 
-        // Máscara CPF
-        document.getElementById('cpfID').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 11) {
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-                e.target.value = value;
-            }
-        });
+    // Máscara CPF
+    document.getElementById('cpfID').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length <= 11) {
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        }
+    });
 
-        // Máscara CEP
-        document.getElementById('cepID').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 8) {
-                value = value.replace(/(\d{5})(\d)/, '$1-$2');
-                e.target.value = value;
-            }
-        });
-    </script>
+    // Máscara CEP
+    document.getElementById('cepID').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length <= 8) {
+            value = value.replace(/(\d{5})(\d)/, '$1-$2');
+            e.target.value = value;
+        }
+    });
+</script>
 </body>
 
 </html>
