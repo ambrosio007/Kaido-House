@@ -151,7 +151,7 @@ def vitrine_home():
     except Exception as e:
         return jsonify({"error": str(e)}), 500 '''
     
-@user_bp.route('/api/vitrine-home')
+'''@user_bp.route('/api/vitrine-home')
 def vitrine_home():
     # Peças: limit 5, ordenado por random no banco
     pecas_novas = PecaService.buscar_custom(estado='novo', limit=5)
@@ -166,4 +166,21 @@ def vitrine_home():
         "pecas_usadas": pecas_usadas,
         "carros_novos": carros_novos,
         "carros_usados": carros_usados
+    })'''
+
+@user_bp.route('/api/vitrine-completa')
+def vitrine_completa():
+    # Peças
+    p_novas = PecaService.buscar_vitrine(estado='novo', limit=5)
+    p_usadas = PecaService.buscar_vitrine(estado='usado', limit=5)
+    
+    # Veículos
+    v_novos = VeiculoService.buscar_vitrine(apenas_novos=True, limit=5)
+    v_usados = VeiculoService.buscar_vitrine(apenas_novos=False, limit=5)
+    
+    return jsonify({
+        "pecas_novas": p_novas,
+        "pecas_usadas": p_usadas,
+        "carros_novos": v_novos,
+        "carros_usados": v_usados
     })

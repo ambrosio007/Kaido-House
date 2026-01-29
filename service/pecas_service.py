@@ -1,5 +1,5 @@
-from model.peca_model import PecaModel
-from repository.peca_repository import PecaRepository
+from model.pecas_model import PecaModel
+from repository.pecas_repository import PecaRepository
 import os
 from werkzeug.utils import secure_filename
 
@@ -75,3 +75,15 @@ class PecaService:
         except Exception as e:
             print(f"Erro ao atualizar peça: {e}")
             return False
+
+    @staticmethod
+    def buscar_vitrine(estado=None, limit=5):
+        """
+        Busca peças para a vitrine da Home de forma aleatória.
+        """
+        try:
+            # Chama o repositório passando o filtro de estado (novo/usado) e o limite
+            return PecaRepository.listar_aleatorio(estado=estado, limit=limit)
+        except Exception as e:
+            print(f"Erro ao buscar vitrine de peças: {e}")
+            return []

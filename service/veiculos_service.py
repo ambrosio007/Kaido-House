@@ -1,4 +1,4 @@
-from model.veiculo_model import VeiculoModel
+from model.veiculos_model import VeiculoModel
 from repository.veiculo_repository import VeiculoRepository
 import os
 from werkzeug.utils import secure_filename
@@ -75,3 +75,16 @@ class VeiculoService:
         except Exception as e:
             print(f"Erro ao atualizar veículo: {e}")
             return False
+        
+    @staticmethod
+    def buscar_vitrine(apenas_novos=True, limit=5):
+        """
+        Busca veículos para a vitrine filtrando por novos ou usados.
+        Consideramos 'novos' veículos com KM próximo a zero (ex: < 100km).
+        """
+        try:
+            # Chama o repositório com o filtro de KM e o limite de 5 itens aleatórios
+            return VeiculoRepository.listar_aleatorio_home(apenas_novos=apenas_novos, limit=limit)
+        except Exception as e:
+            print(f"Erro ao buscar vitrine de veículos: {e}")
+            return []

@@ -1,4 +1,5 @@
 from config.database import get_connection, release_connection
+from controller.pecas_controller import estado
 from psycopg2.extras import RealDictCursor
 
 class PecaRepository:
@@ -144,22 +145,24 @@ class PecaRepository:
 
 @staticmethod
 def listar_aleatorio(limit=5, apenas_novos=True):
-    """Lista peças aleatórias, com opção para apenas novas"""
     conn = get_connection()
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
-        query = "SELECT * FROM pecas WHERE status = 'ativo'"
-        params = []
-        
-        if apenas_novos:
-            query += " AND estado = 'novo'"
-        
-        query += " ORDER BY RANDOM() LIMIT %s"
-        params.append(limit)
-        
-        cursor.execute(query, params)
-        pecas = cursor.fetchall()
-        cursor.close()
-        return [dict(p) for p in pecas]
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            
+            # SQL base
+            query = "SELECT * FROM pecas WHERE 1=1"
+            params = []
+
+            # Filtra por estado se for enviado (novo ou usado)
+            if estado:
+                query += " AND estado = %s"
+                params.append(estado)
+
+            # Ordena aleatoriamente e limita a 5
+            query += " ORDER BY RANDOM() LIMIT %s"
+            params.append(limit)
+
+            cursor.execute(query, params)
+            return cursor.fetchall()
     finally:
-        release_connection(conn)
+            release_connection(conn)
