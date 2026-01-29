@@ -1,5 +1,4 @@
 from config.database import get_connection, release_connection
-from controller.pecas_controller import estado
 from psycopg2.extras import RealDictCursor
 
 class PecaRepository:
