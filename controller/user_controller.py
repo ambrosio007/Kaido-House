@@ -67,13 +67,13 @@ def cadastro_usuario():
         }), 500
     
 
-@user_bp.route('/login-user', methods=['POST'])  # ✅ CORRIGIDO: era /login-usuer
+@user_bp.route('/login-user', methods=['POST'])
 def login_usuario():
     data = request.get_json() or request.form
     email = data.get('email')
     senha = data.get('senha')
 
-    user = UserService.autenticar_usuario(email, senha)  # ✅ CORRIGIDO
+    user = UserService.autenticar_usuario(email, senha)
 
     if user:
         acces_token = create_access_token(identity={'id': user['id'], 'nome': user['nome'], 'email': user['email']})
@@ -133,6 +133,113 @@ def atualiza_user():
     if UserService.atualizar_usuario(user_id, user_edit):
         return jsonify({"message": "Usuário atualizado com sucesso"}), 200
     return jsonify({"error": "Falha ao atualizar usuário"}), 400
+
+
+# ============= NOVAS ROTAS ADICIONADAS =============
+
+@user_bp.route('/user-profile', methods=['GET'])
+@jwt_required()
+def get_user_profile():
+    """
+    Retorna os dados do perfil do usuário logado
+    Requer token JWT válido
+    """
+    try:
+        # Pega a identidade do usuário do token JWT
+        current_user = get_jwt_identity()
+        user_id = current_user.get('id')
+        
+        # Busca os dados completos do usuário
+        user_data = UserService.buscar_por_id(user_id)
+        
+        if not user_data:
+            return jsonify({'error': 'Usuário não encontrado'}), 404
+        
+        # Retorna os dados do usuário
+        return jsonify({
+            'id': user_data.get('id'),
+            'nome': user_data.get('nome'),
+            'email': user_data.get('email'),
+            'cpf': user_data.get('cpf'),
+            'data_nascimento': user_data.get('data_nascimento'),
+            'cep': user_data.get('cep'),
+            'data_cadastro': user_data.get('data_cadastro') or user_data.get('created_at'),
+            # Estatísticas (pode ajustar conforme seu banco)
+            'total_pedidos': user_data.get('total_pedidos', 0),
+            'avaliacao': user_data.get('avaliacao', 0.0),
+            'total_favoritos': user_data.get('total_favoritos', 0)
+        }), 200
+        
+    except Exception as e:
+        print(f'Erro ao buscar perfil: {str(e)}')
+        return jsonify({'error': 'Erro ao buscar dados do usuário'}), 500
+
+
+@user_bp.route('/cadastrar-veiculo', methods=['POST'])
+@jwt_required()
+def cadastrar_veiculo():
+    """
+    Rota para cadastrar um veículo para venda
+    """
+    try:
+        current_user = get_jwt_identity()
+        user_id = current_user.get('id')
+        data = request.get_json()
+        
+        # Validação básica
+        campos_obrigatorios = ['marca', 'modelo', 'ano', 'km', 'cor', 'preco', 'descricao']
+        for campo in campos_obrigatorios:
+            if campo not in data:
+                return jsonify({'error': f'Campo {campo} é obrigatório'}), 400
+        
+        # Adiciona o ID do usuário aos dados
+        data['user_id'] = user_id
+        
+        # Cadastra o veículo usando o service
+        sucesso = VeiculoService.cadastrar_veiculo(data)
+        
+        if sucesso:
+            return jsonify({'message': 'Veículo cadastrado com sucesso'}), 201
+        else:
+            return jsonify({'error': 'Erro ao cadastrar veículo'}), 400
+        
+    except Exception as e:
+        print(f'Erro ao cadastrar veículo: {str(e)}')
+        return jsonify({'error': 'Erro ao cadastrar veículo'}), 500
+
+
+@user_bp.route('/cadastrar-peca', methods=['POST'])
+@jwt_required()
+def cadastrar_peca():
+    """
+    Rota para cadastrar uma peça para venda
+    """
+    try:
+        current_user = get_jwt_identity()
+        user_id = current_user.get('id')
+        data = request.get_json()
+        
+        # Validação básica
+        campos_obrigatorios = ['nome', 'categoria', 'marca', 'estado', 'preco', 'descricao']
+        for campo in campos_obrigatorios:
+            if campo not in data:
+                return jsonify({'error': f'Campo {campo} é obrigatório'}), 400
+        
+        # Adiciona o ID do usuário aos dados
+        data['user_id'] = user_id
+        
+        # Cadastra a peça usando o service
+        sucesso = PecaService.cadastrar_peca(data)
+        
+        if sucesso:
+            return jsonify({'message': 'Peça cadastrada com sucesso'}), 201
+        else:
+            return jsonify({'error': 'Erro ao cadastrar peça'}), 400
+        
+    except Exception as e:
+        print(f'Erro ao cadastrar peça: {str(e)}')
+        return jsonify({'error': 'Erro ao cadastrar peça'}), 500
+
 
 @user_bp.route('/api/vitrine-completa')
 def vitrine_completa():
