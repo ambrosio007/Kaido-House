@@ -10,25 +10,45 @@
 </head>
 <body>
 
-    <header>
-        <a href="home.html" class="logo">
-            <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="logo-img">
+        <header>
+        <a href="/" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
         </a>
+
         <nav class="navbar">
-            <a href="home.html">Início</a>
-            <a href="/templates/pecas.html">Peças</a>
-            <a href="/templates/carros_pg.html">Veículos</a>
-            <a href="#customizacao">Customização</a>
+            <a href="/">Início</a>
+            <a href="/pecas">Peças</a>
+            <a href="/veiculos">Veículos</a>
+            <a href="#contato">Contato</a>
         </nav>
+
         <div class="header-icons">
-            <a href="#" class="icon-link active"><i class="fas fa-shopping-cart"></i><span class="cart-badge">2</span></a>
+            <!-- Ícone do Carrinho -->
+            <a href="/carrinho" class="icon-link cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge">0</span>
+            </a>
+
+            <!-- Área de Perfil/Login -->
             <div class="profile-area">
-                <a href="/templates/perfil.html" class="auth-icon-container"><img src="/static/images/default-avatar.jpg" class="profile-avatar"></a>
+                <!-- Estado DESLOGADO - Mostra ícone de login -->
+                <a href="/login" class="auth-icon-container login-state" id="profile-target">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+
+                <!-- Estado LOGADO - Mostra avatar/inicial + dropdown -->
+                <a href="/perfil" class="auth-icon-container profile-state hidden" id="profile-target-logged">
+                    <!-- A inicial ou foto será inserida aqui pelo JavaScript -->
+                    <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
+
+                    <!-- Dropdown será criado dinamicamente pelo JavaScript -->
+                </a>
             </div>
+
+            <!-- Menu Mobile -->
             <i id="menu-btn" class="fas fa-bars"></i>
         </div>
     </header>
-
     <main class="cart-container">
         <section class="cart-section">
             <h1 class="main-title"><i class="fas fa-shopping-cart"></i> Meu <span>Carrinho</span></h1>
@@ -104,7 +124,46 @@
         </section>
     </main>
 
-    <footer id="footer-placeholder"></footer>
+            <footer>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
+                <p>A maior autoridade em cultura JDM e performance de Joinville Sul. Transformando sonhos em projetos
+                    reais.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-nav">
+                <h3>Navegação</h3>
+                <ul>
+                    <li><a href="#">Catálogo de Peças</a></li>
+                    <li><a href="#">Estoque de Veículos</a></li>
+                    <li><a href="#">Oficina de Customização</a></li>
+                    <li><a href="#">Blog Kaido</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h3>Atendimento</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Joinville, SC - Unidade Sul</p>
+                <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
+                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-pix"></i>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Kaido-House. Desenvolvido para SENAI/SC.</p>
+        </div>
+    </footer>
 
     <script src="/static/js/nav_bar.js"></script>
     <script src="/static/js/carrinho.js"></script>
