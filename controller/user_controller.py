@@ -78,7 +78,7 @@ def login_usuario():
     email = data.get('email')
     senha = data.get('senha')
 
-    user = UserService.autenticar_usuario(email, senha)
+    user = UserService.autenticar_usuer(email, senha)
 
     if user:
         acces_token = create_access_token(identity={'id': user['id'], 'nome': user['nome'], 'email': user['email']})
