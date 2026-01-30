@@ -142,14 +142,20 @@ class PecaRepository:
         finally:
             release_connection(conn)
 
-@staticmethod
-def listar_aleatorio(limit=5, apenas_novos=True):
-    conn = get_connection()
-    try:
+    @staticmethod
+    def listar_aleatorio(estado=None, limit=5):
+        """
+        ✅ CORRIGIDO: Busca peças aleatórias para vitrine
+        Args:
+            estado: 'novo' ou 'usado' para filtrar
+            limit: quantidade de peças a retornar
+        """
+        conn = get_connection()
+        try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
             # SQL base
-            query = "SELECT * FROM pecas WHERE 1=1"
+            query = "SELECT * FROM pecas WHERE status = 'ativo'"
             params = []
 
             # Filtra por estado se for enviado (novo ou usado)
@@ -157,11 +163,16 @@ def listar_aleatorio(limit=5, apenas_novos=True):
                 query += " AND estado = %s"
                 params.append(estado)
 
-            # Ordena aleatoriamente e limita a 5
+            # Ordena aleatoriamente e limita
             query += " ORDER BY RANDOM() LIMIT %s"
             params.append(limit)
 
             cursor.execute(query, params)
-            return cursor.fetchall()
-    finally:
+            pecas = cursor.fetchall()
+            cursor.close()
+            return [dict(p) for p in pecas]
+        except Exception as e:
+            print(f"Erro ao listar peças aleatórias: {e}")
+            return []
+        finally:
             release_connection(conn)

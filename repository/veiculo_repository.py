@@ -131,20 +131,27 @@ class VeiculoRepository:
         finally:
             release_connection(conn)
 
-@staticmethod
-def listar_aleatorio(apenas_novos=True, limit=5):
+    @staticmethod
+    def listar_aleatorio(apenas_novos=True, limit=5):
+        """
+        ✅ CORRIGIDO: Lista veículos aleatórios para a vitrine
+        """
         conn = get_connection()
         try:
-            # Usamos RealDictCursor para o JS receber um objeto JSON pronto
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
             
             # Se apenas_novos for True, busca KM < 100. Se False, busca KM >= 100.
             if apenas_novos:
-                query = "SELECT * FROM veiculos WHERE km < 100 ORDER BY RANDOM() LIMIT %s"
+                query = "SELECT * FROM veiculos WHERE km < 100 AND status = 'ativo' ORDER BY RANDOM() LIMIT %s"
             else:
-                query = "SELECT * FROM veiculos WHERE km >= 100 ORDER BY RANDOM() LIMIT %s"
+                query = "SELECT * FROM veiculos WHERE km >= 100 AND status = 'ativo' ORDER BY RANDOM() LIMIT %s"
             
             cursor.execute(query, (limit,))
-            return cursor.fetchall()
+            veiculos = cursor.fetchall()
+            cursor.close()
+            return [dict(v) for v in veiculos]
+        except Exception as e:
+            print(f"Erro ao listar veículos aleatórios: {e}")
+            return []
         finally:
             release_connection(conn)

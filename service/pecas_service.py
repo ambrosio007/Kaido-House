@@ -7,6 +7,9 @@ class PecaService:
 
     @staticmethod
     def cadastrar_peca(dados, fotos=None):
+        """
+        ✅ CORRIGIDO: Cadastra peça com suporte a upload de múltiplas fotos
+        """
         try:
             peca = PecaModel(**dados)
             
@@ -21,10 +24,11 @@ class PecaService:
                         filename = secure_filename(f"{peca.id}_{foto.filename}")
                         filepath = os.path.join(upload_folder, filename)
                         foto.save(filepath)
-                        fotos_salvas.append(filepath)
+                        # Salvar caminho relativo para servir via web
+                        fotos_salvas.append(f"/static/uploads/pecas/{filename}")
             
             peca_dict = peca.to_dict()
-            peca_dict['fotos'] = ','.join(fotos_salvas)
+            peca_dict['fotos'] = ','.join(fotos_salvas) if fotos_salvas else ''
             
             status = PecaRepository.adicionar_peca(peca_dict)
             
@@ -34,6 +38,7 @@ class PecaService:
                 return False, "Erro ao cadastrar peça no banco de dados"
                 
         except Exception as e:
+            print(f"Erro em PecaService.cadastrar_peca: {e}")
             return False, f"Erro: {str(e)}"
     
     @staticmethod
@@ -79,10 +84,12 @@ class PecaService:
     @staticmethod
     def buscar_vitrine(estado=None, limit=5):
         """
-        Busca peças para a vitrine da Home de forma aleatória.
+        ✅ CORRIGIDO: Busca peças para a vitrine da Home de forma aleatória.
+        Args:
+            estado: 'novo' ou 'usado' para filtrar
+            limit: quantidade de peças a retornar
         """
         try:
-            # Chama o repositório passando o filtro de estado (novo/usado) e o limite
             return PecaRepository.listar_aleatorio(estado=estado, limit=limit)
         except Exception as e:
             print(f"Erro ao buscar vitrine de peças: {e}")

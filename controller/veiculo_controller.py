@@ -1,30 +1,47 @@
 from flask import Blueprint, render_template, jsonify, session, request, redirect, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from service.veiculo_service import VeiculoService
+from service.veiculos_service import VeiculoService
 
 veiculo_bp = Blueprint('veiculo', __name__)
 
 @veiculo_bp.route('/cadastro-veiculo', methods=['POST'])
-@jwt_required() # <--- O "porteiro" verifica o token aqui
+@jwt_required()
 def cadastro_veiculo():
-    """Cadastra um novo veículo"""
+    """Cadastra um novo veículo COM SUPORTE A UPLOAD DE IMAGENS"""
     
     # Pega o ID do usuário que está dentro do Token
     current_user_id = get_jwt_identity()
     
-    dados = {
-        "user_id": current_user_id, # Usamos o ID do token, não da sessão
-        "marca": request.form.get('marca'),
-        "modelo": request.form.get('modelo'),
-        "ano": request.form.get('ano'),
-        "km": request.form.get('km'),
-        "cor": request.form.get('cor'),
-        "preco": request.form.get('preco'),
-        "descricao": request.form.get('descricao')
-    }
-    
-    # Processar fotos se houver
-    fotos = request.files.getlist('fotos')
+    # ✅ CORREÇÃO: Aceitar tanto FormData (com fotos) quanto JSON
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        # Requisição com arquivos (FormData)
+        dados = {
+            "user_id": current_user_id,
+            "marca": request.form.get('marca'),
+            "modelo": request.form.get('modelo'),
+            "ano": request.form.get('ano'),
+            "km": request.form.get('km'),
+            "cor": request.form.get('cor'),
+            "preco": request.form.get('preco'),
+            "descricao": request.form.get('descricao')
+        }
+        
+        # Processar fotos
+        fotos = request.files.getlist('fotos')
+    else:
+        # Requisição JSON (sem fotos)
+        dados_json = request.get_json()
+        dados = {
+            "user_id": current_user_id,
+            "marca": dados_json.get('marca'),
+            "modelo": dados_json.get('modelo'),
+            "ano": dados_json.get('ano'),
+            "km": dados_json.get('km'),
+            "cor": dados_json.get('cor'),
+            "preco": dados_json.get('preco'),
+            "descricao": dados_json.get('descricao')
+        }
+        fotos = None
     
     status, mensagem = VeiculoService.cadastrar_veiculo(dados, fotos)
     
@@ -48,7 +65,6 @@ def meus_veiculos():
 @veiculo_bp.route('/veiculos', methods=['GET'])
 def listar_veiculos():
     """Lista todos os veículos ativos"""
-    # Não tem @jwt_required, pois é público
     veiculos = VeiculoService.listar_todos()
     return jsonify(veiculos), 200
 
@@ -73,7 +89,6 @@ def deletar_veiculo(veiculo_id):
     veiculo = VeiculoService.buscar_por_id(veiculo_id)
     
     # VERIFICAÇÃO DE PROPRIEDADE:
-    # Compara o dono do veículo com o dono do token
     if not veiculo or veiculo.get('user_id') != current_user_id:
         return jsonify({"error": "Veículo não encontrado ou você não tem permissão para deletá-lo"}), 403
     

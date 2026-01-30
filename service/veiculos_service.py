@@ -7,6 +7,9 @@ class VeiculoService:
 
     @staticmethod
     def cadastrar_veiculo(dados, fotos=None):
+        """
+        ✅ CORRIGIDO: Cadastra veículo com suporte a upload de múltiplas fotos
+        """
         try:
             veiculo = VeiculoModel(**dados)
             
@@ -21,10 +24,11 @@ class VeiculoService:
                         filename = secure_filename(f"{veiculo.id}_{foto.filename}")
                         filepath = os.path.join(upload_folder, filename)
                         foto.save(filepath)
-                        fotos_salvas.append(filepath)
+                        # Salvar caminho relativo para servir via web
+                        fotos_salvas.append(f"/static/uploads/veiculos/{filename}")
             
             veiculo_dict = veiculo.to_dict()
-            veiculo_dict['fotos'] = ','.join(fotos_salvas)
+            veiculo_dict['fotos'] = ','.join(fotos_salvas) if fotos_salvas else ''
             
             status = VeiculoRepository.adicionar_veiculo(veiculo_dict)
             
@@ -34,6 +38,7 @@ class VeiculoService:
                 return False, "Erro ao cadastrar veículo no banco de dados"
                 
         except Exception as e:
+            print(f"Erro em VeiculoService.cadastrar_veiculo: {e}")
             return False, f"Erro: {str(e)}"
     
     @staticmethod
@@ -79,12 +84,11 @@ class VeiculoService:
     @staticmethod
     def buscar_vitrine(apenas_novos=True, limit=5):
         """
-        Busca veículos para a vitrine filtrando por novos ou usados.
+        ✅ CORRIGIDO: Busca veículos para a vitrine filtrando por novos ou usados.
         Consideramos 'novos' veículos com KM próximo a zero (ex: < 100km).
         """
         try:
-            # Chama o repositório com o filtro de KM e o limite de 5 itens aleatórios
-            return VeiculoRepository.listar_aleatorio_home(apenas_novos=apenas_novos, limit=limit)
+            return VeiculoRepository.listar_aleatorio(apenas_novos=apenas_novos, limit=limit)
         except Exception as e:
             print(f"Erro ao buscar vitrine de veículos: {e}")
             return []
