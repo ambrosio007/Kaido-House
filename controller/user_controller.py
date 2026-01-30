@@ -4,6 +4,11 @@ from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identi
 from service.pecas_service import PecaService
 from service.veiculos_service import VeiculoService
 import uuid
+import sys
+from io import StringIO
+
+# Variável global para armazenar logs
+logs_buffer = []
 
 user_bp = Blueprint('user', __name__, template_folder='templates')
 
@@ -42,7 +47,7 @@ def recuperar_senha():
 
 
 
-@user_bp.route('/cadastro-user', methods=['POST'])
+''' @user_bp.route('/cadastro-user', methods=['POST'])
 def cadastro_usuario():
     dados = request.form.to_dict() 
 
@@ -64,7 +69,7 @@ def cadastro_usuario():
         return jsonify({
             "success": False,
             "error": f"Erro inesperado no servidor: {str(e)}"
-        }), 500
+        }), 500 '''
     
 
 @user_bp.route('/login-usuer', methods=['POST'])
@@ -457,3 +462,85 @@ def diagnostico_cadastro():
     """
     
     return html_resultado# Adicione no topo do arquivo se não existir
+
+@user_bp.route('/ver-logs')
+def ver_logs():
+    """Endpoint para visualizar os logs de cadastro"""
+    logs_html = "<br>".join(logs_buffer[-50:]) if logs_buffer else "Nenhum log ainda"
+    
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Logs do Sistema</title>
+        <style>
+            body {{ font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }}
+            pre {{ background: #252526; padding: 15px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap; }}
+            .error {{ color: #f48771; }}
+            .success {{ color: #4ec9b0; }}
+        </style>
+        <script>
+            // Auto-refresh a cada 2 segundos
+            setTimeout(function(){{ location.reload(); }}, 2000);
+        </script>
+    </head>
+    <body>
+        <h1>🔍 Logs em Tempo Real</h1>
+        <p>Esta página atualiza automaticamente a cada 2 segundos</p>
+        <pre>{logs_html}</pre>
+    </body>
+    </html>
+    """
+
+@user_bp.route('/limpar-logs')
+def limpar_logs():
+    """Limpa os logs"""
+    global logs_buffer
+    logs_buffer = []
+    return "Logs limpos! <a href='/ver-logs'>Voltar</a>"
+
+
+# Modifique a rota de cadastro para capturar logs
+@user_bp.route('/cadastro-user', methods=['POST'])
+def cadastro_usuario():
+    global logs_buffer
+    
+    dados = request.form.to_dict()
+    
+    # Log dos dados recebidos
+    log_msg = f"<span class='success'>📥 RECEBIDO:</span> {', '.join([f'{k}={v[:20] if k != \"senha\" else \"******\"}' for k, v in dados.items()])}"
+    logs_buffer.append(log_msg)
+    print(log_msg)
+
+    try:
+        status, mensagem = UserService.cadastrar_user(dados)
+
+        if status:
+            log_msg = f"<span class='success'>✅ SUCESSO:</span> Usuário {dados.get('nome')} cadastrado"
+            logs_buffer.append(log_msg)
+            print(log_msg)
+            
+            return jsonify({
+                "success": True,
+                "message": f"Usuário {dados.get('nome')} cadastrado com sucesso!"
+            }), 201
+        else:
+            log_msg = f"<span class='error'>❌ ERRO:</span> {mensagem}"
+            logs_buffer.append(log_msg)
+            print(log_msg)
+            
+            return jsonify({
+                "success": False,
+                "error": mensagem
+            }), 400
+            
+    except Exception as e:
+        log_msg = f"<span class='error'>💥 EXCEÇÃO:</span> {str(e)}"
+        logs_buffer.append(log_msg)
+        print(log_msg)
+        
+        return jsonify({
+            "success": False,
+            "error": f"Erro inesperado no servidor: {str(e)}"
+        }), 500

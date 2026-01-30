@@ -7,19 +7,42 @@ class UserService:
     @staticmethod
     def cadastrar_user(dados):
         try:
+            print(f"========== CADASTRO DE USUÁRIO ==========")
+            print(f"1. Dados recebidos no service:")
+            for key, value in dados.items():
+                if key == 'senha':
+                    print(f"   {key}: ****** (oculto)")
+                else:
+                    print(f"   {key}: {value}")
+            
+            print(f"\n2. Criando UserModel...")
             user = UserModel(**dados)
-            status = UserRepository.adicionar_user(user.__dict__)
-        
+            print(f"   ✅ UserModel criado com sucesso")
+            print(f"   ID: {user.id}")
+            print(f"   Perfil: {user.perfil}")
+            
+            print(f"\n3. Convertendo para dict...")
+            user_dict = user.__dict__
+            print(f"   Campos no dict: {list(user_dict.keys())}")
+            
+            print(f"\n4. Chamando UserRepository.adicionar_user...")
+            status = UserRepository.adicionar_user(user_dict)
+            
+            print(f"\n5. Resultado do repository: {status}")
+            print(f"==========================================\n")
+            
             if status:
                 return True, "Usuário cadastrado com sucesso"
             else:
                 return False, "Erro ao salvar usuário no banco de dados"
-            
+                
         except TypeError as e:
-        # Captura erros de campos incorretos no UserModel
+            print(f"ERRO TypeError: {str(e)}")
             return False, f"Campo inválido: {str(e)}"
         except Exception as e:
-        # Captura qualquer outro erro
+            print(f"ERRO Exception: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return False, f"Erro: {str(e)}"
     
     @staticmethod
