@@ -151,6 +151,7 @@ def get_user_profile():
     """
     Retorna os dados do perfil do usuário logado
     Requer token JWT válido
+    ✅ CORRIGIDO: Agora retorna apenas campos que existem no banco
     """
     try:
         current_user = get_jwt_identity()
@@ -161,15 +162,16 @@ def get_user_profile():
         if not user_data:
             return jsonify({'error': 'Usuário não encontrado'}), 404
         
+        # ✅ CORRIGIDO: Retornar apenas campos que existem
         return jsonify({
             'id': user_data.get('id'),
             'nome': user_data.get('nome'),
             'email': user_data.get('email'),
             'cpf': user_data.get('cpf'),
-            'data_nascimento': user_data.get('data_nascimento'),
+            'idade': user_data.get('idade'),  # ✅ idade ao invés de data_nascimento
             'cep': user_data.get('cep'),
             'foto_perfil': user_data.get('foto_perfil'),
-            'data_cadastro': user_data.get('data_cadastro') or user_data.get('created_at'),
+            'data_cadastro': user_data.get('created_at'),  # ✅ created_at direto
             'total_pedidos': user_data.get('total_pedidos', 0),
             'avaliacao': user_data.get('avaliacao', 0.0),
             'total_favoritos': user_data.get('total_favoritos', 0)

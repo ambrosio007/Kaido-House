@@ -86,8 +86,9 @@ function preencherDadosUsuario(user) {
         else if (labelText.includes('CPF') && user.cpf) {
             valueDiv.textContent = formatarCPF(user.cpf);
         }
-        else if (labelText.includes('Data de Nascimento') && user.data_nascimento) {
-            valueDiv.textContent = formatarData(user.data_nascimento);
+        // ✅ CORRIGIDO: Agora exibe idade ao invés de data de nascimento
+        else if (labelText.includes('Data de Nascimento') && user.idade) {
+            valueDiv.textContent = `${user.idade} anos`;
         }
         else if (labelText.includes('CEP') && user.cep) {
             valueDiv.textContent = formatarCEP(user.cep);
