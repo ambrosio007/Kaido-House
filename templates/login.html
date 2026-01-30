@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/login.css">
     <title>Login</title>
 </head>
+
 <body>
     <div class="container">
         <form id="loginForm">
@@ -32,12 +34,14 @@
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault(); // Impede o recarregamento da página
 
             // Pega os dados dos inputs
             const email = document.getElementById('emailID').value;
             const senha = document.getElementById('senhaID').value;
+
+            console.log('🔐 Tentando fazer login...', { email });
 
             try {
                 // Envia para o seu Back-end
@@ -49,30 +53,44 @@
                     body: JSON.stringify({ email: email, senha: senha })
                 });
 
+                console.log('📊 Status da resposta:', response.status);
+
                 const data = await response.json();
+                console.log('📦 Dados recebidos:', data);
 
                 if (response.ok) {
-                    // --- O PASSO MAIS IMPORTANTE DO JWT ---
-                    // 1. Salva o token no navegador
-                    localStorage.setItem('token', data.token);
-                    
-                    // 2. Opcional: Salvar dados do usuário para mostrar "Olá, Fulano"
-                    if (data.user) {
-                        localStorage.setItem('user_name', data.user.nome);
-                        localStorage.setItem('user_id', data.user.id);
-                    }
+                    // ✅ CORRIGIDO: usar 'access_token' ao invés de 'token'
+                    if (data.access_token) {
+                        // 1. Salva o token no navegador
+                        localStorage.setItem('token', data.access_token);
+                        console.log('✅ Token salvo com sucesso!');
 
-                    // 3. Redireciona para a Home ou Dashboard
-                    window.location.href = '/'; 
+                        // 2. Opcional: Salvar dados do usuário para mostrar "Olá, Fulano"
+                        if (data.user) {
+                            localStorage.setItem('user_name', data.user.nome);
+                            localStorage.setItem('user_id', data.user.id);
+                            console.log('✅ Dados do usuário salvos!');
+                        }
+
+                        console.log('🚀 Redirecionando para a home...');
+
+                        // 3. Redireciona para a Home ou Dashboard
+                        window.location.href = '/';
+                    } else {
+                        console.error('❌ Token não encontrado na resposta!');
+                        alert('Erro: Token de autenticação não recebido');
+                    }
                 } else {
+                    console.error('❌ Erro no login:', data);
                     alert('Erro no login: ' + (data.error || 'Verifique seus dados'));
                 }
 
             } catch (error) {
-                console.error('Erro:', error);
+                console.error('❌ Erro de conexão:', error);
                 alert('Erro de conexão com o servidor.');
             }
         });
     </script>
 </body>
+
 </html>
