@@ -25,21 +25,29 @@
         </nav>
 
         <div class="header-icons">
-            <a href="/templates/carrinho.html" class="icon-link cart-icon">
+            <!-- Ícone do Carrinho -->
+            <a href="/carrinho" class="icon-link cart-icon">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-badge">0</span>
             </a>
 
+            <!-- Área de Perfil/Login -->
             <div class="profile-area">
-                <a onclick="window.location.href='/login'" class="auth-icon-container login-state" id="profile-target">
+                <!-- Estado DESLOGADO - Mostra ícone de login -->
+                <a href="/login" class="auth-icon-container login-state" id="profile-target">
                     <i class="fas fa-user-circle"></i>
                 </a>
-                <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden"
-                    id="profile-target-logged">
+                
+                <!-- Estado LOGADO - Mostra avatar/inicial + dropdown -->
+                <a href="/perfil" class="auth-icon-container profile-state hidden" id="profile-target-logged">
+                    <!-- A inicial ou foto será inserida aqui pelo JavaScript -->
                     <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
+                    
+                    <!-- Dropdown será criado dinamicamente pelo JavaScript -->
                 </a>
             </div>
 
+            <!-- Menu Mobile -->
             <i id="menu-btn" class="fas fa-bars"></i>
         </div>
     </header>
