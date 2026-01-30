@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peças JDM | Kaido-House</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/home.css">
-    <link rel="stylesheet" href="/static/pecas.css">
+    <link rel="stylesheet" href="/static/css/home.css">
+    <link rel="stylesheet" href="/static/css/pecas.css">
 </head>
 
 <body>
@@ -40,10 +40,7 @@
                 
                 <!-- Estado LOGADO - Mostra avatar/inicial + dropdown -->
                 <a href="/perfil" class="auth-icon-container profile-state hidden" id="profile-target-logged">
-                    <!-- A inicial ou foto será inserida aqui pelo JavaScript -->
                     <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
-                    
-                    <!-- Dropdown será criado dinamicamente pelo JavaScript -->
                 </a>
             </div>
 
@@ -111,4 +108,87 @@
                     <span class="brand">K&N</span>
                     <h3>Filtro de Ar Esportivo High Flow</h3>
                     <p class="part-price">R$ 450,00</p>
-                    <button class="add-
+                    <button class="add-to-cart"><i class="fas fa-cart-plus"></i> Adicionar</button>
+                </div>
+            </div>
+
+            <div class="part-card" data-condition="new">
+                <div class="part-image">
+                    <img src="/static/images/new-part-3.jpg" alt="Turbo">
+                    <span class="tag new-tag">Novo</span>
+                </div>
+                <div class="part-info">
+                    <span class="brand">Garrett</span>
+                    <h3>Turbo GTX3076R Gen II</h3>
+                    <p class="part-price">R$ 12.800,00</p>
+                    <button class="add-to-cart"><i class="fas fa-cart-plus"></i> Adicionar</button>
+                </div>
+            </div>
+
+            <div class="part-card" data-condition="used">
+                <div class="part-image">
+                    <img src="/static/images/used-part-2.jpg" alt="Volante Nardi">
+                    <span class="tag used-tag">Usado</span>
+                </div>
+                <div class="part-info">
+                    <span class="brand">Nardi</span>
+                    <h3>Volante Classic 350mm Madeira</h3>
+                    <p class="part-price">R$ 1.850,00</p>
+                    <button class="add-to-cart"><i class="fas fa-cart-plus"></i> Adicionar</button>
+                </div>
+            </div>
+
+            <div class="part-card" data-condition="new">
+                <div class="part-image">
+                    <img src="/static/images/new-part-4.jpg" alt="Escape">
+                    <span class="tag new-tag">Novo</span>
+                </div>
+                <div class="part-info">
+                    <span class="brand">HKS</span>
+                    <h3>Sistema de Escape Hi-Power Spec L</h3>
+                    <p class="part-price">R$ 6.500,00</p>
+                    <button class="add-to-cart"><i class="fas fa-cart-plus"></i> Adicionar</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Sobre Nós</h3>
+                <p>Kaido House - Especialistas em peças e veículos JDM desde 2020.</p>
+                <div class="socials">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Links Rápidos</h3>
+                <ul>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/pecas">Peças</a></li>
+                    <li><a href="/veiculos">Veículos</a></li>
+                    <li><a href="/contato">Contato</a></li>
+                </ul>
+            </div>
+            <div class="footer-section contact">
+                <h3>Contato</h3>
+                <p><i class="fas fa-phone"></i> (11) 98765-4321</p>
+                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> São Paulo, SP</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Kaido House. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/static/js/nav_bar.js"></script>
+    <script src="/static/js/pecas.js"></script>
+</body>
+
+</html>
