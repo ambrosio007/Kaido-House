@@ -32,7 +32,6 @@ class UserService:
             print(f"\n❌ ERRO: {erro_msg}")
             print(f"==========================================\n")
             
-            # Retorna a mensagem de erro específica
             if "já está cadastrado" in erro_msg or "already exists" in erro_msg:
                 return False, erro_msg
             else:
@@ -43,7 +42,7 @@ class UserService:
         """Autentica usuário por email e senha"""
         user = UserRepository.buscar_por_email_e_senha(email, senha)
         if user and bcrypt.checkpw(senha.encode('utf-8'), user['senha'].encode('utf-8')):
-            return user  # Retorna o dict do usuário
+            return user
         return None
     
     @staticmethod
@@ -60,7 +59,7 @@ class UserService:
     def lista():
         """Lista todos os usuários"""
         users = UserRepository.lista_users()
-        return users  # Retorna lista de dicts
+        return users
 
     @staticmethod
     def buscar_por_id(user_id):
@@ -68,35 +67,39 @@ class UserService:
         Busca um usuário pelo ID e retorna seus dados completos
         """
         try:
-            # SUBSTITUA ISSO pela sua lógica de busca no banco
-            # Exemplo com SQLAlchemy:
-            # user = User.query.get(user_id)
-            
-            # Exemplo com banco de dados direto:
-            # user = db.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
-            
-            # EXEMPLO GENÉRICO - ADAPTE PARA SEU BANCO:
-            user = User.query.get(user_id)  # Se usar SQLAlchemy
+            user = UserRepository.buscar_por_id(user_id)
             
             if not user:
                 return None
             
             # Retorna um dicionário com os dados do usuário
             return {
-                'id': user.id,
-                'nome': user.nome,
-                'email': user.email,
-                'cpf': user.cpf if hasattr(user, 'cpf') else None,
-                'data_nascimento': user.data_nascimento.isoformat() if hasattr(user, 'data_nascimento') and user.data_nascimento else None,
-                'cep': user.cep if hasattr(user, 'cep') else None,
-                'created_at': user.created_at.isoformat() if hasattr(user, 'created_at') and user.created_at else None,
-                'data_cadastro': user.created_at.isoformat() if hasattr(user, 'created_at') and user.created_at else None,
+                'id': user.get('id'),
+                'nome': user.get('nome'),
+                'email': user.get('email'),
+                'cpf': user.get('cpf'),
+                'data_nascimento': user.get('data_nascimento'),
+                'cep': user.get('cep'),
+                'foto_perfil': user.get('foto_perfil'),
+                'created_at': user.get('created_at'),
+                'data_cadastro': user.get('created_at'),
                 # Estatísticas opcionais
-                'total_pedidos': 0,  # Implemente a contagem real de pedidos
-                'avaliacao': 0.0,    # Implemente o cálculo real da avaliação
-                'total_favoritos': 0 # Implemente a contagem real de favoritos
+                'total_pedidos': user.get('total_pedidos', 0),
+                'avaliacao': user.get('avaliacao', 0.0),
+                'total_favoritos': user.get('total_favoritos', 0)
             }
             
         except Exception as e:
             print(f'Erro ao buscar usuário por ID: {str(e)}')
             return None
+    
+    @staticmethod
+    def atualizar_foto_perfil(user_id, foto_url):
+        """
+        Atualiza a foto de perfil do usuário
+        """
+        try:
+            return UserRepository.atualizar_foto_perfil(user_id, foto_url)
+        except Exception as e:
+            print(f'Erro ao atualizar foto de perfil: {str(e)}')
+            return False

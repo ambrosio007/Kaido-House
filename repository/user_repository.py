@@ -23,8 +23,8 @@ class UserRepository:
         try:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO usuarios (id, nome, cpf, cep, email, idade, senha, perfil)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO usuarios (id, nome, cpf, cep, email, idade, senha, perfil, foto_perfil)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 dados['id'], 
                 dados['nome'], 
@@ -32,8 +32,9 @@ class UserRepository:
                 dados['cep'], 
                 dados['email'], 
                 dados['idade'], 
-                dados['senha_hash'],  # ✅ Corrigido: era 'senha', agora é 'senha_hash'
-                dados.get('perfil', 'cliente')  # ✅ Usa 'cliente' como padrão se não existir
+                dados['senha_hash'],
+                dados.get('perfil', 'cliente'),
+                dados.get('foto_perfil', None)
             ))
             conn.commit()
             cursor.close()
@@ -136,6 +137,28 @@ class UserRepository:
         except Exception as e:
             conn.rollback()
             print(f"Erro ao atualizar senha: {e}")
+            return False
+        finally:
+            release_connection(conn)
+    
+    @staticmethod
+    def atualizar_foto_perfil(user_id, foto_url):
+        """Atualiza a foto de perfil do usuário"""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE usuarios
+                SET foto_perfil = %s
+                WHERE id = %s
+            """, (foto_url, user_id))
+            conn.commit()
+            updated = cursor.rowcount
+            cursor.close()
+            return updated > 0
+        except Exception as e:
+            conn.rollback()
+            print(f"Erro ao atualizar foto de perfil: {e}")
             return False
         finally:
             release_connection(conn)

@@ -3,9 +3,19 @@ from service.user_service import UserService
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 from service.pecas_service import PecaService
 from service.veiculos_service import VeiculoService
+from werkzeug.utils import secure_filename
+import os
+import uuid
 
 
 user_bp = Blueprint('user', __name__, template_folder='templates')
+
+# Configurações de upload
+UPLOAD_FOLDER = 'static/uploads/profile_photos'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @user_bp.route('/') 
 def home():
@@ -23,7 +33,6 @@ def login():
 def perfil():
     return render_template('perfil.html')
 
-# --- ROTA DE PÁGINA (HTML) ---
 @user_bp.route('/carrinho')
 def ver_carrinho():
     return render_template('carrinho.html') 
@@ -39,7 +48,6 @@ def pag_veiculos():
 @user_bp.route('/receuperar-senha')
 def recuperar_senha():
     return render_template('recupera_senha.html')
-
 
 
 @user_bp.route('/cadastro-user', methods=['POST'])
@@ -135,7 +143,7 @@ def atualiza_user():
     return jsonify({"error": "Falha ao atualizar usuário"}), 400
 
 
-# ============= NOVAS ROTAS ADICIONADAS =============
+# ============= ROTAS DE PERFIL =============
 
 @user_bp.route('/user-profile', methods=['GET'])
 @jwt_required()
@@ -145,17 +153,14 @@ def get_user_profile():
     Requer token JWT válido
     """
     try:
-        # Pega a identidade do usuário do token JWT
         current_user = get_jwt_identity()
         user_id = current_user.get('id')
         
-        # Busca os dados completos do usuário
         user_data = UserService.buscar_por_id(user_id)
         
         if not user_data:
             return jsonify({'error': 'Usuário não encontrado'}), 404
         
-        # Retorna os dados do usuário
         return jsonify({
             'id': user_data.get('id'),
             'nome': user_data.get('nome'),
@@ -163,8 +168,8 @@ def get_user_profile():
             'cpf': user_data.get('cpf'),
             'data_nascimento': user_data.get('data_nascimento'),
             'cep': user_data.get('cep'),
+            'foto_perfil': user_data.get('foto_perfil'),
             'data_cadastro': user_data.get('data_cadastro') or user_data.get('created_at'),
-            # Estatísticas (pode ajustar conforme seu banco)
             'total_pedidos': user_data.get('total_pedidos', 0),
             'avaliacao': user_data.get('avaliacao', 0.0),
             'total_favoritos': user_data.get('total_favoritos', 0)
@@ -173,6 +178,90 @@ def get_user_profile():
     except Exception as e:
         print(f'Erro ao buscar perfil: {str(e)}')
         return jsonify({'error': 'Erro ao buscar dados do usuário'}), 500
+
+
+@user_bp.route('/upload-foto-perfil', methods=['POST'])
+@jwt_required()
+def upload_foto_perfil():
+    """
+    Rota para upload de foto de perfil
+    """
+    try:
+        current_user = get_jwt_identity()
+        user_id = current_user.get('id')
+        
+        # Verificar se há arquivo no request
+        if 'foto' not in request.files:
+            return jsonify({'error': 'Nenhum arquivo enviado'}), 400
+        
+        file = request.files['foto']
+        
+        if file.filename == '':
+            return jsonify({'error': 'Nenhum arquivo selecionado'}), 400
+        
+        if file and allowed_file(file.filename):
+            # Criar nome único para o arquivo
+            filename = secure_filename(file.filename)
+            file_extension = filename.rsplit('.', 1)[1].lower()
+            unique_filename = f"{user_id}_{uuid.uuid4().hex}.{file_extension}"
+            
+            # Garantir que o diretório existe
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            
+            # Salvar arquivo
+            file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+            file.save(file_path)
+            
+            # URL pública da foto
+            foto_url = f"/static/uploads/profile_photos/{unique_filename}"
+            
+            # Atualizar no banco de dados
+            if UserService.atualizar_foto_perfil(user_id, foto_url):
+                return jsonify({
+                    'message': 'Foto de perfil atualizada com sucesso',
+                    'foto_url': foto_url
+                }), 200
+            else:
+                # Se falhar ao atualizar banco, remover arquivo
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                return jsonify({'error': 'Erro ao atualizar foto no banco de dados'}), 500
+        else:
+            return jsonify({'error': 'Tipo de arquivo não permitido'}), 400
+            
+    except Exception as e:
+        print(f'Erro ao fazer upload de foto: {str(e)}')
+        return jsonify({'error': 'Erro ao fazer upload da foto'}), 500
+
+
+@user_bp.route('/remover-foto-perfil', methods=['DELETE'])
+@jwt_required()
+def remover_foto_perfil():
+    """
+    Remove a foto de perfil do usuário
+    """
+    try:
+        current_user = get_jwt_identity()
+        user_id = current_user.get('id')
+        
+        # Buscar foto atual
+        user_data = UserService.buscar_por_id(user_id)
+        
+        if user_data and user_data.get('foto_perfil'):
+            # Remover arquivo do servidor
+            foto_path = user_data['foto_perfil'].replace('/static/', 'static/')
+            if os.path.exists(foto_path):
+                os.remove(foto_path)
+        
+        # Atualizar banco para NULL
+        if UserService.atualizar_foto_perfil(user_id, None):
+            return jsonify({'message': 'Foto de perfil removida com sucesso'}), 200
+        else:
+            return jsonify({'error': 'Erro ao remover foto'}), 500
+            
+    except Exception as e:
+        print(f'Erro ao remover foto: {str(e)}')
+        return jsonify({'error': 'Erro ao remover foto'}), 500
 
 
 @user_bp.route('/cadastrar-veiculo', methods=['POST'])
@@ -186,16 +275,12 @@ def cadastrar_veiculo():
         user_id = current_user.get('id')
         data = request.get_json()
         
-        # Validação básica
         campos_obrigatorios = ['marca', 'modelo', 'ano', 'km', 'cor', 'preco', 'descricao']
         for campo in campos_obrigatorios:
             if campo not in data:
                 return jsonify({'error': f'Campo {campo} é obrigatório'}), 400
         
-        # Adiciona o ID do usuário aos dados
         data['user_id'] = user_id
-        
-        # Cadastra o veículo usando o service
         sucesso = VeiculoService.cadastrar_veiculo(data)
         
         if sucesso:
@@ -219,16 +304,12 @@ def cadastrar_peca():
         user_id = current_user.get('id')
         data = request.get_json()
         
-        # Validação básica
         campos_obrigatorios = ['nome', 'categoria', 'marca', 'estado', 'preco', 'descricao']
         for campo in campos_obrigatorios:
             if campo not in data:
                 return jsonify({'error': f'Campo {campo} é obrigatório'}), 400
         
-        # Adiciona o ID do usuário aos dados
         data['user_id'] = user_id
-        
-        # Cadastra a peça usando o service
         sucesso = PecaService.cadastrar_peca(data)
         
         if sucesso:
@@ -243,11 +324,8 @@ def cadastrar_peca():
 
 @user_bp.route('/api/vitrine-completa')
 def vitrine_completa():
-    # Peças
     p_novas = PecaService.buscar_vitrine(estado='novo', limit=5)
     p_usadas = PecaService.buscar_vitrine(estado='usado', limit=5)
-    
-    # Veículos
     v_novos = VeiculoService.buscar_vitrine(apenas_novos=True, limit=5)
     v_usados = VeiculoService.buscar_vitrine(apenas_novos=False, limit=5)
     

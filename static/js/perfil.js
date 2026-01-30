@@ -3,22 +3,20 @@
 document.addEventListener('DOMContentLoaded', function() {
     carregarDadosUsuario();
     configurarBotoes();
+    configurarUploadFoto();
 });
 
 // Função para carregar dados do usuário
 async function carregarDadosUsuario() {
     try {
-        // Buscar token do localStorage
         const token = localStorage.getItem('token');
         
         if (!token) {
-            // Se não houver token, redirecionar para login
             alert('Você precisa estar logado para acessar esta página');
             window.location.href = '/login';
             return;
         }
 
-        // Fazer requisição para buscar dados do usuário
         const response = await fetch('https://kaido-house.onrender.com/user-profile', {
             method: 'GET',
             headers: {
@@ -29,7 +27,6 @@ async function carregarDadosUsuario() {
 
         if (!response.ok) {
             if (response.status === 401) {
-                // Token inválido ou expirado
                 localStorage.removeItem('token');
                 alert('Sessão expirada. Faça login novamente.');
                 window.location.href = '/login';
@@ -39,8 +36,6 @@ async function carregarDadosUsuario() {
         }
 
         const userData = await response.json();
-        
-        // Preencher dados no HTML
         preencherDadosUsuario(userData);
 
     } catch (error) {
@@ -51,11 +46,18 @@ async function carregarDadosUsuario() {
 
 // Função para preencher os dados do usuário no HTML
 function preencherDadosUsuario(user) {
-    // Foto de perfil (iniciais)
+    // Foto de perfil
     const profilePhoto = document.querySelector('.profile-photo');
     if (profilePhoto && user.nome) {
-        const iniciais = obterIniciais(user.nome);
-        profilePhoto.textContent = iniciais;
+        if (user.foto_perfil) {
+            // Se tem foto, exibir a imagem
+            profilePhoto.innerHTML = `<img src="${user.foto_perfil}" alt="Foto de perfil" class="profile-image">`;
+        } else {
+            // Se não tem foto, exibir iniciais
+            const iniciais = obterIniciais(user.nome);
+            profilePhoto.textContent = iniciais;
+            profilePhoto.classList.add('sem-foto');
+        }
     }
 
     // Nome do usuário
@@ -92,7 +94,7 @@ function preencherDadosUsuario(user) {
         }
     });
 
-    // Data de cadastro (Membro desde)
+    // Data de cadastro
     if (user.data_cadastro) {
         const memberSince = document.querySelector('.profile-header p');
         if (memberSince) {
@@ -118,6 +120,94 @@ function preencherDadosUsuario(user) {
         if (user.total_favoritos !== undefined) {
             statCards[2].querySelector('.number').textContent = user.total_favoritos;
         }
+    }
+}
+
+// Configurar upload de foto
+function configurarUploadFoto() {
+    const profilePhoto = document.querySelector('.profile-photo');
+    
+    if (profilePhoto) {
+        // Criar input de arquivo (oculto)
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        document.body.appendChild(fileInput);
+        
+        // Adicionar cursor pointer e título
+        profilePhoto.style.cursor = 'pointer';
+        profilePhoto.title = 'Clique para alterar a foto de perfil';
+        
+        // Evento de clique na foto
+        profilePhoto.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // Evento quando selecionar arquivo
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            
+            if (!file) return;
+            
+            // Validar tipo de arquivo
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor, selecione uma imagem válida');
+                return;
+            }
+            
+            // Validar tamanho (máx 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('A imagem deve ter no máximo 5MB');
+                return;
+            }
+            
+            // Fazer upload
+            await uploadFotoPerfil(file);
+        });
+    }
+}
+
+// Função para fazer upload da foto
+async function uploadFotoPerfil(file) {
+    try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            alert('Você precisa estar logado');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('foto', file);
+        
+        const response = await fetch('https://kaido-house.onrender.com/upload-foto-perfil', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Atualizar a foto na tela
+            const profilePhoto = document.querySelector('.profile-photo');
+            if (profilePhoto) {
+                profilePhoto.innerHTML = `<img src="${data.foto_url}" alt="Foto de perfil" class="profile-image">`;
+                profilePhoto.classList.remove('sem-foto');
+            }
+            
+            alert('Foto de perfil atualizada com sucesso!');
+        } else {
+            const error = await response.json();
+            alert(`Erro: ${error.error || 'Erro ao fazer upload da foto'}`);
+        }
+        
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao fazer upload da foto. Tente novamente.');
     }
 }
 

@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/perfil.css">
     <link rel="stylesheet" href="/static/home.css">
+    <!-- ✅ ADICIONAR: CSS da foto de perfil -->
+    <link rel="stylesheet" href="/static/css/profile-photo-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <title>Perfil do Usuário</title>
@@ -35,9 +37,12 @@
                 <a onclick="window.location.href='/login'" class="auth-icon-container login-state" id="profile-target">
                     <i class="fas fa-user-circle"></i>
                 </a>
+                <!-- ✅ MODIFICADO: Removido caminho fixo da imagem -->
                 <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden"
                     id="profile-target-logged">
-                    <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
+                    <div class="header-profile-photo">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
                 </a>
             </div>
 
@@ -49,24 +54,25 @@
     <main class="main-content">
         <div class="container">
             <div class="profile-header">
-                <div class="profile-photo">
-                    JD
+                <!-- ✅ MODIFICADO: Removido conteúdo hardcoded, será preenchido via JavaScript -->
+                <div class="profile-photo" title="Clique para alterar a foto de perfil">
+                    <!-- Foto será carregada dinamicamente -->
                 </div>
-                <h1>João da Silva</h1>
-                <p>Membro desde Janeiro 2025</p>
+                <h1>Carregando...</h1>
+                <p>Membro desde...</p>
             </div>
 
             <div class="stats">
                 <div class="stat-card">
-                    <div class="number">127</div>
+                    <div class="number">0</div>
                     <div class="label">Pedidos</div>
                 </div>
                 <div class="stat-card">
-                    <div class="number">4.8</div>
+                    <div class="number">0.0</div>
                     <div class="label">Avaliação</div>
                 </div>
                 <div class="stat-card">
-                    <div class="number">23</div>
+                    <div class="number">0</div>
                     <div class="label">Favoritos</div>
                 </div>
             </div>
@@ -74,27 +80,27 @@
             <div class="profile-info">
                 <div class="info-group">
                     <label>Nome Completo</label>
-                    <div class="value">João da Silva</div>
+                    <div class="value">Carregando...</div>
                 </div>
 
                 <div class="info-group">
                     <label>Email</label>
-                    <div class="value">joao.silva@email.com</div>
+                    <div class="value">Carregando...</div>
                 </div>
 
                 <div class="info-group">
                     <label>CPF</label>
-                    <div class="value">123.456.789-00</div>
+                    <div class="value">Carregando...</div>
                 </div>
 
                 <div class="info-group">
                     <label>Data de Nascimento</label>
-                    <div class="value">15/03/1990</div>
+                    <div class="value">Carregando...</div>
                 </div>
 
                 <div class="info-group">
                     <label>CEP</label>
-                    <div class="value">57000-000</div>
+                    <div class="value">Carregando...</div>
                 </div>
             </div>
 
