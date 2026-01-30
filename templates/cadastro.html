@@ -30,7 +30,7 @@
                 <br><br>
                 <div class="inputBox">
                     <label for="idadeID" class="labelInput"><b>Data de Nascimento</b></label>
-                    <input type="date" name="idade" id="idadeID" class="inputUser" required>
+                    <input type="date" name="idade" id="idadeID" class="inputUser" required max="">
                 </div>
                 <br><br>
                 <div class="inputBox">
@@ -56,30 +56,53 @@
     </div>
 
     <script>
+        // Define data máxima (hoje) para o campo de data de nascimento
+        document.addEventListener('DOMContentLoaded', function() {
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('idadeID').setAttribute('max', hoje);
+        });
+
         // Envio do formulário
         document.getElementById('formCadastro').addEventListener('submit', async function (e) {
-            e.preventDefault(); // Impede a página de recarregar
+            e.preventDefault();
 
             const senha = document.getElementById('senhaID').value;
             const confirmaSenha = document.getElementById('confirma_senhaID').value;
+            const dataNascimento = document.getElementById('idadeID').value;
 
+            // Validação de senha
             if (senha !== confirmaSenha) {
                 alert('As senhas não coincidem!');
                 return;
             }
 
+            // Validação de data
+            if (!dataNascimento || dataNascimento === '') {
+                alert('Por favor, informe uma data de nascimento válida!');
+                return;
+            }
+
+            // Verifica se a data não é futura
+            const dataAtual = new Date();
+            const dataSelecionada = new Date(dataNascimento);
+            
+            if (dataSelecionada > dataAtual) {
+                alert('A data de nascimento não pode ser no futuro!');
+                return;
+            }
+
+            // Verifica se a pessoa tem pelo menos 16 anos
+            const idade = Math.floor((dataAtual - dataSelecionada) / (365.25 * 24 * 60 * 60 * 1000));
+            if (idade < 16) {
+                alert('Você deve ter pelo menos 16 anos para se cadastrar!');
+                return;
+            }
+
             // Pega os dados do formulário
             const formData = new FormData(this);
-
-            // IMPORTANTE: Remove o campo confirma_senha antes de enviar
+            
+            // Remove o campo confirma_senha antes de enviar
             formData.delete('confirma_senha');
-
-            // Também mude 'date' para 'idade' se ainda não fez
-            if (formData.has('date')) {
-                const dataValue = formData.get('date');
-                formData.delete('date');
-                formData.append('idade', dataValue);
-            }
 
             try {
                 const response = await fetch('/cadastro-user', {
@@ -87,7 +110,7 @@
                     body: formData
                 });
 
-                const data = await response.json(); // Agora sempre retorna JSON
+                const data = await response.json();
 
                 if (data.success) {
                     alert(data.message);
@@ -120,59 +143,6 @@
             if (value.length <= 8) {
                 value = value.replace(/(\d{5})(\d)/, '$1-$2');
                 e.target.value = value;
-            }
-        });
-
-        document.getElementById('formCadastro').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const senha = document.getElementById('senhaID').value;
-            const confirmaSenha = document.getElementById('confirma_senhaID').value;
-
-            if (senha !== confirmaSenha) {
-                alert('As senhas não coincidem!');
-                return;
-            }
-
-            const formData = new FormData(this);
-
-            // Remove confirma_senha
-            formData.delete('confirma_senha');
-
-            // TEMPORÁRIO: Ver o que está sendo enviado
-            console.log('===== DADOS SENDO ENVIADOS =====');
-            for (let [key, value] of formData.entries()) {
-                console.log(key + ': ' + value);
-            }
-            console.log('================================');
-
-            try {
-                const response = await fetch('/cadastro-user', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const text = await response.text();
-                console.log('Resposta do servidor:', text);
-
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    console.error("Servidor respondeu algo que não é JSON:", text);
-                    alert("Erro: " + text);
-                    return;
-                }
-
-                if (response.ok) {
-                    alert('Cadastro realizado com sucesso!');
-                    window.location.href = '/login';
-                } else {
-                    alert('Erro: ' + (data.error || data.mensagem || 'Erro desconhecido'));
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro de conexão.');
             }
         });
     </script>
