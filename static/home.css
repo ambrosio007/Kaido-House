@@ -568,3 +568,132 @@ footer {
         border-bottom: 2px solid #ff0000;
     }
 }
+/* ========================================
+   AVATAR COM INICIAL E DROPDOWN
+   ======================================== */
+
+/* Avatar com inicial (quando não tem foto) */
+.avatar-inicial {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    color: white;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.auth-icon-container:hover .avatar-inicial {
+    background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+}
+
+/* Dropdown de perfil */
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(255, 0, 0, 0.3);
+    min-width: 240px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    overflow: hidden;
+    border: 1px solid #333;
+}
+
+/* Seta do dropdown */
+.profile-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    width: 16px;
+    height: 16px;
+    background-color: #1a1a1a;
+    transform: rotate(45deg);
+    border-left: 1px solid #333;
+    border-top: 1px solid #333;
+}
+
+/* Mostrar dropdown ao passar o mouse */
+.profile-state:hover .profile-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Header do dropdown */
+.dropdown-header {
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    color: white;
+}
+
+.dropdown-nome {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: white;
+}
+
+.dropdown-email {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    color: white;
+}
+
+/* Itens do dropdown */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    color: #f0f0f0;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.dropdown-item i {
+    width: 18px;
+    font-size: 1rem;
+    color: #999;
+    transition: color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #2a2a2a;
+    padding-left: 1.5rem;
+}
+
+.dropdown-item:hover i {
+    color: #ff0000;
+}
+
+/* Separador */
+.dropdown-divider {
+    height: 1px;
+    background-color: #333;
+    margin: 0.5rem 0;
+}
+
+/* Item de logout */
+.dropdown-item.logout {
+    color: #ff5555;
+}
+
+.dropdown-item.logout i {
+    color: #ff5555;
+}
+
+.dropdown-item.logout:hover {
+    background-color: rgba(255, 0, 0, 0.1);
+}
