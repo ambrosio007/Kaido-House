@@ -116,19 +116,12 @@ def login_usuario():
             print(f"{'='*60}\n")
             return jsonify({"error": "Erro ao processar dados do usuário"}), 500
         
-        # Criar identity para o token
-        identity = {
-            'id': user_id,
-            'nome': user.get('nome', ''),
-            'email': user.get('email', '')
-        }
-        
-        print(f"\n🔑 Identity que será usado no token:")
-        print(f"   {identity}")
+        # Criar identity para o token (APENAS O ID COMO STRING)
+        print(f"\n🔑 Identity que será usado no token: {user_id}")
         
         # Gerar token JWT
         try:
-            access_token = create_access_token(identity=identity)
+            access_token = create_access_token(identity=user_id)
             
             print(f"\n✅ Token JWT gerado com sucesso!")
             print(f"   Comprimento: {len(access_token)} caracteres")
