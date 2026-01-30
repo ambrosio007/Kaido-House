@@ -4,7 +4,11 @@ from controller.user_controller import user_bp
 import os
 
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = 'your_secret_key_here'
+
+# Configurações de segurança
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'ddfbbfb184d7143c012eee95a50b05b34aa722887368574a0db514622eb2c8cd')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', '09fbf119994172d829e9e927cb6e9f27dc9b7940df04b2c5f07660aee423b432')
+
 jwt = JWTManager(app)
 
 app.register_blueprint(user_bp)
