@@ -65,6 +65,7 @@ class UserService:
     def buscar_por_id(user_id):
         """
         Busca um usuário pelo ID e retorna seus dados completos
+        ✅ VERSÃO CORRIGIDA - usando 'idade' ao invés de 'data_nascimento'
         """
         try:
             user = UserRepository.buscar_por_id(user_id)
@@ -78,7 +79,7 @@ class UserService:
                 'nome': user.get('nome'),
                 'email': user.get('email'),
                 'cpf': user.get('cpf'),
-                'data_nascimento': user.get('data_nascimento'),
+                'idade': user.get('idade'),  # ✅ CORRIGIDO: usar 'idade' ao invés de 'data_nascimento'
                 'cep': user.get('cep'),
                 'foto_perfil': user.get('foto_perfil'),
                 'created_at': user.get('created_at'),
