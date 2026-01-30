@@ -2,7 +2,7 @@ import uuid
 import bcrypt
 
 class UserModel:
-    def __init__(self, nome, cpf, cep, idade, email, senha):
+    def __init__(self, nome, cpf, cep, idade, email, senha, perfil='cliente'):
         self.id = str(uuid.uuid4())
         self.nome = nome
         self.cpf = cpf
@@ -10,6 +10,7 @@ class UserModel:
         self.idade = idade
         self.email = email
         self.senha_hash = bcrypt.hashpw(senha.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        self.perfil = perfil  # ✅ Adicionar este campo
 
     def to_dict(self):
         return {
@@ -18,5 +19,6 @@ class UserModel:
             "cpf": self.cpf,
             "cep": self.cep,
             "idade": self.idade,
-            "email": self.email
+            "email": self.email,
+            "perfil": self.perfil
         }

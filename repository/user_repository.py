@@ -32,8 +32,8 @@ class UserRepository:
                 dados['cep'], 
                 dados['email'], 
                 dados['idade'], 
-                dados['senha'], 
-                dados['perfil']
+                dados['senha_hash'],  # ✅ Corrigido: era 'senha', agora é 'senha_hash'
+                dados.get('perfil', 'cliente')  # ✅ Usa 'cliente' como padrão se não existir
             ))
             conn.commit()
             cursor.close()

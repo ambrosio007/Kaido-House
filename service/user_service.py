@@ -9,17 +9,18 @@ class UserService:
         try:
             user = UserModel(**dados)
             status = UserRepository.adicionar_user(user.__dict__)
-            
+        
             if status:
                 return True, "Usuário cadastrado com sucesso"
             else:
                 return False, "Erro ao salvar usuário no banco de dados"
-                
+            
         except TypeError as e:
-            # Captura erros de campos incorretos
-            return False, f"Erro nos dados fornecidos: {str(e)}"
+        # Captura erros de campos incorretos no UserModel
+            return False, f"Campo inválido: {str(e)}"
         except Exception as e:
-            return False, f"Erro inesperado: {str(e)}"
+        # Captura qualquer outro erro
+            return False, f"Erro: {str(e)}"
     
     @staticmethod
     def autenticar_user(email, senha):
