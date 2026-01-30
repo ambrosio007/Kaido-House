@@ -6,6 +6,7 @@ from service.veiculos_service import VeiculoService
 from werkzeug.utils import secure_filename
 import os
 import uuid
+import traceback
 
 
 user_bp = Blueprint('user', __name__, template_folder='templates')
@@ -77,25 +78,95 @@ def cadastro_usuario():
 
 @user_bp.route('/login-user', methods=['POST'])
 def login_usuario():
-    data = request.get_json() or request.form
-    email = data.get('email')
-    senha = data.get('senha')
+    """
+    Rota de login com logs detalhados e validação do token
+    ✅ VERSÃO CORRIGIDA
+    """
+    try:
+        data = request.get_json() or request.form
+        email = data.get('email')
+        senha = data.get('senha')
 
-    user = UserService.autenticar_usuario(email, senha)
+        print(f"\n{'='*60}")
+        print(f"🔐 LOGIN REQUEST")
+        print(f"{'='*60}")
+        print(f"Email: {email}")
+        
+        # Autenticar usuário
+        user = UserService.autenticar_usuario(email, senha)
 
-    if user:
-        acces_token = create_access_token(identity={'id': user['id'], 'nome': user['nome'], 'email': user['email']})
-        session['user_id'] = user['id']
-        session['user_nome'] = user['nome']
-        session['user_email'] = user['email']
+        if not user:
+            print(f"❌ Autenticação falhou para: {email}")
+            print(f"{'='*60}\n")
+            return jsonify({"error": "Email ou senha incorretos"}), 401
+        
+        # Usuário autenticado com sucesso
+        print(f"✅ Usuário autenticado: {user.get('nome')}")
+        print(f"\n📋 Dados do usuário para o token:")
+        print(f"   ID: {user.get('id')}")
+        print(f"   Tipo ID: {type(user.get('id'))}")
+        print(f"   Nome: {user.get('nome')}")
+        print(f"   Email: {user.get('email')}")
+        
+        # Garantir que o ID é string
+        user_id = str(user['id']) if user.get('id') else None
+        
+        if not user_id:
+            print(f"❌ ERRO: ID do usuário está vazio!")
+            print(f"{'='*60}\n")
+            return jsonify({"error": "Erro ao processar dados do usuário"}), 500
+        
+        # Criar identity para o token
+        identity = {
+            'id': user_id,
+            'nome': user.get('nome', ''),
+            'email': user.get('email', '')
+        }
+        
+        print(f"\n🔑 Identity que será usado no token:")
+        print(f"   {identity}")
+        
+        # Gerar token JWT
+        try:
+            access_token = create_access_token(identity=identity)
+            
+            print(f"\n✅ Token JWT gerado com sucesso!")
+            print(f"   Comprimento: {len(access_token)} caracteres")
+            print(f"   Partes (deve ser 3): {len(access_token.split('.'))}")
+            print(f"   Preview: {access_token[:50]}...")
+            
+            # Validar que o token tem 3 partes
+            if len(access_token.split('.')) != 3:
+                print(f"❌ ERRO: Token malformado! Não tem 3 partes!")
+                print(f"{'='*60}\n")
+                return jsonify({"error": "Erro ao gerar token de autenticação"}), 500
+                
+        except Exception as e:
+            print(f"❌ ERRO ao gerar token JWT: {str(e)}")
+            traceback.print_exc()
+            print(f"{'='*60}\n")
+            return jsonify({"error": "Erro ao gerar token de autenticação"}), 500
+        
+        # Salvar na sessão
+        session['user_id'] = user_id
+        session['user_nome'] = user.get('nome', '')
+        session['user_email'] = user.get('email', '')
+        
+        print(f"\n✅ Login concluído com sucesso!")
+        print(f"{'='*60}\n")
+        
         return jsonify({
             "message": "Login realizado com sucesso", 
-            "access_token": acces_token
-            }), 200
-    else:
-        return jsonify({
-            "error": "Email ou senha incorretos"
-        }), 401
+            "access_token": access_token
+        }), 200
+        
+    except Exception as e:
+        print(f"\n❌ ERRO CRÍTICO no login:")
+        print(f"   {str(e)}")
+        traceback.print_exc()
+        print(f"{'='*60}\n")
+        return jsonify({"error": "Erro interno do servidor"}), 500
+
     
 @user_bp.route('/logout')
 def logout():
@@ -150,49 +221,85 @@ def atualiza_user():
 def get_user_profile():
     """
     Retorna os dados do perfil do usuário logado
-    Requer token JWT válido
-    ✅ CORRIGIDO: Agora retorna apenas campos que existem no banco
+    ✅ VERSÃO FINAL COM LOGS DETALHADOS
     """
     try:
-        current_user = get_jwt_identity()
-        user_id = current_user.get('id')
+        print("\n" + "="*60)
+        print("🔐 REQUISIÇÃO: /user-profile")
+        print("="*60)
         
+        # Obter identidade do JWT
+        current_user = get_jwt_identity()
+        print(f"✅ Token JWT processado")
+        print(f"📋 Identity extraída do token:")
+        print(f"   Tipo: {type(current_user)}")
+        print(f"   Conteúdo: {current_user}")
+        
+        if not current_user:
+            print("❌ Identity do token está vazia!")
+            return jsonify({'error': 'Token inválido'}), 401
+        
+        # Extrair user_id (pode ser string ou dict)
+        if isinstance(current_user, dict):
+            user_id = current_user.get('id')
+        else:
+            user_id = current_user
+            
+        print(f"🆔 User ID extraído: {user_id} (tipo: {type(user_id)})")
+        
+        if not user_id:
+            print("❌ ID de usuário não encontrado no token")
+            return jsonify({'error': 'ID de usuário não encontrado no token'}), 401
+        
+        # Buscar dados do usuário
+        print(f"\n🔍 Buscando usuário no banco...")
         user_data = UserService.buscar_por_id(user_id)
         
         if not user_data:
+            print(f"❌ Usuário não encontrado no banco: {user_id}")
             return jsonify({'error': 'Usuário não encontrado'}), 404
         
-        # ✅ CORRIGIDO: Retornar apenas campos que existem
-        return jsonify({
+        print(f"✅ Usuário encontrado!")
+        
+        # Construir resposta
+        print(f"\n📦 Montando resposta...")
+        response = {
             'id': user_data.get('id'),
             'nome': user_data.get('nome'),
             'email': user_data.get('email'),
-            'cpf': user_data.get('cpf'),
-            'idade': user_data.get('idade'),  # ✅ idade ao invés de data_nascimento
-            'cep': user_data.get('cep'),
+            'cpf': user_data.get('cpf', ''),
+            'idade': user_data.get('idade', 0),
+            'cep': user_data.get('cep', ''),
             'foto_perfil': user_data.get('foto_perfil'),
-            'data_cadastro': user_data.get('created_at'),  # ✅ created_at direto
+            'data_cadastro': user_data.get('created_at'),
             'total_pedidos': user_data.get('total_pedidos', 0),
             'avaliacao': user_data.get('avaliacao', 0.0),
             'total_favoritos': user_data.get('total_favoritos', 0)
-        }), 200
+        }
+        
+        print(f"✅ Resposta montada!")
+        print(f"📤 Retornando 200 OK")
+        print("="*60 + "\n")
+        
+        return jsonify(response), 200
         
     except Exception as e:
-        print(f'Erro ao buscar perfil: {str(e)}')
-        return jsonify({'error': 'Erro ao buscar dados do usuário'}), 500
+        print(f"\n❌ ERRO CRÍTICO:")
+        print(f"   Tipo: {type(e).__name__}")
+        print(f"   Mensagem: {str(e)}")
+        traceback.print_exc()
+        print("="*60 + "\n")
+        
+        return jsonify({'error': 'Erro interno do servidor'}), 500
 
 
 @user_bp.route('/upload-foto-perfil', methods=['POST'])
 @jwt_required()
 def upload_foto_perfil():
-    """
-    Rota para upload de foto de perfil
-    """
     try:
         current_user = get_jwt_identity()
-        user_id = current_user.get('id')
+        user_id = current_user.get('id') if isinstance(current_user, dict) else current_user
         
-        # Verificar se há arquivo no request
         if 'foto' not in request.files:
             return jsonify({'error': 'Nenhum arquivo enviado'}), 400
         
@@ -202,29 +309,23 @@ def upload_foto_perfil():
             return jsonify({'error': 'Nenhum arquivo selecionado'}), 400
         
         if file and allowed_file(file.filename):
-            # Criar nome único para o arquivo
             filename = secure_filename(file.filename)
             file_extension = filename.rsplit('.', 1)[1].lower()
             unique_filename = f"{user_id}_{uuid.uuid4().hex}.{file_extension}"
             
-            # Garantir que o diretório existe
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
             
-            # Salvar arquivo
             file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
             file.save(file_path)
             
-            # URL pública da foto
             foto_url = f"/static/uploads/profile_photos/{unique_filename}"
             
-            # Atualizar no banco de dados
             if UserService.atualizar_foto_perfil(user_id, foto_url):
                 return jsonify({
                     'message': 'Foto de perfil atualizada com sucesso',
                     'foto_url': foto_url
                 }), 200
             else:
-                # Se falhar ao atualizar banco, remover arquivo
                 if os.path.exists(file_path):
                     os.remove(file_path)
                 return jsonify({'error': 'Erro ao atualizar foto no banco de dados'}), 500
@@ -232,30 +333,25 @@ def upload_foto_perfil():
             return jsonify({'error': 'Tipo de arquivo não permitido'}), 400
             
     except Exception as e:
-        print(f'Erro ao fazer upload de foto: {str(e)}')
+        print(f'Erro ao fazer upload: {str(e)}')
+        traceback.print_exc()
         return jsonify({'error': 'Erro ao fazer upload da foto'}), 500
 
 
 @user_bp.route('/remover-foto-perfil', methods=['DELETE'])
 @jwt_required()
 def remover_foto_perfil():
-    """
-    Remove a foto de perfil do usuário
-    """
     try:
         current_user = get_jwt_identity()
-        user_id = current_user.get('id')
+        user_id = current_user.get('id') if isinstance(current_user, dict) else current_user
         
-        # Buscar foto atual
         user_data = UserService.buscar_por_id(user_id)
         
         if user_data and user_data.get('foto_perfil'):
-            # Remover arquivo do servidor
             foto_path = user_data['foto_perfil'].replace('/static/', 'static/')
             if os.path.exists(foto_path):
                 os.remove(foto_path)
         
-        # Atualizar banco para NULL
         if UserService.atualizar_foto_perfil(user_id, None):
             return jsonify({'message': 'Foto de perfil removida com sucesso'}), 200
         else:
@@ -263,18 +359,16 @@ def remover_foto_perfil():
             
     except Exception as e:
         print(f'Erro ao remover foto: {str(e)}')
+        traceback.print_exc()
         return jsonify({'error': 'Erro ao remover foto'}), 500
 
 
 @user_bp.route('/cadastrar-veiculo', methods=['POST'])
 @jwt_required()
 def cadastrar_veiculo():
-    """
-    Rota para cadastrar um veículo para venda
-    """
     try:
         current_user = get_jwt_identity()
-        user_id = current_user.get('id')
+        user_id = current_user.get('id') if isinstance(current_user, dict) else current_user
         data = request.get_json()
         
         campos_obrigatorios = ['marca', 'modelo', 'ano', 'km', 'cor', 'preco', 'descricao']
@@ -292,18 +386,16 @@ def cadastrar_veiculo():
         
     except Exception as e:
         print(f'Erro ao cadastrar veículo: {str(e)}')
+        traceback.print_exc()
         return jsonify({'error': 'Erro ao cadastrar veículo'}), 500
 
 
 @user_bp.route('/cadastrar-peca', methods=['POST'])
 @jwt_required()
 def cadastrar_peca():
-    """
-    Rota para cadastrar uma peça para venda
-    """
     try:
         current_user = get_jwt_identity()
-        user_id = current_user.get('id')
+        user_id = current_user.get('id') if isinstance(current_user, dict) else current_user
         data = request.get_json()
         
         campos_obrigatorios = ['nome', 'categoria', 'marca', 'estado', 'preco', 'descricao']
@@ -321,6 +413,7 @@ def cadastrar_peca():
         
     except Exception as e:
         print(f'Erro ao cadastrar peça: {str(e)}')
+        traceback.print_exc()
         return jsonify({'error': 'Erro ao cadastrar peça'}), 500
 
 
