@@ -44,22 +44,27 @@ def recuperar_senha():
 
 @user_bp.route('/cadastro-user', methods=['POST'])
 def cadastro_usuario():
-    # 1. Corrigido: to_dict() sem argumentos
     dados = request.form.to_dict() 
 
     try:
-        # 2. Certifique-se que o UserService retorna (bool, str)
         status, mensagem = UserService.cadastrar_user(dados)
 
         if status:
-            # 3. Corrigido: url_for usa o nome da FUNÇÃO (ex: login_page)
-            # Supondo que sua função de login se chama 'login' no blueprint 'auth'
-            return f"Usuário {dados.get('nome')} cadastrado com sucesso! <a href='{url_for('user_bp.login')}'>Faça login aqui</a>"
+            return jsonify({
+                "success": True,
+                "message": f"Usuário {dados.get('nome')} cadastrado com sucesso!"
+            }), 201
         else:
-            return f"Erro no cadastro: {mensagem} <a href='{url_for('user_bp.cadastro_usuario')}'>Tente novamente</a>"
+            return jsonify({
+                "success": False,
+                "error": mensagem
+            }), 400
             
     except Exception as e:
-        return f"Erro inesperado no servidor: {str(e)}", 500
+        return jsonify({
+            "success": False,
+            "error": f"Erro inesperado no servidor: {str(e)}"
+        }), 500
     
 
 @user_bp.route('/login-usuer', methods=['POST'])
