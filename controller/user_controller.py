@@ -3,7 +3,7 @@ from service.user_service import UserService
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 from service.pecas_service import PecaService
 from service.veiculos_service import VeiculoService
-
+import uuid
 
 user_bp = Blueprint('user', __name__, template_folder='templates')
 
