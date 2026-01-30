@@ -463,6 +463,14 @@ def diagnostico_cadastro():
     
     return html_resultado# Adicione no topo do arquivo se não existir
 
+# Adicione estas rotas ao user_controller.py
+
+import sys
+from io import StringIO
+
+# Variável global para armazenar logs
+logs_buffer = []
+
 @user_bp.route('/ver-logs')
 def ver_logs():
     """Endpoint para visualizar os logs de cadastro"""
@@ -508,8 +516,16 @@ def cadastro_usuario():
     
     dados = request.form.to_dict()
     
-    # Log dos dados recebidos
-    log_msg = f"<span class='success'>📥 RECEBIDO:</span> {', '.join([f'{k}={v[:20] if k != \"senha\" else \"******\"}' for k, v in dados.items()])}"
+    # Log dos dados recebidos - CORRIGIDO
+    dados_log = []
+    for k, v in dados.items():
+        if k == 'senha':
+            dados_log.append(f'{k}=******')
+        else:
+            valor = str(v)[:20]
+            dados_log.append(f'{k}={valor}')
+    
+    log_msg = f"<span class='success'>📥 RECEBIDO:</span> {', '.join(dados_log)}"
     logs_buffer.append(log_msg)
     print(log_msg)
 
