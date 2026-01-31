@@ -249,7 +249,7 @@ footer {
 }
 
 /* ====================================
-   4. ESTILOS DO CARROSSEL SWIPER
+   4. ESTILOS DO CARROSSEL SWIPER (BANNER)
    ==================================== */
 .home-banner-carousel {
     width: 100%;
@@ -314,109 +314,18 @@ footer {
 /* ====================================
    5. ESTILOS DOS CARROSSEIS DE CARDS
    ==================================== */
-.card-carousel-section {
-    padding: 20px 0;
-    margin-bottom: 30px;
-}
 
-.section-title {
-    font-size: 1.8em;
-    color: #f0f0f0;
-    margin-bottom: 25px;
-    padding: 0 5%;
-    border-left: 5px solid #ff0000;
-    padding-left: 15px;
-}
+/* ✅ REMOVIDO: Estilos duplicados de .card-carousel-section, .section-title
+   e .card-slider foram removidos daqui pois já existem no card.css */
 
-.card-slider {
-    padding: 10px 5%; /* Padding para as setas de navegação */
-}
+/* ✅ REMOVIDO: Estilos de .product-card e .vehicle-card 
+   Esses estilos estão no card.css e estavam causando conflito */
 
-/* Estilo do Card de Produto/Veículo */
-.product-card, .vehicle-card {
-    background: #1a1a1a;
-    border-radius: 10px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-    max-width: 300px; /* Limite a largura para caberem vários na tela */
-    transition: transform 0.3s;
-    border: 1px solid #333;
-}
-
-.product-card:hover, .vehicle-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(255, 0, 0, 0.3);
-}
-
-.card-image {
-    position: relative;
-    height: 180px; /* Altura fixa para a imagem do card */
-    overflow: hidden;
-}
-
-.card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.discount-tag {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #ff0000;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 0.8em;
-}
-
-.card-content {
-    padding: 15px;
-    text-align: center;
-}
-
-.card-content h3 {
-    font-size: 1.1em;
-    color: #ff0000;
-    margin-bottom: 5px;
-}
-
-.card-content .price {
-    font-size: 1.3em;
-    font-weight: bold;
-    margin: 10px 0;
-}
-
-.card-content del {
-    color: #999;
-    font-size: 0.9em;
-    margin-right: 10px;
-}
-
-/* Botão de Card (Estilize conforme o seu padrão de botão) */
-.btn-card {
-    display: block;
-    width: 100%;
-    padding: 8px 0;
-    background: #2a2a2a;
-    color: #f0f0f0;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-top: 10px;
-    transition: background 0.3s;
-}
-
-.btn-card:hover {
-    background: #ff0000;
-}
-
-/* Estilos de Navegação (Setas) do Swiper */
+/* Estilos de Navegação (Setas) do Swiper - Mantidos aqui para o banner */
 .swiper-button-next, .swiper-button-prev {
     color: #ff0000 !important;
     transform: scale(0.8);
-    background-color: rgba(26, 26, 26, 0.7); /* Fundo sutil para melhor visibilidade */
+    background-color: rgba(26, 26, 26, 0.7);
     border-radius: 50%;
     padding: 15px;
     top: 50%;
@@ -431,7 +340,7 @@ footer {
     background: #ff0000 !important;
 }
 
-/* Media Query Específica para Carrossel */
+/* Media Query Específica para Banner */
 @media (max-width: 600px) {
     .banner-slider {
         height: 300px;
@@ -568,6 +477,7 @@ footer {
         border-bottom: 2px solid #ff0000;
     }
 }
+
 /* ========================================
    AVATAR COM INICIAL E DROPDOWN
    ======================================== */
