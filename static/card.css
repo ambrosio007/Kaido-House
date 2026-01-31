@@ -31,6 +31,7 @@
     transition: all 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     height: 100%;
+    min-height: 480px; /* ✅ CORRIGIDO: Altura mínima para evitar cards achatados */
     display: flex;
     flex-direction: column;
     border: 1px solid #2a2a2a;
@@ -49,6 +50,7 @@
     height: 250px;
     overflow: hidden;
     background: #0a0a0a;
+    flex-shrink: 0; /* ✅ CORRIGIDO: Impede que a imagem seja comprimida */
 }
 
 .card-image img {
@@ -95,6 +97,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    justify-content: space-between; /* ✅ CORRIGIDO: Distribui melhor o conteúdo */
 }
 
 .card-title {
@@ -191,6 +194,12 @@
     padding: 20px 0 60px;
 }
 
+/* ✅ CORRIGIDO: Adiciona altura mínima aos slides do Swiper */
+.card-slider .swiper-slide {
+    height: auto;
+    min-height: 480px;
+}
+
 .swiper-button-next,
 .swiper-button-prev {
     color: #e74c3c;
@@ -274,6 +283,14 @@
         font-size: 1.5rem;
     }
     
+    .product-card {
+        min-height: 420px; /* ✅ Altura ajustada para mobile */
+    }
+    
+    .card-slider .swiper-slide {
+        min-height: 420px;
+    }
+    
     .card-image {
         height: 200px;
     }
@@ -306,6 +323,14 @@
 @media (max-width: 480px) {
     .card-carousel-section {
         padding: 20px 10px;
+    }
+    
+    .product-card {
+        min-height: 400px; /* ✅ Altura ajustada para telas pequenas */
+    }
+    
+    .card-slider .swiper-slide {
+        min-height: 400px;
     }
     
     .card-actions {
