@@ -347,11 +347,13 @@ if (formVeiculo) {
         formData.append('preco',     document.getElementById('veiculoPreco').value);
         formData.append('descricao', document.getElementById('veiculoDescricao').value);
 
-        // Adicionar as fotos selecionadas (se houver)
+        // ✅ CORREÇÃO: Converter FileList para Array antes de usar forEach
         const fotosVeiculo = document.getElementById('veiculoFotos');
-        fotosVeiculo.files.forEach(file => {
-            formData.append('fotos', file);
-        });
+        if (fotosVeiculo && fotosVeiculo.files) {
+            Array.from(fotosVeiculo.files).forEach(file => {
+                formData.append('fotos', file);
+            });
+        }
         
         try {
             // Não define Content-Type: o navegador define automaticamente com o boundary do FormData
@@ -401,11 +403,13 @@ if (formPeca) {
         formData.append('preco',     document.getElementById('pecaPreco').value);
         formData.append('descricao', document.getElementById('pecaDescricao').value);
 
-        // Adicionar as fotos selecionadas (se houver)
+        // ✅ CORREÇÃO: Converter FileList para Array antes de usar forEach
         const fotos = document.getElementById('pecaFotos');
-        fotos.files.forEach(file => {
-            formData.append('fotos', file);
-        });
+        if (fotos && fotos.files) {
+            Array.from(fotos.files).forEach(file => {
+                formData.append('fotos', file);
+            });
+        }
         
         try {
             // Não define Content-Type: o navegador define automaticamente com o boundary do FormData
