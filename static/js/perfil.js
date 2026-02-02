@@ -337,24 +337,30 @@ if (formVeiculo) {
             return;
         }
         
-        const dados = {
-            marca: document.getElementById('veiculoMarca').value,
-            modelo: document.getElementById('veiculoModelo').value,
-            ano: parseInt(document.getElementById('veiculoAno').value),
-            km: parseInt(document.getElementById('veiculoKm').value),
-            cor: document.getElementById('veiculoCor').value,
-            preco: parseFloat(document.getElementById('veiculoPreco').value),
-            descricao: document.getElementById('veiculoDescricao').value
-        };
+        // Usar FormData para enviar dados + arquivos juntos
+        const formData = new FormData();
+        formData.append('marca',     document.getElementById('veiculoMarca').value);
+        formData.append('modelo',    document.getElementById('veiculoModelo').value);
+        formData.append('ano',       document.getElementById('veiculoAno').value);
+        formData.append('km',        document.getElementById('veiculoKm').value);
+        formData.append('cor',       document.getElementById('veiculoCor').value);
+        formData.append('preco',     document.getElementById('veiculoPreco').value);
+        formData.append('descricao', document.getElementById('veiculoDescricao').value);
+
+        // Adicionar as fotos selecionadas (se houver)
+        const fotosVeiculo = document.getElementById('veiculoFotos');
+        fotosVeiculo.files.forEach(file => {
+            formData.append('fotos', file);
+        });
         
         try {
-            const response = await fetch('https://kaido-house.onrender.com/cadastrar-veiculo', {
+            // Não define Content-Type: o navegador define automaticamente com o boundary do FormData
+            const response = await fetch('https://kaido-house.onrender.com/cadastro-veiculo', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(dados)
+                body: formData
             });
             
             if (response.ok) {
@@ -385,24 +391,30 @@ if (formPeca) {
             return;
         }
         
-        const dados = {
-            nome: document.getElementById('pecaNome').value,
-            categoria: document.getElementById('pecaCategoria').value,
-            marca: document.getElementById('pecaMarca').value,
-            modelo: document.getElementById('pecaModelo').value,
-            estado: document.getElementById('pecaEstado').value,
-            preco: parseFloat(document.getElementById('pecaPreco').value),
-            descricao: document.getElementById('pecaDescricao').value
-        };
+        // Usar FormData para enviar dados + arquivos juntos
+        const formData = new FormData();
+        formData.append('nome',      document.getElementById('pecaNome').value);
+        formData.append('categoria', document.getElementById('pecaCategoria').value);
+        formData.append('marca',     document.getElementById('pecaMarca').value);
+        formData.append('modelo',    document.getElementById('pecaModelo').value);
+        formData.append('estado',    document.getElementById('pecaEstado').value);
+        formData.append('preco',     document.getElementById('pecaPreco').value);
+        formData.append('descricao', document.getElementById('pecaDescricao').value);
+
+        // Adicionar as fotos selecionadas (se houver)
+        const fotos = document.getElementById('pecaFotos');
+        fotos.files.forEach(file => {
+            formData.append('fotos', file);
+        });
         
         try {
-            const response = await fetch('https://kaido-house.onrender.com/cadastrar-peca', {
+            // Não define Content-Type: o navegador define automaticamente com o boundary do FormData
+            const response = await fetch('https://kaido-house.onrender.com/cadastro-peca', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(dados)
+                body: formData
             });
             
             if (response.ok) {
