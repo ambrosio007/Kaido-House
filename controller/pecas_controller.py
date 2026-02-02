@@ -76,10 +76,19 @@ def listar_pecas():
     pecas = PecaService.listar_todos(categoria=categoria, estado=estado)
     return jsonify(pecas), 200
 
-# --- ROTA PÚBLICA: Detalhes ---
+# --- ROTA PÚBLICA: Página HTML de Detalhes ---
 @peca_bp.route('/peca/<peca_id>', methods=['GET'])
-def detalhes_peca(peca_id):
-    """Retorna detalhes de uma peça específica"""
+def detalhes_peca_pagina(peca_id):
+    """Renderiza a página HTML de detalhes da peça"""
+    peca = PecaService.buscar_por_id(peca_id)
+    if peca:
+        return render_template('detalhes_peca.html', peca=peca)
+    return render_template('erro_404.html'), 404
+
+# --- ROTA PÚBLICA API: Detalhes (JSON) ---
+@peca_bp.route('/api/peca/<peca_id>', methods=['GET'])
+def detalhes_peca_api(peca_id):
+    """Retorna detalhes de uma peça específica em JSON"""
     peca = PecaService.buscar_por_id(peca_id)
     if peca:
         return jsonify(peca), 200
@@ -128,21 +137,6 @@ def atualizar_peca(peca_id):
 @peca_bp.route('/pecas/categorias', methods=['GET'])
 def listar_categorias():
     """Lista todas as categorias de peças disponíveis"""
-    categorias = [
-        {"value": "motor", "label": "Motor e Transmissão"},
-        {"value": "suspensao", "label": "Suspensão e Freios"},
-        {"value": "carroceria", "label": "Carroceria"},
-        {"value": "eletrica", "label": "Parte Elétrica"},
-        {"value": "interior", "label": "Interior"},
-        {"value": "outros", "label": "Outros"}
-    ]
-    return jsonify(categorias), 200
-
-# --- ROTA PÚBLICA: Listas Auxiliares ---
-@peca_bp.route('/pecas/categorias', methods=['GET'])
-def listar_categorias():
-    """Lista todas as categorias de peças disponíveis"""
-    # Dados estáticos não precisam de proteção
     categorias = [
         {"value": "motor", "label": "Motor e Transmissão"},
         {"value": "suspensao", "label": "Suspensão e Freios"},

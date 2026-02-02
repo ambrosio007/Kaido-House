@@ -68,10 +68,19 @@ def listar_veiculos():
     veiculos = VeiculoService.listar_todos()
     return jsonify(veiculos), 200
 
-# --- ROTA PÚBLICA: Ver detalhes do carro ---
+# --- ROTA PÚBLICA: Página HTML de Detalhes ---
 @veiculo_bp.route('/veiculo/<veiculo_id>', methods=['GET'])
-def detalhes_veiculo(veiculo_id):
-    """Retorna detalhes de um veículo específico"""
+def detalhes_veiculo_pagina(veiculo_id):
+    """Renderiza a página HTML de detalhes do veículo"""
+    veiculo = VeiculoService.buscar_por_id(veiculo_id)
+    if veiculo:
+        return render_template('detalhes_veiculo.html', veiculo=veiculo)
+    return render_template('erro_404.html'), 404
+
+# --- ROTA PÚBLICA API: Detalhes (JSON) ---
+@veiculo_bp.route('/api/veiculo/<veiculo_id>', methods=['GET'])
+def detalhes_veiculo_api(veiculo_id):
+    """Retorna detalhes de um veículo específico em JSON"""
     veiculo = VeiculoService.buscar_por_id(veiculo_id)
     if veiculo:
         return jsonify(veiculo), 200

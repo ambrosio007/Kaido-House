@@ -10,6 +10,7 @@ body {
     min-height: 100vh; /* Garante que o body ocupe toda a altura */
     display: flex;
     flex-direction: column; /* Necessário para o footer fixar no final */
+    overflow-x: hidden;
 }
 
 main {
