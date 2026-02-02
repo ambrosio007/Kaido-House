@@ -22,6 +22,7 @@ def cadastro_veiculo():
             "ano": request.form.get('ano'),
             "km": request.form.get('km'),
             "cor": request.form.get('cor'),
+            "estado": request.form.get('estado'),
             "preco": request.form.get('preco'),
             "descricao": request.form.get('descricao')
         }
@@ -38,6 +39,7 @@ def cadastro_veiculo():
             "ano": dados_json.get('ano'),
             "km": dados_json.get('km'),
             "cor": dados_json.get('cor'),
+            "estado": dados_json.get('estado'),
             "preco": dados_json.get('preco'),
             "descricao": dados_json.get('descricao')
         }

@@ -344,6 +344,7 @@ if (formVeiculo) {
         formData.append('ano',       document.getElementById('veiculoAno').value);
         formData.append('km',        document.getElementById('veiculoKm').value);
         formData.append('cor',       document.getElementById('veiculoCor').value);
+        formData.append('estado',    document.getElementById('veiculoEstado').value);
         formData.append('preco',     document.getElementById('veiculoPreco').value);
         formData.append('descricao', document.getElementById('veiculoDescricao').value);
 
