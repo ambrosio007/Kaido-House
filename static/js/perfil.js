@@ -365,18 +365,39 @@ if (formVeiculo) {
                 body: formData
             });
             
+            // ✅ VERIFICAR SE A RESPOSTA É JSON ANTES DE PARSEAR
+            const contentType = response.headers.get('content-type');
+            
             if (response.ok) {
-                alert('Veículo cadastrado com sucesso!');
+                // Se sucesso, tentar parsear JSON
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    alert('Veículo cadastrado com sucesso!');
+                } else {
+                    alert('Veículo cadastrado com sucesso!');
+                }
                 modal.classList.remove('show');
                 document.body.style.overflow = 'auto';
                 formVeiculo.reset();
             } else {
-                const error = await response.json();
-                alert(`Erro: ${error.error || 'Erro ao cadastrar veículo'}`);
+                // Se erro, tentar obter mensagem de erro
+                let errorMessage = 'Erro ao cadastrar veículo';
+                
+                if (contentType && contentType.includes('application/json')) {
+                    const error = await response.json();
+                    errorMessage = error.error || error.message || errorMessage;
+                } else if (response.status === 404) {
+                    errorMessage = 'Rota não encontrada no servidor. Verifique a URL da API.';
+                } else {
+                    const textError = await response.text();
+                    console.error('Resposta do servidor:', textError);
+                }
+                
+                alert(`Erro: ${errorMessage}`);
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Erro ao cadastrar veículo. Tente novamente.');
+            alert('Erro ao cadastrar veículo. Verifique sua conexão e tente novamente.');
         }
     };
 }
@@ -421,18 +442,39 @@ if (formPeca) {
                 body: formData
             });
             
+            // ✅ VERIFICAR SE A RESPOSTA É JSON ANTES DE PARSEAR
+            const contentType = response.headers.get('content-type');
+            
             if (response.ok) {
-                alert('Peça cadastrada com sucesso!');
+                // Se sucesso, tentar parsear JSON
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    alert('Peça cadastrada com sucesso!');
+                } else {
+                    alert('Peça cadastrada com sucesso!');
+                }
                 modal.classList.remove('show');
                 document.body.style.overflow = 'auto';
                 formPeca.reset();
             } else {
-                const error = await response.json();
-                alert(`Erro: ${error.error || 'Erro ao cadastrar peça'}`);
+                // Se erro, tentar obter mensagem de erro
+                let errorMessage = 'Erro ao cadastrar peça';
+                
+                if (contentType && contentType.includes('application/json')) {
+                    const error = await response.json();
+                    errorMessage = error.error || error.message || errorMessage;
+                } else if (response.status === 404) {
+                    errorMessage = 'Rota não encontrada no servidor. Verifique se a rota /cadastro-peca existe na API.';
+                } else {
+                    const textError = await response.text();
+                    console.error('Resposta do servidor:', textError);
+                }
+                
+                alert(`Erro: ${errorMessage}`);
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Erro ao cadastrar peça. Tente novamente.');
+            alert('Erro ao cadastrar peça. Verifique sua conexão e tente novamente.');
         }
     };
 }
