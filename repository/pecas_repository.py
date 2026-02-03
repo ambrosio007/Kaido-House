@@ -1,28 +1,30 @@
 from config.database import get_connection, release_connection
 from psycopg2.extras import RealDictCursor
 
-class PecaRepository:
+class VeiculoRepository:
 
     @staticmethod
-    def adicionar_peca(dados):
-        """Adiciona uma nova peça"""
+    def adicionar_veiculo(dados):
+        """✅ ATUALIZADO: Adiciona um novo veículo com suporte a public_ids do Cloudinary"""
         conn = get_connection()
         try:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO pecas (id, user_id, nome, categoria, marca, modelo, estado, preco, descricao, fotos, data_cadastro, status)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO veiculos (id, user_id, marca, modelo, ano, km, cor, estado, preco, descricao, fotos, public_ids, data_cadastro, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 dados['id'], 
                 dados['user_id'], 
-                dados['nome'], 
-                dados['categoria'], 
                 dados['marca'], 
-                dados['modelo'],
-                dados['estado'], 
+                dados['modelo'], 
+                dados['ano'],
+                dados['km'], 
+                dados['cor'],
+                dados.get('estado', 'usado'),  # ✅ NOVO
                 dados['preco'], 
                 dados['descricao'], 
                 dados.get('fotos', ''),
+                dados.get('public_ids', ''),  # ✅ NOVO
                 dados['data_cadastro'],
                 dados['status']
             ))
@@ -31,73 +33,62 @@ class PecaRepository:
             return True
         except Exception as e:
             conn.rollback()
-            print(f"Erro ao adicionar peça: {e}")
+            print(f"Erro ao adicionar veículo: {e}")
             return False
         finally:
             release_connection(conn)
 
     @staticmethod
     def listar_por_usuario(user_id):
-        """Lista peças de um usuário específico"""
+        """Lista veículos de um usuário específico"""
         conn = get_connection()
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             cursor.execute(
-                "SELECT * FROM pecas WHERE user_id = %s AND status = 'ativo'", 
+                "SELECT * FROM veiculos WHERE user_id = %s AND status = 'ativo'", 
                 (user_id,)
             )
-            pecas = cursor.fetchall()
+            veiculos = cursor.fetchall()
             cursor.close()
-            return [dict(p) for p in pecas]
+            return [dict(v) for v in veiculos]
         finally:
             release_connection(conn)
     
     @staticmethod
-    def listar_todos(categoria=None, estado=None):
-        """Lista todas as peças ativas com filtros opcionais"""
+    def listar_todos():
+        """Lista todos os veículos ativos"""
         conn = get_connection()
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
-            query = "SELECT * FROM pecas WHERE status = 'ativo'"
-            params = []
-            
-            if categoria:
-                query += " AND categoria = %s"
-                params.append(categoria)
-            
-            if estado:
-                query += " AND estado = %s"
-                params.append(estado)
-            
-            cursor.execute(query, params if params else None)
-            pecas = cursor.fetchall()
+            cursor.execute("SELECT * FROM veiculos WHERE status = 'ativo'")
+            veiculos = cursor.fetchall()
             cursor.close()
-            return [dict(p) for p in pecas]
+            return [dict(v) for v in veiculos]
         finally:
             release_connection(conn)
     
     @staticmethod
-    def buscar_por_id(peca_id):
-        """Busca peça por ID"""
+    def buscar_por_id(veiculo_id):
+        """Busca veículo por ID"""
         conn = get_connection()
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
-            cursor.execute("SELECT * FROM pecas WHERE id = %s", (peca_id,))
-            peca = cursor.fetchone()
+            cursor.execute("SELECT * FROM veiculos WHERE id = %s", (veiculo_id,))
+            veiculo = cursor.fetchone()
             cursor.close()
-            return dict(peca) if peca else None
+            return dict(veiculo) if veiculo else None
         finally:
             release_connection(conn)
     
     @staticmethod
-    def deletar(peca_id):
-        """Deleta (inativa) uma peça"""
+    def deletar(veiculo_id):
+        """Deleta (inativa) um veículo"""
         conn = get_connection()
         try:
             cursor = conn.cursor()
             cursor.execute(
-                "UPDATE pecas SET status = 'inativo' WHERE id = %s", 
-                (peca_id,)
+                "UPDATE veiculos SET status = 'inativo' WHERE id = %s", 
+                (veiculo_id,)
             )
             conn.commit()
             updated = cursor.rowcount
@@ -105,31 +96,32 @@ class PecaRepository:
             return updated > 0
         except Exception as e:
             conn.rollback()
-            print(f"Erro ao deletar peça: {e}")
+            print(f"Erro ao deletar veículo: {e}")
             return False
         finally:
             release_connection(conn)
     
     @staticmethod
-    def atualizar_peca(peca_id, dados):
-        """Atualiza dados da peça"""
+    def atualizar_veiculo(veiculo_id, dados):
+        """Atualiza dados do veículo"""
         conn = get_connection()
         try:
             cursor = conn.cursor()
             cursor.execute("""
-                UPDATE pecas
-                SET nome = %s, categoria = %s, marca = %s, modelo = %s,
-                    estado = %s, preco = %s, descricao = %s
+                UPDATE veiculos
+                SET marca = %s, modelo = %s, ano = %s, km = %s, 
+                    cor = %s, estado = %s, preco = %s, descricao = %s
                 WHERE id = %s
             """, (
-                dados.get('nome'),
-                dados.get('categoria'),
                 dados.get('marca'),
                 dados.get('modelo'),
+                dados.get('ano'),
+                dados.get('km'),
+                dados.get('cor'),
                 dados.get('estado'),
                 dados.get('preco'),
                 dados.get('descricao'),
-                peca_id
+                veiculo_id
             ))
             conn.commit()
             updated = cursor.rowcount
@@ -137,42 +129,32 @@ class PecaRepository:
             return updated > 0
         except Exception as e:
             conn.rollback()
-            print(f"Erro ao atualizar peça: {e}")
+            print(f"Erro ao atualizar veículo: {e}")
             return False
         finally:
             release_connection(conn)
 
     @staticmethod
-    def listar_aleatorio(estado=None, limit=5):
+    def listar_aleatorio(apenas_novos=True, limit=5):
         """
-        ✅ CORRIGIDO: Busca peças aleatórias para vitrine
-        Args:
-            estado: 'novo' ou 'usado' para filtrar
-            limit: quantidade de peças a retornar
+        ✅ CORRIGIDO: Lista veículos aleatórios para a vitrine
         """
         conn = get_connection()
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
-            # SQL base
-            query = "SELECT * FROM pecas WHERE status = 'ativo'"
-            params = []
-
-            # Filtra por estado se for enviado (novo ou usado)
-            if estado:
-                query += " AND estado = %s"
-                params.append(estado)
-
-            # Ordena aleatoriamente e limita
-            query += " ORDER BY RANDOM() LIMIT %s"
-            params.append(limit)
-
-            cursor.execute(query, params)
-            pecas = cursor.fetchall()
+            # Se apenas_novos for True, busca KM < 100. Se False, busca KM >= 100.
+            if apenas_novos:
+                query = "SELECT * FROM veiculos WHERE km < 100 AND status = 'ativo' ORDER BY RANDOM() LIMIT %s"
+            else:
+                query = "SELECT * FROM veiculos WHERE km >= 100 AND status = 'ativo' ORDER BY RANDOM() LIMIT %s"
+            
+            cursor.execute(query, (limit,))
+            veiculos = cursor.fetchall()
             cursor.close()
-            return [dict(p) for p in pecas]
+            return [dict(v) for v in veiculos]
         except Exception as e:
-            print(f"Erro ao listar peças aleatórias: {e}")
+            print(f"Erro ao listar veículos aleatórios: {e}")
             return []
         finally:
             release_connection(conn)

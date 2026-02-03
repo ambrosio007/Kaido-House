@@ -1,40 +1,45 @@
 from model.veiculos_model import VeiculoModel
 from repository.veiculo_repository import VeiculoRepository
-import os
-from werkzeug.utils import secure_filename
+from config_cloudinary import upload_image, delete_image
 
 class VeiculoService:
 
     @staticmethod
     def cadastrar_veiculo(dados, fotos=None):
         """
-        ✅ CORRIGIDO: Cadastra veículo com suporte a upload de múltiplas fotos
+        ✅ ATUALIZADO: Cadastra veículo com upload no Cloudinary
         """
         try:
             veiculo = VeiculoModel(**dados)
             
-            # Processar upload de fotos
-            fotos_salvas = []
+            # Processar upload de fotos no Cloudinary
+            urls_fotos = []
+            public_ids = []
+            
             if fotos:
-                upload_folder = 'static/uploads/veiculos'
-                os.makedirs(upload_folder, exist_ok=True)
-                
                 for foto in fotos:
                     if foto and foto.filename:
-                        filename = secure_filename(f"{veiculo.id}_{foto.filename}")
-                        filepath = os.path.join(upload_folder, filename)
-                        foto.save(filepath)
-                        # Salvar caminho relativo para servir via web
-                        fotos_salvas.append(f"/static/uploads/veiculos/{filename}")
+                        # Upload para Cloudinary
+                        result = upload_image(foto, folder='kaido-house/veiculos')
+                        
+                        if result:
+                            urls_fotos.append(result['url'])
+                            public_ids.append(result['public_id'])
             
             veiculo_dict = veiculo.to_dict()
-            veiculo_dict['fotos'] = ','.join(fotos_salvas) if fotos_salvas else ''
+            # Salvar URLs separadas por vírgula
+            veiculo_dict['fotos'] = ','.join(urls_fotos) if urls_fotos else ''
+            # Salvar public_ids para poder deletar depois
+            veiculo_dict['public_ids'] = ','.join(public_ids) if public_ids else ''
             
             status = VeiculoRepository.adicionar_veiculo(veiculo_dict)
             
             if status:
                 return True, "Veículo cadastrado com sucesso!"
             else:
+                # Se falhou, deletar imagens do Cloudinary
+                for public_id in public_ids:
+                    delete_image(public_id)
                 return False, "Erro ao cadastrar veículo no banco de dados"
                 
         except Exception as e:
@@ -67,7 +72,21 @@ class VeiculoService:
     
     @staticmethod
     def deletar_veiculo(veiculo_id):
+        """
+        ✅ ATUALIZADO: Deleta veículo e suas imagens do Cloudinary
+        """
         try:
+            # Buscar o veículo para pegar os public_ids
+            veiculo = VeiculoRepository.buscar_por_id(veiculo_id)
+            
+            if veiculo and veiculo.get('public_ids'):
+                # Deletar imagens do Cloudinary
+                public_ids = veiculo['public_ids'].split(',')
+                for public_id in public_ids:
+                    if public_id.strip():
+                        delete_image(public_id.strip())
+            
+            # Deletar do banco
             return VeiculoRepository.deletar(veiculo_id)
         except Exception as e:
             print(f"Erro ao deletar veículo: {e}")

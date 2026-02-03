@@ -1,40 +1,45 @@
 from model.pecas_model import PecaModel
 from repository.pecas_repository import PecaRepository
-import os
-from werkzeug.utils import secure_filename
+from config_cloudinary import upload_image, delete_image
 
 class PecaService:
 
     @staticmethod
     def cadastrar_peca(dados, fotos=None):
         """
-        ✅ CORRIGIDO: Cadastra peça com suporte a upload de múltiplas fotos
+        ✅ ATUALIZADO: Cadastra peça com upload no Cloudinary
         """
         try:
             peca = PecaModel(**dados)
             
-            # Processar upload de fotos
-            fotos_salvas = []
+            # Processar upload de fotos no Cloudinary
+            urls_fotos = []
+            public_ids = []
+            
             if fotos:
-                upload_folder = 'static/uploads/pecas'
-                os.makedirs(upload_folder, exist_ok=True)
-                
                 for foto in fotos:
                     if foto and foto.filename:
-                        filename = secure_filename(f"{peca.id}_{foto.filename}")
-                        filepath = os.path.join(upload_folder, filename)
-                        foto.save(filepath)
-                        # Salvar caminho relativo para servir via web
-                        fotos_salvas.append(f"/static/uploads/pecas/{filename}")
+                        # Upload para Cloudinary
+                        result = upload_image(foto, folder='kaido-house/pecas')
+                        
+                        if result:
+                            urls_fotos.append(result['url'])
+                            public_ids.append(result['public_id'])
             
             peca_dict = peca.to_dict()
-            peca_dict['fotos'] = ','.join(fotos_salvas) if fotos_salvas else ''
+            # Salvar URLs separadas por vírgula
+            peca_dict['fotos'] = ','.join(urls_fotos) if urls_fotos else ''
+            # Salvar public_ids para poder deletar depois
+            peca_dict['public_ids'] = ','.join(public_ids) if public_ids else ''
             
             status = PecaRepository.adicionar_peca(peca_dict)
             
             if status:
                 return True, "Peça cadastrada com sucesso!"
             else:
+                # Se falhou, deletar imagens do Cloudinary
+                for public_id in public_ids:
+                    delete_image(public_id)
                 return False, "Erro ao cadastrar peça no banco de dados"
                 
         except Exception as e:
@@ -67,7 +72,21 @@ class PecaService:
     
     @staticmethod
     def deletar_peca(peca_id):
+        """
+        ✅ ATUALIZADO: Deleta peça e suas imagens do Cloudinary
+        """
         try:
+            # Buscar a peça para pegar os public_ids
+            peca = PecaRepository.buscar_por_id(peca_id)
+            
+            if peca and peca.get('public_ids'):
+                # Deletar imagens do Cloudinary
+                public_ids = peca['public_ids'].split(',')
+                for public_id in public_ids:
+                    if public_id.strip():
+                        delete_image(public_id.strip())
+            
+            # Deletar do banco
             return PecaRepository.deletar(peca_id)
         except Exception as e:
             print(f"Erro ao deletar peça: {e}")
