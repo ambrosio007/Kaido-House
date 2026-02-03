@@ -9,9 +9,13 @@ class PecaRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor()
+            
+            # ✅ GARANTIR que public_ids seja uma string
+            public_ids = str(dados.get('public_ids', ''))
+            
             cursor.execute("""
                 INSERT INTO pecas (id, user_id, nome, categoria, marca, modelo, estado, preco, descricao, fotos, public_ids, data_cadastro, status)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::text, %s, %s)
             """, (
                 dados['id'], 
                 dados['user_id'], 
@@ -23,7 +27,7 @@ class PecaRepository:
                 dados['preco'], 
                 dados['descricao'], 
                 dados.get('fotos', ''),
-                dados.get('public_ids', ''),  # ✅ NOVO
+                public_ids,  # ✅ Agora garantimos que é string
                 dados['data_cadastro'],
                 dados['status']
             ))

@@ -9,9 +9,13 @@ class VeiculoRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor()
+            
+            # ✅ GARANTIR que public_ids seja uma string
+            public_ids = str(dados.get('public_ids', ''))
+            
             cursor.execute("""
                 INSERT INTO veiculos (id, user_id, marca, modelo, ano, km, cor, estado, preco, descricao, fotos, public_ids, data_cadastro, status)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::text, %s, %s)
             """, (
                 dados['id'], 
                 dados['user_id'], 
@@ -20,11 +24,11 @@ class VeiculoRepository:
                 dados['ano'],
                 dados['km'], 
                 dados['cor'],
-                dados.get('estado', 'usado'),  # ✅ NOVO
+                dados.get('estado', 'usado'),
                 dados['preco'], 
                 dados['descricao'], 
                 dados.get('fotos', ''),
-                dados.get('public_ids', ''),  # ✅ NOVO
+                public_ids,  # ✅ Agora garantimos que é string
                 dados['data_cadastro'],
                 dados['status']
             ))
@@ -37,7 +41,7 @@ class VeiculoRepository:
             return False
         finally:
             release_connection(conn)
-
+        
     @staticmethod
     def listar_por_usuario(user_id):
         """Lista veículos de um usuário específico"""
