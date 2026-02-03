@@ -1,6 +1,6 @@
 from model.veiculos_model import VeiculoModel
 from repository.veiculo_repository import VeiculoRepository
-from config_cloudinary import upload_image, delete_image
+from config.cloudinary import upload_image, delete_image
 
 class VeiculoService:
 

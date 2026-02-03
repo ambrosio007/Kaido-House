@@ -1,6 +1,6 @@
 from model.pecas_model import PecaModel
 from repository.pecas_repository import PecaRepository
-from config_cloudinary import upload_image, delete_image
+from config.cloudinary import upload_image, delete_image
 
 class PecaService:
 
