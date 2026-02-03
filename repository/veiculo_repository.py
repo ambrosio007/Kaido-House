@@ -5,13 +5,13 @@ class VeiculoRepository:
 
     @staticmethod
     def adicionar_veiculo(dados):
-        """Adiciona um novo veículo"""
+        """✅ ATUALIZADO: Adiciona um novo veículo com suporte a public_ids do Cloudinary"""
         conn = get_connection()
         try:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO veiculos (id, user_id, marca, modelo, ano, km, cor, preco, descricao, fotos, data_cadastro, status)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO veiculos (id, user_id, marca, modelo, ano, km, cor, estado, preco, descricao, fotos, public_ids, data_cadastro, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 dados['id'], 
                 dados['user_id'], 
@@ -19,10 +19,12 @@ class VeiculoRepository:
                 dados['modelo'], 
                 dados['ano'],
                 dados['km'], 
-                dados['cor'], 
+                dados['cor'],
+                dados.get('estado', 'usado'),  # ✅ NOVO
                 dados['preco'], 
                 dados['descricao'], 
                 dados.get('fotos', ''),
+                dados.get('public_ids', ''),  # ✅ NOVO
                 dados['data_cadastro'],
                 dados['status']
             ))
@@ -108,7 +110,7 @@ class VeiculoRepository:
             cursor.execute("""
                 UPDATE veiculos
                 SET marca = %s, modelo = %s, ano = %s, km = %s, 
-                    cor = %s, preco = %s, descricao = %s
+                    cor = %s, estado = %s, preco = %s, descricao = %s
                 WHERE id = %s
             """, (
                 dados.get('marca'),
@@ -116,6 +118,7 @@ class VeiculoRepository:
                 dados.get('ano'),
                 dados.get('km'),
                 dados.get('cor'),
+                dados.get('estado'),
                 dados.get('preco'),
                 dados.get('descricao'),
                 veiculo_id
