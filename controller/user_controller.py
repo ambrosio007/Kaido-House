@@ -3,6 +3,8 @@ from service.user_service import UserService
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 from service.pecas_service import PecaService
 from service.veiculos_service import VeiculoService
+from repository.pecas_repository import PecaRepository
+from repository.veiculo_repository import VeiculoRepository
 from werkzeug.utils import secure_filename
 import os
 import uuid

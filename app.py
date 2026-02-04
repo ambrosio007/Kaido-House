@@ -2,8 +2,9 @@ from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from controller.user_controller import user_bp
-from controller.pecas_controller import peca_bp      # 🔥 ADICIONAR
-from controller.veiculo_controller import veiculo_bp  # 🔥 ADICIONAR
+from controller.pecas_controller import peca_bp
+from controller.veiculo_controller import veiculo_bp
+from controller.carrinho_controller import carrinho_bp  # 🔥 ADICIONAR ESTA LINHA
 import os
 
 app = Flask(__name__)
@@ -95,17 +96,21 @@ def token_not_fresh_callback(jwt_header, jwt_payload):
 # Registrar User Blueprint
 app.register_blueprint(user_bp)
 
-# 🔥 ADICIONAR - Registrar Peças Blueprint
+# Registrar Peças Blueprint
 app.register_blueprint(peca_bp)
 
-# 🔥 ADICIONAR - Registrar Veículos Blueprint
+# Registrar Veículos Blueprint
 app.register_blueprint(veiculo_bp)
+
+# 🔥 ADICIONAR - Registrar Carrinho Blueprint
+app.register_blueprint(carrinho_bp)
 
 print("\n" + "="*60)
 print("✅ Blueprints registrados:")
 print("   - user_bp")
 print("   - peca_bp")
 print("   - veiculo_bp")
+print("   - carrinho_bp")  # 🔥 ADICIONAR
 print("="*60 + "\n")
 
 # ==================== ROTAS DE SISTEMA ====================
