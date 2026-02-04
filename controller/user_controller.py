@@ -699,10 +699,9 @@ def detalhes_peca(peca_id):
 # ============= ROTAS DE RECUPERAÇÃO DE SENHA =============
 
 @user_bp.route('/solicitar-recuperacao-senha', methods=['POST'])
-def solicitar_recuperacao_senha():
+def solicitar_recuperacao_senha_api():  # ✅ Nome único
     """
-    Endpoint para solicitar recuperação de senha
-    Recebe o e-mail e envia o link de recuperação
+    Endpoint API para solicitar recuperação de senha
     """
     try:
         data = request.get_json()
@@ -751,9 +750,9 @@ def solicitar_recuperacao_senha():
 
 
 @user_bp.route('/redefinir-senha', methods=['POST'])
-def redefinir_senha():
+def redefinir_senha_api():  # ✅ Nome diferente de redefinir_senha_page
     """
-    Endpoint para redefinir a senha usando o token
+    Endpoint API para redefinir a senha usando o token
     """
     try:
         data = request.get_json()
@@ -810,10 +809,9 @@ def redefinir_senha():
 
 
 @user_bp.route('/validar-token-recuperacao', methods=['POST'])
-def validar_token_recuperacao():
+def validar_token_recuperacao_api():  # ✅ Nome único
     """
     Valida se um token de recuperação é válido
-    Usado para verificar antes de mostrar o formulário de nova senha
     """
     try:
         data = request.get_json()
