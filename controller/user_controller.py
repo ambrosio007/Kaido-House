@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 import os
 import uuid
 import traceback
+from datetime import datetime
 
 
 user_bp = Blueprint('user', __name__, template_folder='templates')
@@ -17,6 +18,8 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# ============= ROTAS DE PÁGINAS =============
 
 @user_bp.route('/') 
 def home():
@@ -64,9 +67,62 @@ def redefinir_senha_page():
 
 @user_bp.route('/cadastro-user', methods=['POST'])
 def cadastro_usuario():
-    dados = request.form.to_dict() 
-
+    """
+    Cadastra um novo usuário
+    ✅ VERSÃO CORRIGIDA - Converte data de nascimento em idade
+    """
     try:
+        # Captura os dados do formulário
+        dados = {
+            'nome': request.form.get('nome'),
+            'cpf': request.form.get('cpf'),
+            'cep': request.form.get('cep'),
+            'email': request.form.get('email'),
+            'senha': request.form.get('senha')
+        }
+        
+        # ✅ CORREÇÃO: Converte data de nascimento em idade
+        data_nascimento_str = request.form.get('idade')  # Vem como "2004-01-17"
+        
+        if data_nascimento_str:
+            try:
+                # Converte string para objeto date
+                data_nascimento = datetime.strptime(data_nascimento_str, '%Y-%m-%d').date()
+                
+                # Calcula a idade
+                hoje = datetime.now().date()
+                idade = hoje.year - data_nascimento.year
+                
+                # Ajusta se ainda não fez aniversário este ano
+                if (hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day):
+                    idade -= 1
+                
+                # Adiciona a idade calculada aos dados
+                dados['idade'] = idade
+                
+                print(f"📅 Data de nascimento: {data_nascimento_str}")
+                print(f"🎂 Idade calculada: {idade} anos")
+                
+            except ValueError as e:
+                print(f"❌ Erro ao converter data: {e}")
+                return jsonify({
+                    'success': False,
+                    'error': 'Data de nascimento inválida'
+                }), 400
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Data de nascimento é obrigatória'
+            }), 400
+        
+        # Validação básica
+        if not all([dados['nome'], dados['cpf'], dados['email'], dados['senha']]):
+            return jsonify({
+                'success': False,
+                'error': 'Todos os campos são obrigatórios'
+            }), 400
+        
+        # Chama o serviço para cadastrar
         status, mensagem = UserService.cadastrar_user(dados)
 
         if status:
@@ -81,6 +137,8 @@ def cadastro_usuario():
             }), 400
             
     except Exception as e:
+        print(f"❌ Erro no controller: {str(e)}")
+        traceback.print_exc()
         return jsonify({
             "success": False,
             "error": f"Erro inesperado no servidor: {str(e)}"
@@ -227,14 +285,14 @@ def solicitar_recuperacao():
 @user_bp.route('/validar-token-recuperacao', methods=['GET'])
 def validar_token():
     """
-    Valida se o token de recuperação é válido
+    Valida se um token de recuperação é válido
     """
     try:
         token = request.args.get('token')
         
         if not token:
             return jsonify({
-                "valid": False,
+                "success": False,
                 "error": "Token não fornecido"
             }), 400
         
@@ -242,19 +300,19 @@ def validar_token():
         
         if token_data:
             return jsonify({
-                "valid": True,
-                "email": token_data.get('email')
+                "success": True,
+                "message": "Token válido"
             }), 200
         else:
             return jsonify({
-                "valid": False,
+                "success": False,
                 "error": "Token inválido ou expirado"
             }), 400
             
     except Exception as e:
         print(f"Erro ao validar token: {str(e)}")
         return jsonify({
-            "valid": False,
+            "success": False,
             "error": "Erro ao validar token"
         }), 500
 
@@ -262,34 +320,25 @@ def validar_token():
 @user_bp.route('/redefinir-senha', methods=['POST'])
 def redefinir_senha():
     """
-    Redefine a senha do usuário usando o token
+    Redefine a senha do usuário
     """
     try:
         data = request.get_json() or request.form
         token = data.get('token')
         nova_senha = data.get('nova_senha')
-        confirmar_senha = data.get('confirmar_senha')
         
-        # Validações
-        if not token or not nova_senha or not confirmar_senha:
+        if not token or not nova_senha:
             return jsonify({
                 "success": False,
-                "error": "Todos os campos são obrigatórios"
+                "error": "Token e nova senha são obrigatórios"
             }), 400
         
-        if nova_senha != confirmar_senha:
+        if len(nova_senha) < 8:
             return jsonify({
                 "success": False,
-                "error": "As senhas não coincidem"
+                "error": "A senha deve ter no mínimo 8 caracteres"
             }), 400
         
-        if len(nova_senha) < 6:
-            return jsonify({
-                "success": False,
-                "error": "A senha deve ter no mínimo 6 caracteres"
-            }), 400
-        
-        # Redefinir senha
         sucesso, mensagem = UserService.redefinir_senha(token, nova_senha)
         
         if sucesso:
@@ -312,47 +361,65 @@ def redefinir_senha():
         }), 500
 
 
-# ============= ROTAS DE USUÁRIO =============
+# ============= ROTAS DE USUÁRIOS (CRUD) =============
 
-@user_bp.route('/user/json')
-def busc_user_json():
+@user_bp.route('/lista-users')
+def lista_users():
+    users = UserService.lista()
+    return jsonify(users), 200
+
+
+@user_bp.route('/buscar-user/<string:user_id>')
+def buscar_user(user_id):
+    user = UserService.buscar_por_id(user_id)
+    if user:
+        return jsonify(user), 200
+    return jsonify({"error": "Usuário não encontrado"}), 404
+
+
+@user_bp.route('/deletar-user', methods=['DELETE'])
+def deletar_user():
     if "user_id" not in session:
         return jsonify({"error": "Usuário não autenticado"}), 401
-    return jsonify(UserService.lista())
-
-@user_bp.route('/users')
-def lista_users():
-    current_user_id = get_jwt_identity()
-
-    if current_user_id is None:
-        return redirect(url_for('user.login'))
     
-    usuarios = UserService.lista()
-    return render_template('usuarios.html', usuarios=usuarios)
-
-@user_bp.route('/users/<id>', methods=['DELETE'])
-@jwt_required()
-def delet_user(id):
-    current_user_id = get_jwt_identity()
-
-    if current_user_id != id:
-        return jsonify({"error": "Não permitido deletar"}), 401
+    user_id = request.args.get('id') or session.get('user_id')
     
-    if UserService.deletar_usuario(id):
+    if UserService.deletar_usuario(user_id):
+        session.clear()
         return jsonify({"message": "Usuário deletado com sucesso"}), 200
     return jsonify({"error": "Falha ao deletar usuário"}), 400
 
-@user_bp.route('/users/', methods=['PUT'])
-def atualiza_user():
+
+@user_bp.route('/atualizar-user', methods=['PUT'])
+def atualizar_user():
+    """
+    Atualiza dados do usuário
+    ✅ COM SUPORTE PARA CONVERSÃO DE DATA DE NASCIMENTO
+    """
     if "user_id" not in session:
         return jsonify({"error": "Usuário não autenticado"}), 401
     
-    user_edit = request.get_json()
-    user_id = user_edit.get('id') or session.get('user_id')
-    
-    if UserService.atualizar_usuario(user_id, user_edit):
-        return jsonify({"message": "Usuário atualizado com sucesso"}), 200
-    return jsonify({"error": "Falha ao atualizar usuário"}), 400
+    try:
+        user_edit = request.get_json()
+        user_id = user_edit.get('id') or session.get('user_id')
+        
+        # ✅ Se vier data de nascimento, converte para idade
+        if 'idade' in user_edit and isinstance(user_edit['idade'], str) and '-' in user_edit['idade']:
+            data_nascimento_str = user_edit['idade']
+            data_nascimento = datetime.strptime(data_nascimento_str, '%Y-%m-%d').date()
+            hoje = datetime.now().date()
+            idade = hoje.year - data_nascimento.year
+            if (hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day):
+                idade -= 1
+            user_edit['idade'] = idade
+        
+        if UserService.atualizar_usuario(user_id, user_edit):
+            return jsonify({"message": "Usuário atualizado com sucesso"}), 200
+        return jsonify({"error": "Falha ao atualizar usuário"}), 400
+        
+    except Exception as e:
+        print(f"Erro ao atualizar usuário: {str(e)}")
+        return jsonify({"error": "Erro ao atualizar usuário"}), 500
 
 
 # ============= ROTAS DE PERFIL =============
@@ -503,6 +570,8 @@ def remover_foto_perfil():
         traceback.print_exc()
         return jsonify({'error': 'Erro ao remover foto'}), 500
 
+
+# ============= ROTAS DE VEÍCULOS E PEÇAS =============
 
 @user_bp.route('/cadastrar-veiculo', methods=['POST'])
 @jwt_required()

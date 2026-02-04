@@ -30,6 +30,7 @@
                 <br><br>
                 <div class="inputBox">
                     <label for="idadeID" class="labelInput"><b>Data de Nascimento</b></label>
+                    <!-- ✅ O name continua "idade" para manter compatibilidade com o backend -->
                     <input type="date" name="idade" id="idadeID" class="inputUser" required max="">
                 </div>
                 <br><br>
@@ -103,6 +104,10 @@
             
             // Remove o campo confirma_senha antes de enviar
             formData.delete('confirma_senha');
+
+            console.log('📤 Enviando dados do cadastro...');
+            console.log('Data de nascimento:', dataNascimento);
+            console.log('Idade calculada no frontend:', idade, 'anos');
 
             try {
                 const response = await fetch('/cadastro-user', {
