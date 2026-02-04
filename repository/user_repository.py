@@ -21,7 +21,7 @@ class UserRepository:
     def adicionar_user(dados):
         """
         Adiciona um novo usuário
-        ✅ VERSÃO CORRIGIDA com logs detalhados e tratamento de erros
+        ✅ VERSÃO CORRIGIDA - SEM foto_perfil no cadastro inicial
         """
         conn = None
         try:
@@ -56,11 +56,13 @@ class UserRepository:
             # Log da query SQL
             print(f"\n3. Executando INSERT...")
             print(f"   Tabela: usuarios")
-            print(f"   Campos: id, nome, cpf, cep, email, idade, senha, perfil, foto_perfil")
+            print(f"   Campos: id, nome, cpf, cep, email, idade, senha, perfil")
+            print(f"   ⚠️  foto_perfil NÃO incluída (será adicionada depois se o usuário quiser)")
             
+            # ✅ CORREÇÃO: Removido foto_perfil do INSERT inicial
             cursor.execute("""
-                INSERT INTO usuarios (id, nome, cpf, cep, email, idade, senha, perfil, foto_perfil)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO usuarios (id, nome, cpf, cep, email, idade, senha, perfil)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 dados['id'], 
                 dados['nome'], 
@@ -69,8 +71,7 @@ class UserRepository:
                 dados['email'], 
                 idade,  # Usar a variável idade validada
                 dados['senha_hash'],
-                dados.get('perfil', 'cliente'),
-                dados.get('foto_perfil', None)
+                dados.get('perfil', 'cliente')
             ))
             
             print(f"   ✅ Query executada sem erros")
@@ -218,7 +219,10 @@ class UserRepository:
     
     @staticmethod
     def atualizar_foto_perfil(user_id, foto_url):
-        """Atualiza a foto de perfil do usuário"""
+        """
+        Atualiza a foto de perfil do usuário
+        ℹ️  Este método será usado DEPOIS do cadastro, quando o usuário quiser adicionar foto
+        """
         conn = get_connection()
         try:
             cursor = conn.cursor()
