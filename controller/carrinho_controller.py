@@ -20,7 +20,7 @@ def listar_carrinho():
     except Exception as e:
         return jsonify({"error": f"Erro ao listar carrinho: {str(e)}"}), 500
 
-@@carrinho_bp.route('/api/carrinho/adicionar', methods=['POST'])
+@carrinho_bp.route('/api/carrinho/adicionar', methods=['POST'])
 @jwt_required()
 def adicionar_ao_carrinho():
     """
