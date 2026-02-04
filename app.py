@@ -20,6 +20,7 @@ CORS(app, resources={
 # Configurações de segurança
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'ddfbbfb184d7143c012eee95a50b05b34aa722887368574a0db514622eb2c8cd')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', '09fbf119994172d829e9e927cb6e9f27dc9b7940df04b2c5f07660aee423b432')
+app.config['JWT_TOKEN_LOCATION'] = ['headers']
 
 # Tamanho máximo de upload (16MB)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -30,17 +31,64 @@ jwt = JWTManager(app)
 # Handler para token expirado
 @jwt.expired_token_loader
 def expired_token_callback(jwt_header, jwt_payload):
-    return jsonify({'error': 'Token expirado', 'message': 'Por favor, faça login novamente'}), 401
+    """
+    Chamado quando o token JWT expirou
+    """
+    print(f"⏰ Token expirado para usuário: {jwt_payload.get('sub')}")
+    return jsonify({
+        'error': 'Token expirado',
+        'message': 'Sua sessão expirou. Faça login novamente',
+        'code': 'EXPIRED_TOKEN'
+    }), 401
 
 # Handler para token inválido
 @jwt.invalid_token_loader
-def invalid_token_callback(error):
-    return jsonify({'error': 'Token inválido'}), 422
+def invalid_token_callback(error_string):
+    """
+    Chamado quando o token JWT é inválido
+    """
+    print(f"❌ Token inválido: {error_string}")
+    return jsonify({
+        'error': 'Token inválido',
+        'message': 'Por favor, faça login novamente',
+        'code': 'INVALID_TOKEN'
+    }), 401
 
 # Handler para token ausente
 @jwt.unauthorized_loader
-def missing_token_callback(error):
-    return jsonify({'error': 'Autorização necessária'}), 401
+def unauthorized_callback(error_string):
+    """
+    Chamado quando nenhum token foi enviado
+    """
+    print(f"🚫 Acesso não autorizado: {error_string}")
+    return jsonify({
+        'error': 'Autenticação necessária',
+        'message': 'Você precisa estar logado para acessar este recurso',
+        'code': 'NO_TOKEN'
+    }), 401
+
+@jwt.revoked_token_loader
+def revoked_token_callback(jwt_header, jwt_payload):
+    """
+    Chamado quando o token foi revogado
+    """
+    print(f"🔒 Token revogado para usuário: {jwt_payload.get('sub')}")
+    return jsonify({
+        'error': 'Token revogado',
+        'message': 'Este token foi revogado. Faça login novamente',
+        'code': 'REVOKED_TOKEN'
+    }), 401
+
+@jwt.needs_fresh_token_loader
+def token_not_fresh_callback(jwt_header, jwt_payload):
+    """
+    Chamado quando uma operação precisa de um token "fresco"
+    """
+    return jsonify({
+        'error': 'Token não é fresco',
+        'message': 'Esta operação requer um login recente',
+        'code': 'FRESH_TOKEN_REQUIRED'
+    }), 401
 
 # ==================== REGISTRAR BLUEPRINTS ====================
 

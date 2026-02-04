@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, jsonify, session, request, redirect, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from service.carrinho_service import CarrinhoService
+import traceback
 
 carrinho_bp = Blueprint('carrinho', __name__)
 
@@ -19,24 +20,41 @@ def listar_carrinho():
     except Exception as e:
         return jsonify({"error": f"Erro ao listar carrinho: {str(e)}"}), 500
 
-@carrinho_bp.route('/api/carrinho/adicionar', methods=['POST'])
+@@carrinho_bp.route('/api/carrinho/adicionar', methods=['POST'])
 @jwt_required()
 def adicionar_ao_carrinho():
     """
     Adiciona um item ao carrinho
+    ✅ VERSÃO COM LOGS DETALHADOS
     """
-    current_user_id = get_jwt_identity()
+    print("\n" + "="*60)
+    print("🛒 REQUISIÇÃO: /api/carrinho/adicionar")
+    print("="*60)
     
     try:
+        # Obter ID do usuário do token JWT
+        current_user_id = get_jwt_identity()
+        print(f"✅ Usuário autenticado: {current_user_id}")
+        
+        # Obter dados da requisição
         dados = request.get_json()
+        print(f"📦 Dados recebidos: {dados}")
         
         tipo_item = dados.get('tipo_item')
         item_id = dados.get('item_id')
         quantidade = dados.get('quantidade', 1)
         
+        # Validação
         if not tipo_item or not item_id:
-            return jsonify({"error": "Dados incompletos"}), 400
+            print("❌ Dados incompletos")
+            return jsonify({
+                "error": "Dados incompletos",
+                "message": "tipo_item e item_id são obrigatórios"
+            }), 400
         
+        print(f"📋 Tipo: {tipo_item}, ID: {item_id}, Qtd: {quantidade}")
+        
+        # Adicionar ao carrinho
         sucesso, mensagem = CarrinhoService.adicionar_item(
             user_id=current_user_id,
             tipo_item=tipo_item,
@@ -45,18 +63,37 @@ def adicionar_ao_carrinho():
         )
         
         if sucesso:
-            # Retornar também o total de itens atualizado
+            print("✅ Item adicionado com sucesso!")
+            
+            # Obter total atualizado
             total_itens = CarrinhoService.obter_resumo_carrinho(current_user_id)['total_itens']
+            
+            print(f"📊 Total de itens no carrinho: {total_itens}")
+            print("="*60 + "\n")
+            
             return jsonify({
                 "success": True,
                 "message": mensagem,
                 "total_itens": total_itens
             }), 200
         else:
-            return jsonify({"error": mensagem}), 400
+            print(f"❌ Erro ao adicionar: {mensagem}")
+            print("="*60 + "\n")
+            
+            return jsonify({
+                "error": mensagem,
+                "success": False
+            }), 400
             
     except Exception as e:
-        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
+        print(f"❌ ERRO CRÍTICO: {str(e)}")
+        traceback.print_exc()
+        print("="*60 + "\n")
+        
+        return jsonify({
+            "error": "Erro interno do servidor",
+            "message": str(e)
+        }), 500
 
 @carrinho_bp.route('/api/carrinho/atualizar/<item_id>', methods=['PUT'])
 @jwt_required()

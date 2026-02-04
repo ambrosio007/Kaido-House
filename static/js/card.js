@@ -198,24 +198,46 @@ function inicializarSwipers() {
 }
 
 // Função para adicionar item ao carrinho
+// ==========================================
+// ADICIONAR AO CARRINHO - VERSÃO CORRIGIDA
+// ==========================================
+
 async function adicionarAoCarrinho(itemId, tipo) {
-    console.log(`🛒 Adicionando ao carrinho: ${tipo} ${itemId}`);
+    console.log(`🛒 Tentando adicionar ao carrinho: ${tipo} ${itemId}`);
     
-    // Verificar se está logado
+    // ✅ PASSO 1: Verificar se tem token
     const token = localStorage.getItem('access_token');
     
     if (!token) {
-        alert('Você precisa estar logado para adicionar itens ao carrinho!');
-        window.location.href = '/login';
+        console.warn('⚠️ Token não encontrado no localStorage');
+        mostrarNotificacao('Você precisa estar logado para adicionar itens ao carrinho!', 'warning');
+        setTimeout(() => {
+            window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        }, 1500);
+        return;
+    }
+    
+    console.log('✅ Token encontrado:', token.substring(0, 20) + '...');
+    
+    // ✅ PASSO 2: Verificar se token está expirado (opcional mas recomendado)
+    if (isTokenExpired(token)) {
+        console.warn('⚠️ Token expirado');
+        localStorage.removeItem('access_token');
+        mostrarNotificacao('Sua sessão expirou. Faça login novamente.', 'error');
+        setTimeout(() => {
+            window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        }, 1500);
         return;
     }
     
     try {
+        console.log('📤 Enviando requisição para /api/carrinho/adicionar...');
+        
         const response = await fetch('/api/carrinho/adicionar', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`  // ✅ Formato correto
             },
             body: JSON.stringify({
                 tipo_item: tipo,
@@ -224,26 +246,119 @@ async function adicionarAoCarrinho(itemId, tipo) {
             })
         });
         
-        const result = await response.json();
+        console.log(`📥 Resposta recebida: Status ${response.status} ${response.statusText}`);
         
+        // ✅ PASSO 3: Verificar o Content-Type ANTES de fazer parse
+        const contentType = response.headers.get('content-type');
+        console.log('📋 Content-Type:', contentType);
+        
+        let result;
+        
+        if (contentType && contentType.includes('application/json')) {
+            result = await response.json();
+            console.log('📦 Dados da resposta:', result);
+        } else {
+            // Se não for JSON, pode ser HTML de redirect
+            const text = await response.text();
+            console.error('❌ Resposta não é JSON. Recebido:', text.substring(0, 200));
+            
+            if (response.status === 401) {
+                console.error('❌ Erro 401: Não autorizado');
+                localStorage.removeItem('access_token');
+                mostrarNotificacao('Sessão inválida. Redirecionando para o login...', 'error');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+                }, 1500);
+                return;
+            }
+            
+            throw new Error('Resposta inválida do servidor');
+        }
+        
+        // ✅ PASSO 4: Processar resposta de sucesso
         if (response.ok) {
+            console.log('✅ Item adicionado com sucesso!');
+            
             // Atualizar badge do carrinho
             if (result.total_itens !== undefined) {
                 const badge = document.querySelector('.cart-badge');
                 if (badge) {
                     badge.textContent = result.total_itens;
+                    
+                    // Animação de destaque
+                    badge.style.transform = 'scale(1.3)';
+                    badge.style.transition = 'transform 0.3s';
+                    setTimeout(() => {
+                        badge.style.transform = 'scale(1)';
+                    }, 300);
                 }
             }
             
             // Feedback visual
             mostrarNotificacao('✅ Item adicionado ao carrinho!', 'success');
+            
         } else {
-            mostrarNotificacao(result.error || 'Erro ao adicionar item', 'error');
+            // ✅ PASSO 5: Tratar erros específicos
+            console.error('❌ Erro na requisição:', result);
+            
+            // Tratamento por código de erro
+            if (result.code === 'EXPIRED_TOKEN' || result.code === 'INVALID_TOKEN') {
+                console.error('❌ Token expirado ou inválido');
+                localStorage.removeItem('access_token');
+                mostrarNotificacao('Sessão expirada. Redirecionando...', 'error');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+                }, 1500);
+            } else if (result.code === 'NO_TOKEN') {
+                console.error('❌ Token não enviado');
+                mostrarNotificacao('Você precisa estar logado!', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+                }, 1500);
+            } else {
+                // Outros erros
+                mostrarNotificacao(result.error || result.message || 'Erro ao adicionar item', 'error');
+            }
         }
         
     } catch (error) {
-        console.error('❌ Erro ao adicionar ao carrinho:', error);
-        mostrarNotificacao('Erro ao adicionar item ao carrinho', 'error');
+        console.error('❌ Erro na requisição:', error);
+        mostrarNotificacao('Erro ao adicionar item ao carrinho. Tente novamente.', 'error');
+    }
+}
+
+// ==========================================
+// FUNÇÃO AUXILIAR: Verificar se token está expirado
+// ==========================================
+
+function isTokenExpired(token) {
+    try {
+        // Decodificar o payload do JWT (parte do meio)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        
+        // Verificar se tem campo 'exp' (expiration)
+        if (!payload.exp) {
+            console.warn('⚠️ Token não tem campo de expiração');
+            return false;
+        }
+        
+        // Comparar com o tempo atual
+        const expirationTime = payload.exp * 1000; // Converter para milissegundos
+        const now = Date.now();
+        
+        const isExpired = now >= expirationTime;
+        
+        if (isExpired) {
+            console.warn('⏰ Token expirado!');
+            console.warn(`   Expirou em: ${new Date(expirationTime).toLocaleString()}`);
+            console.warn(`   Agora: ${new Date(now).toLocaleString()}`);
+        }
+        
+        return isExpired;
+        
+    } catch (error) {
+        console.error('❌ Erro ao validar token:', error);
+        return true; // Se não conseguir validar, considerar expirado
     }
 }
 
@@ -303,3 +418,78 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Log para debug
 console.log('✅ card.js carregado com sucesso!');
+
+// ==========================================
+// VERIFICAR TOKEN AO CARREGAR A PÁGINA
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔄 Verificando autenticação...');
+    
+    const token = localStorage.getItem('access_token');
+    
+    if (token) {
+        console.log('✅ Token encontrado');
+        
+        // Verificar se está expirado
+        if (isTokenExpired(token)) {
+            console.warn('⚠️ Token expirado - removendo');
+            localStorage.removeItem('access_token');
+            
+            // Atualizar UI para estado deslogado
+            const loginState = document.querySelector('.login-state');
+            const profileState = document.querySelector('.profile-state');
+            
+            if (loginState) loginState.classList.remove('hidden');
+            if (profileState) profileState.classList.add('hidden');
+            
+            const badge = document.querySelector('.cart-badge');
+            if (badge) badge.textContent = '0';
+        } else {
+            console.log('✅ Token válido');
+            
+            // Atualizar badge do carrinho
+            atualizarBadgeCarrinho();
+        }
+    } else {
+        console.log('ℹ️ Usuário não autenticado');
+    }
+});
+
+// ==========================================
+// ATUALIZAR BADGE DO CARRINHO
+// ==========================================
+
+async function atualizarBadgeCarrinho() {
+    const token = localStorage.getItem('access_token');
+    
+    if (!token) {
+        const badge = document.querySelector('.cart-badge');
+        if (badge) badge.textContent = '0';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/carrinho/total', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const badge = document.querySelector('.cart-badge');
+            if (badge) {
+                badge.textContent = data.total_itens || '0';
+            }
+        } else if (response.status === 401) {
+            // Token inválido
+            console.warn('⚠️ Token inválido ao buscar total do carrinho');
+            localStorage.removeItem('access_token');
+            const badge = document.querySelector('.cart-badge');
+            if (badge) badge.textContent = '0';
+        }
+    } catch (error) {
+        console.error('❌ Erro ao atualizar badge:', error);
+    }
+}

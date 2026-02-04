@@ -1,7 +1,7 @@
 from model.carrinho_model import CarrinhoItemModel
 from repository.carrinho_repository import CarrinhoRepository
 from repository.veiculo_repository import VeiculoRepository
-from repository.peca_repository import PecaRepository
+from repository.pecas_repository import PecaRepository
 
 class CarrinhoService:
     """

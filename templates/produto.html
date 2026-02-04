@@ -2,114 +2,408 @@
 <html lang="pt-BR">
 
 <head>
-       
     <meta charset="UTF-8">
-       
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Kaido-House</title>
-       
+    <title>{{ produto.nome if produto.nome else (produto.marca ~ ' ' ~ produto.modelo) }} | Kaido-House</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-     <link rel="stylesheet" href="/static/produto.css">  
     <link rel="stylesheet" href="/static/home.css">
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="/static/detalhes_produto.css">
 </head>
 
 <body>
-       
-        <footer>
-        <div class="footer-container">
-            <div class="footer-brand">
-                <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
-                <p>A maior autoridade em cultura JDM e performance de Joinville Sul. Transformando sonhos em projetos
-                    reais.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                    <a href="#"><i class="fab fa-tiktok"></i></a>
+    <header>
+        <a href="/" class="logo">
+            <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
+        </a>
+
+        <nav class="navbar">
+            <a href="/">Início</a>
+            <a href="/pecas">Peças</a>
+            <a href="/veiculos">Veículos</a>
+            <a href="#contato">Contato</a>
+        </nav>
+
+        <div class="header-icons">
+            <a href="/carrinho" class="icon-link cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge">0</span>
+            </a>
+
+            <div class="profile-area">
+                <a href="/login" class="auth-icon-container login-state" id="profile-target">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+
+                <a href="/perfil" class="auth-icon-container profile-state hidden" id="profile-target-logged">
+                    <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
+                </a>
+            </div>
+
+            <i id="menu-btn" class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main class="detalhes-container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/"><i class="fas fa-home"></i> Início</a>
+            <span class="separator">›</span>
+            <a href="/{{ tipo }}s">{{ 'Veículos' if tipo == 'veiculo' else 'Peças' }}</a>
+            <span class="separator">›</span>
+            <span class="current">{{ produto.nome if produto.nome else (produto.marca ~ ' ' ~ produto.modelo) }}</span>
+        </div>
+
+        <div class="produto-detalhes">
+            <!-- Galeria de Imagens -->
+            <div class="galeria-section">
+                <div class="imagem-principal">
+                    {% if produto.fotos %}
+                        {% set fotos_lista = produto.fotos.split(',') %}
+                        <img id="imagem-destaque" src="{{ fotos_lista[0].strip() }}" alt="Imagem principal" 
+                             onerror="this.src='/static/img/default-placeholder.jpg'">
+                    {% else %}
+                        <img id="imagem-destaque" src="/static/img/default-placeholder.jpg" alt="Imagem padrão">
+                    {% endif %}
+                    
+                    <!-- Badge de Estado -->
+                    {% if produto.estado == 'novo' or (produto.km and produto.km < 100) %}
+                        <span class="badge-estado novo">NOVO</span>
+                    {% else %}
+                        <span class="badge-estado usado">USADO</span>
+                    {% endif %}
                 </div>
+
+                <!-- Miniaturas -->
+                {% if produto.fotos %}
+                    {% set fotos_lista = produto.fotos.split(',') %}
+                    {% if fotos_lista|length > 1 %}
+                        <div class="miniaturas">
+                            {% for foto in fotos_lista %}
+                                <img src="{{ foto.strip() }}" 
+                                     alt="Miniatura {{ loop.index }}" 
+                                     class="miniatura {% if loop.index == 1 %}ativa{% endif %}"
+                                     onclick="trocarImagem('{{ foto.strip() }}')"
+                                     onerror="this.src='/static/img/default-placeholder.jpg'">
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
             </div>
 
-            <div class="footer-nav">
-                <h3>Navegação</h3>
-                <ul>
-                    <li><a href="#">Catálogo de Peças</a></li>
-                    <li><a href="#">Estoque de Veículos</a></li>
-                    <li><a href="#">Oficina de Customização</a></li>
-                    <li><a href="#">Blog Kaido</a></li>
-                </ul>
-            </div>
+            <!-- Informações do Produto -->
+            <div class="info-section">
+                <div class="info-header">
+                    <h1 class="titulo-produto">
+                        {% if tipo == 'veiculo' %}
+                            {{ produto.marca }} {{ produto.modelo }}
+                        {% else %}
+                            {{ produto.nome }}
+                        {% endif %}
+                    </h1>
+                    
+                    <div class="acoes-rapidas">
+                        <button class="btn-favorito" onclick="toggleFavorito('{{ produto.id }}', '{{ tipo }}')">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="btn-compartilhar" onclick="compartilhar()">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                    </div>
+                </div>
 
-            <div class="footer-contact">
-                <h3>Atendimento</h3>
-                <p><i class="fas fa-map-marker-alt"></i> Joinville, SC - Unidade Sul</p>
-                <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
-                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
-                <div class="payment-methods">
-                    <i class="fab fa-cc-visa"></i>
-                    <i class="fab fa-cc-mastercard"></i>
-                    <i class="fab fa-pix"></i>
+                <!-- Preço -->
+                <div class="preco-section">
+                    <span class="preco-atual">R$ {{ "%.2f"|format(produto.preco)|replace('.', ',') }}</span>
+                    {% if produto.preco_antigo %}
+                        <span class="preco-antigo">R$ {{ "%.2f"|format(produto.preco_antigo)|replace('.', ',') }}</span>
+                        <span class="desconto">
+                            -{{ ((produto.preco_antigo - produto.preco) / produto.preco_antigo * 100)|int }}%
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Características Específicas -->
+                <div class="caracteristicas">
+                    {% if tipo == 'veiculo' %}
+                        <!-- Características de Veículo -->
+                        <div class="caracteristica-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <div>
+                                <span class="carac-label">Ano</span>
+                                <span class="carac-valor">{{ produto.ano }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="caracteristica-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <div>
+                                <span class="carac-label">Quilometragem</span>
+                                <span class="carac-valor">{{ "{:,}".format(produto.km).replace(',', '.') }} km</span>
+                            </div>
+                        </div>
+                        
+                        <div class="caracteristica-item">
+                            <i class="fas fa-palette"></i>
+                            <div>
+                                <span class="carac-label">Cor</span>
+                                <span class="carac-valor">{{ produto.cor }}</span>
+                            </div>
+                        </div>
+                        
+                        {% if produto.cambio %}
+                        <div class="caracteristica-item">
+                            <i class="fas fa-cog"></i>
+                            <div>
+                                <span class="carac-label">Câmbio</span>
+                                <span class="carac-valor">{{ produto.cambio }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if produto.combustivel %}
+                        <div class="caracteristica-item">
+                            <i class="fas fa-gas-pump"></i>
+                            <div>
+                                <span class="carac-label">Combustível</span>
+                                <span class="carac-valor">{{ produto.combustivel }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                    {% else %}
+                        <!-- Características de Peça -->
+                        <div class="caracteristica-item">
+                            <i class="fas fa-tag"></i>
+                            <div>
+                                <span class="carac-label">Categoria</span>
+                                <span class="carac-valor">{{ produto.categoria }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="caracteristica-item">
+                            <i class="fas fa-industry"></i>
+                            <div>
+                                <span class="carac-label">Marca</span>
+                                <span class="carac-valor">{{ produto.marca }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="caracteristica-item">
+                            <i class="fas fa-box"></i>
+                            <div>
+                                <span class="carac-label">Estado</span>
+                                <span class="carac-valor">{{ produto.estado|capitalize }}</span>
+                            </div>
+                        </div>
+                        
+                        {% if produto.compatibilidade %}
+                        <div class="caracteristica-item">
+                            <i class="fas fa-car"></i>
+                            <div>
+                                <span class="carac-label">Compatibilidade</span>
+                                <span class="carac-valor">{{ produto.compatibilidade }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Status de Disponibilidade -->
+                <div class="disponibilidade">
+                    {% if produto.status == 'ativo' %}
+                        <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                        <span style="color: #27ae60; font-weight: 600;">Disponível para compra</span>
+                    {% else %}
+                        <i class="fas fa-times-circle" style="color: #e74c3c;"></i>
+                        <span style="color: #e74c3c; font-weight: 600;">Indisponível no momento</span>
+                    {% endif %}
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="botoes-acao">
+                    {% if produto.status == 'ativo' %}
+                        <button class="btn-adicionar-carrinho" onclick="adicionarAoCarrinho('{{ produto.id }}', '{{ tipo }}')">
+                            <i class="fas fa-shopping-cart"></i>
+                            Adicionar ao Carrinho
+                        </button>
+                        
+                        <button class="btn-comprar-agora" onclick="comprarAgora('{{ produto.id }}', '{{ tipo }}')">
+                            <i class="fas fa-bolt"></i>
+                            Comprar Agora
+                        </button>
+                    {% else %}
+                        <button class="btn-indisponivel" disabled>
+                            <i class="fas fa-ban"></i>
+                            Produto Indisponível
+                        </button>
+                    {% endif %}
+                </div>
+
+                <!-- Informações de Entrega -->
+                <div class="info-entrega">
+                    <div class="entrega-item">
+                        <i class="fas fa-truck"></i>
+                        <div>
+                            <strong>Frete Grátis</strong>
+                            <p>Para Joinville e região</p>
+                        </div>
+                    </div>
+                    
+                    <div class="entrega-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <div>
+                            <strong>Compra Segura</strong>
+                            <p>Seus dados protegidos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="entrega-item">
+                        <i class="fas fa-undo"></i>
+                        <div>
+                            <strong>Devolução Garantida</strong>
+                            <p>Em até 7 dias</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Kaido-House. Desenvolvido para SENAI/SC.</p>
-        </div>
-    </footer>
 
-    <main class="main-container">
-        <div class="product-detail-wrapper">
-            <div class="product-gallery">
-                <div class="main-image-container">
-                    <img id="main-img" src="placeholder.jpg" alt="Imagem Principal">
-                </div>
-                <div class="thumbnail-list" id="thumbnail-list">
-                </div>
+        <!-- Abas de Informação Detalhada -->
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="descricao">
+                    <i class="fas fa-align-left"></i> Descrição
+                </button>
+                <button class="tab-btn" data-tab="especificacoes">
+                    <i class="fas fa-list-ul"></i> Especificações
+                </button>
+                <button class="tab-btn" data-tab="vendedor">
+                    <i class="fas fa-user"></i> Vendedor
+                </button>
             </div>
 
-            <div class="product-info-section">
-                <nav class="breadcrumb">
-                    <a href="/">Home</a> / <span id="breadcrumb-category">Categoria</span>
-                </nav>
-
-                <h1 id="product-title" class="product-name">Carregando...</h1>
-                <div class="status-badge" id="product-status">Estado</div>
-
-                <div class="price-container">
-                    <span class="currency">R$</span>
-                    <span id="product-price" class="price-value">0,00</span>
+            <div class="tabs-content">
+                <!-- Aba Descrição -->
+                <div class="tab-pane active" id="descricao">
+                    <h3>Sobre este produto</h3>
+                    <p>{{ produto.descricao if produto.descricao else 'Sem descrição disponível.' }}</p>
                 </div>
 
-                <div class="specs-grid" id="specs-grid">
+                <!-- Aba Especificações -->
+                <div class="tab-pane" id="especificacoes">
+                    <h3>Especificações Técnicas</h3>
+                    <table class="specs-table">
+                        {% if tipo == 'veiculo' %}
+                            <tr>
+                                <td><strong>Marca</strong></td>
+                                <td>{{ produto.marca }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Modelo</strong></td>
+                                <td>{{ produto.modelo }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ano</strong></td>
+                                <td>{{ produto.ano }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Quilometragem</strong></td>
+                                <td>{{ "{:,}".format(produto.km).replace(',', '.') }} km</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cor</strong></td>
+                                <td>{{ produto.cor }}</td>
+                            </tr>
+                            {% if produto.cambio %}
+                            <tr>
+                                <td><strong>Câmbio</strong></td>
+                                <td>{{ produto.cambio }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if produto.combustivel %}
+                            <tr>
+                                <td><strong>Combustível</strong></td>
+                                <td>{{ produto.combustivel }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if produto.motor %}
+                            <tr>
+                                <td><strong>Motor</strong></td>
+                                <td>{{ produto.motor }}</td>
+                            </tr>
+                            {% endif %}
+                        {% else %}
+                            <tr>
+                                <td><strong>Nome</strong></td>
+                                <td>{{ produto.nome }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Categoria</strong></td>
+                                <td>{{ produto.categoria }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Marca</strong></td>
+                                <td>{{ produto.marca }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Estado</strong></td>
+                                <td>{{ produto.estado|capitalize }}</td>
+                            </tr>
+                            {% if produto.compatibilidade %}
+                            <tr>
+                                <td><strong>Compatibilidade</strong></td>
+                                <td>{{ produto.compatibilidade }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endif %}
+                        <tr>
+                            <td><strong>Status</strong></td>
+                            <td>{{ 'Disponível' if produto.status == 'ativo' else 'Indisponível' }}</td>
+                        </tr>
+                    </table>
                 </div>
 
-                <p class="description-text" id="product-description">
-                    Descrição do item carregando...
-                </p>
-
-                <div class="action-buttons">
-                    <button class="btn-buy" onclick="adicionarAoCarrinho()">
-                        <i class="fas fa-shopping-cart"></i> Adicionar ao Carrinho
-                    </button>
-                    <button class="btn-wishlist">
-                        <i class="far fa-heart"></i>
-                    </button>
-                </div>
-
-                <div class="seller-info">
-                    <p><i class="fas fa-user"></i> Vendedor: <span id="seller-name">...</span></p>
-                    <p><i class="fas fa-map-marker-alt"></i> Localização: <span id="location">Brasil</span></p>
+                <!-- Aba Vendedor -->
+                <div class="tab-pane" id="vendedor">
+                    <h3>Informações do Vendedor</h3>
+                    <div class="vendedor-info">
+                        <div class="vendedor-avatar">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="vendedor-detalhes">
+                            <h4>Kaido-House</h4>
+                            <p>Especialista em cultura JDM</p>
+                            <div class="vendedor-stats">
+                                <span><i class="fas fa-star"></i> 4.8 (152 avaliações)</span>
+                                <span><i class="fas fa-box"></i> 500+ vendas</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contato-vendedor">
+                        <button class="btn-contato">
+                            <i class="fas fa-envelope"></i> Entrar em Contato
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Produtos Relacionados -->
+        <section class="relacionados-section">
+            <h2>Você também pode gostar</h2>
+            <div class="produtos-relacionados" id="produtos-relacionados">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </section>
     </main>
 
-        <footer>
+    <footer>
         <div class="footer-container">
             <div class="footer-brand">
                 <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
-                <p>A maior autoridade em cultura JDM e performance de Joinville Sul. Transformando sonhos em projetos
-                    reais.</p>
+                <p>A maior autoridade em cultura JDM e performance de Joinville Sul.</p>
                 <div class="social-links">
                     <a href="#"><i class="fab fa-instagram"></i></a>
                     <a href="#"><i class="fab fa-facebook"></i></a>
@@ -121,37 +415,34 @@
             <div class="footer-nav">
                 <h3>Navegação</h3>
                 <ul>
-                    <li><a href="#">Catálogo de Peças</a></li>
-                    <li><a href="#">Estoque de Veículos</a></li>
-                    <li><a href="#">Oficina de Customização</a></li>
+                    <li><a href="/pecas">Catálogo de Peças</a></li>
+                    <li><a href="/veiculos">Estoque de Veículos</a></li>
                     <li><a href="#">Blog Kaido</a></li>
                 </ul>
             </div>
 
             <div class="footer-contact">
                 <h3>Atendimento</h3>
-                <p><i class="fas fa-map-marker-alt"></i> Joinville, SC - Unidade Sul</p>
+                <p><i class="fas fa-map-marker-alt"></i> Joinville, SC</p>
                 <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
-                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
-                <div class="payment-methods">
-                    <i class="fab fa-cc-visa"></i>
-                    <i class="fab fa-cc-mastercard"></i>
-                    <i class="fab fa-pix"></i>
-                </div>
+                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com.br</p>
             </div>
         </div>
         <div class="footer-bottom">
             <p>&copy; 2026 Kaido-House. Desenvolvido para SENAI/SC.</p>
         </div>
     </footer>
-       
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-       
+
     <script src="/static/js/nav_bar.js"></script>
-       
-    <script src="/static/js/icone_ocult.js"></script>
-       
-    <script src="/static/js/adapte.js"></script>
+    <script src="/static/js/detalhes_produto.js"></script>
+    <script>
+        // Passar dados do produto para JavaScript
+        const produtoAtual = {
+            id: '{{ produto.id }}',
+            tipo: '{{ tipo }}',
+            nome: '{{ produto.nome if produto.nome else (produto.marca ~ " " ~ produto.modelo) }}'
+        };
+    </script>
 </body>
 
 </html>

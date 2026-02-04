@@ -640,3 +640,56 @@ def vitrine_completa():
         "carros_novos": v_novos,
         "carros_usados": v_usados
     })
+
+# ====================================================================
+# ROTAS PARA DETALHES DE PRODUTOS (TEMPLATE ÚNICO)
+# ====================================================================
+
+@user_bp.route('/veiculo/<veiculo_id>')
+def detalhes_veiculo(veiculo_id):
+    """
+    Exibe os detalhes de um veículo específico
+    Usa o template unificado detalhes_produto.html
+    """
+    try:
+        # Buscar veículo no banco
+        veiculo = VeiculoRepository.buscar_por_id(veiculo_id)
+        
+        if not veiculo:
+            # Você pode criar um template 404.html customizado
+            return render_template('404.html', mensagem="Veículo não encontrado"), 404
+        
+        # Renderizar template unificado passando tipo='veiculo'
+        return render_template('detalhes_produto.html', 
+                             produto=veiculo, 
+                             tipo='veiculo')
+        
+    except Exception as e:
+        print(f"❌ Erro ao buscar veículo: {e}")
+        traceback.print_exc()
+        # Você pode criar um template 500.html customizado
+        return render_template('500.html', erro=str(e)), 500
+
+
+@user_bp.route('/peca/<peca_id>')
+def detalhes_peca(peca_id):
+    """
+    Exibe os detalhes de uma peça específica
+    Usa o template unificado detalhes_produto.html
+    """
+    try:
+        # Buscar peça no banco
+        peca = PecaRepository.buscar_por_id(peca_id)
+        
+        if not peca:
+            return render_template('404.html', mensagem="Peça não encontrada"), 404
+        
+        # Renderizar template unificado passando tipo='peca'
+        return render_template('detalhes_produto.html', 
+                             produto=peca, 
+                             tipo='peca')
+        
+    except Exception as e:
+        print(f"❌ Erro ao buscar peça: {e}")
+        traceback.print_exc()
+        return render_template('500.html', erro=str(e)), 500
