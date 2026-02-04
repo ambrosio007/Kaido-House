@@ -695,3 +695,153 @@ def detalhes_peca(peca_id):
         print(f"❌ Erro ao buscar peça: {e}")
         traceback.print_exc()
         return render_template('500.html', erro=str(e)), 500
+    
+# ============= ROTAS DE RECUPERAÇÃO DE SENHA =============
+
+@user_bp.route('/solicitar-recuperacao-senha', methods=['POST'])
+def solicitar_recuperacao_senha():
+    """
+    Endpoint para solicitar recuperação de senha
+    Recebe o e-mail e envia o link de recuperação
+    """
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        
+        print(f"\n{'='*60}")
+        print(f"📧 SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA")
+        print(f"{'='*60}")
+        print(f"Email: {email}")
+        
+        if not email:
+            return jsonify({
+                'success': False,
+                'error': 'E-mail é obrigatório'
+            }), 400
+        
+        # Chamar o serviço
+        sucesso, mensagem = UserService.solicitar_recuperacao_senha(email)
+        
+        if sucesso:
+            print(f"✅ Recuperação iniciada com sucesso")
+            print(f"{'='*60}\n")
+            return jsonify({
+                'success': True,
+                'message': mensagem
+            }), 200
+        else:
+            print(f"❌ Erro ao solicitar recuperação")
+            print(f"{'='*60}\n")
+            return jsonify({
+                'success': False,
+                'error': mensagem
+            }), 400
+            
+    except Exception as e:
+        print(f"❌ ERRO CRÍTICO:")
+        print(f"   Tipo: {type(e).__name__}")
+        print(f"   Mensagem: {str(e)}")
+        traceback.print_exc()
+        print(f"{'='*60}\n")
+        
+        return jsonify({
+            'success': False,
+            'error': 'Erro interno do servidor'
+        }), 500
+
+
+@user_bp.route('/redefinir-senha', methods=['POST'])
+def redefinir_senha():
+    """
+    Endpoint para redefinir a senha usando o token
+    """
+    try:
+        data = request.get_json()
+        token = data.get('token')
+        nova_senha = data.get('nova_senha')
+        
+        print(f"\n{'='*60}")
+        print(f"🔑 REDEFINIÇÃO DE SENHA")
+        print(f"{'='*60}")
+        print(f"Token: {token[:20]}..." if token else "Token: None")
+        
+        if not token or not nova_senha:
+            return jsonify({
+                'success': False,
+                'error': 'Token e nova senha são obrigatórios'
+            }), 400
+        
+        # Validar tamanho mínimo da senha
+        if len(nova_senha) < 6:
+            return jsonify({
+                'success': False,
+                'error': 'A senha deve ter no mínimo 6 caracteres'
+            }), 400
+        
+        # Chamar o serviço
+        sucesso, mensagem = UserService.redefinir_senha(token, nova_senha)
+        
+        if sucesso:
+            print(f"✅ Senha redefinida com sucesso")
+            print(f"{'='*60}\n")
+            return jsonify({
+                'success': True,
+                'message': mensagem
+            }), 200
+        else:
+            print(f"❌ Erro ao redefinir senha")
+            print(f"{'='*60}\n")
+            return jsonify({
+                'success': False,
+                'error': mensagem
+            }), 400
+            
+    except Exception as e:
+        print(f"❌ ERRO CRÍTICO:")
+        print(f"   Tipo: {type(e).__name__}")
+        print(f"   Mensagem: {str(e)}")
+        traceback.print_exc()
+        print(f"{'='*60}\n")
+        
+        return jsonify({
+            'success': False,
+            'error': 'Erro interno do servidor'
+        }), 500
+
+
+@user_bp.route('/validar-token-recuperacao', methods=['POST'])
+def validar_token_recuperacao():
+    """
+    Valida se um token de recuperação é válido
+    Usado para verificar antes de mostrar o formulário de nova senha
+    """
+    try:
+        data = request.get_json()
+        token = data.get('token')
+        
+        if not token:
+            return jsonify({
+                'valido': False,
+                'mensagem': 'Token não fornecido'
+            }), 400
+        
+        token_data = UserService.validar_token_recuperacao(token)
+        
+        if token_data:
+            return jsonify({
+                'valido': True,
+                'mensagem': 'Token válido'
+            }), 200
+        else:
+            return jsonify({
+                'valido': False,
+                'mensagem': 'Token inválido ou expirado'
+            }), 400
+            
+    except Exception as e:
+        print(f"Erro ao validar token: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'valido': False,
+            'mensagem': 'Erro ao validar token'
+        }), 500
