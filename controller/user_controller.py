@@ -46,10 +46,21 @@ def pag_pecas():
 def pag_veiculos():
     return render_template('carros_pg.html')
 
-@user_bp.route('/receuperar-senha')
+@user_bp.route('/recuperar_senha')
 def recuperar_senha():
+    """Renderiza a página de solicitação de recuperação de senha"""
     return render_template('recupera_senha.html')
 
+@user_bp.route('/redefinir_senha')
+def redefinir_senha_page():
+    """Renderiza a página de redefinição de senha com o token"""
+    token = request.args.get('token')
+    if not token:
+        return redirect(url_for('user.recuperar_senha'))
+    return render_template('redefinir_senha.html', token=token)
+
+
+# ============= ROTAS DE AUTENTICAÇÃO =============
 
 @user_bp.route('/cadastro-user', methods=['POST'])
 def cadastro_usuario():
@@ -150,7 +161,12 @@ def login_usuario():
         
         return jsonify({
             "message": "Login realizado com sucesso", 
-            "access_token": access_token
+            "access_token": access_token,
+            "user": {
+                "id": user_id,
+                "nome": user.get('nome'),
+                "email": user.get('email')
+            }
         }), 200
         
     except Exception as e:
@@ -165,6 +181,138 @@ def login_usuario():
 def logout():
     session.clear()
     return redirect(url_for('user.login'))
+
+
+# ============= ROTAS DE RECUPERAÇÃO DE SENHA =============
+
+@user_bp.route('/solicitar-recuperacao-senha', methods=['POST'])
+def solicitar_recuperacao():
+    """
+    Endpoint para solicitar recuperação de senha
+    Recebe o e-mail e envia link de recuperação
+    """
+    try:
+        data = request.get_json() or request.form
+        email = data.get('email')
+        
+        if not email:
+            return jsonify({
+                "success": False,
+                "error": "E-mail é obrigatório"
+            }), 400
+        
+        # Processar recuperação
+        sucesso, mensagem = UserService.solicitar_recuperacao_senha(email)
+        
+        if sucesso:
+            return jsonify({
+                "success": True,
+                "message": mensagem
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": mensagem
+            }), 400
+            
+    except Exception as e:
+        print(f"Erro ao solicitar recuperação: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": "Erro ao processar solicitação"
+        }), 500
+
+
+@user_bp.route('/validar-token-recuperacao', methods=['GET'])
+def validar_token():
+    """
+    Valida se o token de recuperação é válido
+    """
+    try:
+        token = request.args.get('token')
+        
+        if not token:
+            return jsonify({
+                "valid": False,
+                "error": "Token não fornecido"
+            }), 400
+        
+        token_data = UserService.validar_token_recuperacao(token)
+        
+        if token_data:
+            return jsonify({
+                "valid": True,
+                "email": token_data.get('email')
+            }), 200
+        else:
+            return jsonify({
+                "valid": False,
+                "error": "Token inválido ou expirado"
+            }), 400
+            
+    except Exception as e:
+        print(f"Erro ao validar token: {str(e)}")
+        return jsonify({
+            "valid": False,
+            "error": "Erro ao validar token"
+        }), 500
+
+
+@user_bp.route('/redefinir-senha', methods=['POST'])
+def redefinir_senha():
+    """
+    Redefine a senha do usuário usando o token
+    """
+    try:
+        data = request.get_json() or request.form
+        token = data.get('token')
+        nova_senha = data.get('nova_senha')
+        confirmar_senha = data.get('confirmar_senha')
+        
+        # Validações
+        if not token or not nova_senha or not confirmar_senha:
+            return jsonify({
+                "success": False,
+                "error": "Todos os campos são obrigatórios"
+            }), 400
+        
+        if nova_senha != confirmar_senha:
+            return jsonify({
+                "success": False,
+                "error": "As senhas não coincidem"
+            }), 400
+        
+        if len(nova_senha) < 6:
+            return jsonify({
+                "success": False,
+                "error": "A senha deve ter no mínimo 6 caracteres"
+            }), 400
+        
+        # Redefinir senha
+        sucesso, mensagem = UserService.redefinir_senha(token, nova_senha)
+        
+        if sucesso:
+            return jsonify({
+                "success": True,
+                "message": mensagem
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": mensagem
+            }), 400
+            
+    except Exception as e:
+        print(f"Erro ao redefinir senha: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": "Erro ao redefinir senha"
+        }), 500
+
+
+# ============= ROTAS DE USUÁRIO =============
 
 @user_bp.route('/user/json')
 def busc_user_json():

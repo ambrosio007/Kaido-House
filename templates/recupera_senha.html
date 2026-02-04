@@ -7,73 +7,42 @@
     <link rel="stylesheet" href="/static/recuperar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Recuperar Senha | Kaido-House</title>
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        
+        .submit-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 
 <body>
-        <footer>
-        <div class="footer-container">
-            <div class="footer-brand">
-                <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
-                <p>A maior autoridade em cultura JDM e performance de Joinville Sul. Transformando sonhos em projetos
-                    reais.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                    <a href="#"><i class="fab fa-tiktok"></i></a>
-                </div>
-            </div>
-
-            <div class="footer-nav">
-                <h3>Navegação</h3>
-                <ul>
-                    <li><a href="#">Catálogo de Peças</a></li>
-                    <li><a href="#">Estoque de Veículos</a></li>
-                    <li><a href="#">Oficina de Customização</a></li>
-                    <li><a href="#">Blog Kaido</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-contact">
-                <h3>Atendimento</h3>
-                <p><i class="fas fa-map-marker-alt"></i> Joinville, SC - Unidade Sul</p>
-                <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
-                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
-                <div class="payment-methods">
-                    <i class="fab fa-cc-visa"></i>
-                    <i class="fab fa-cc-mastercard"></i>
-                    <i class="fab fa-pix"></i>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Kaido-House. Desenvolvido para SENAI/SC.</p>
-        </div>
-    </footer>
-
-    <div class="header-icons">
-        <a href="/templates/carrinho.html" class="icon-link cart-icon">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="cart-badge">0</span>
-        </a>
-
-        <div class="profile-area">
-            <a onclick="window.location.href='/login'" class="auth-icon-container login-state" id="profile-target">
-                <i class="fas fa-user-circle"></i>
-            </a>
-            <a href="/templates/perfil.html" class="auth-icon-container profile-state hidden" id="profile-target-logged">
-                <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
-            </a>
-        </div>
-
-        <i id="menu-btn" class="fas fa-bars"></i>
-    </div>
-</header>
-
     <main class="password-recovery-page">
         <div class="form-card">
-            <form action="#" method="post" class="recovery-form">
+            <form id="recoveryForm" class="recovery-form">
                 <h2 class="form-title">Recuperação de Senha</h2>
+
+                <div id="alert-container"></div>
 
                 <p class="instruction-message">
                     Enviaremos um código de verificação para o seu e-mail cadastrado.
@@ -86,7 +55,7 @@
 
                 <button type="submit" id="submit-btn" class="submit-button">ENVIAR CÓDIGO</button>
 
-                <a class="back-link" href="/templates/login.html">Voltar para o Login</a>
+                <a class="back-link" href="/login">Voltar para o Login</a>
             </form>
         </div>
     </main>
@@ -107,25 +76,108 @@
             <div class="footer-section links">
                 <h3>Links Rápidos</h3>
                 <ul>
-                    <li><a href="#inicio">Início</a></li>
-                    <li><a href="#pecas">Peças</a></li>
-                    <li><a href="#veiculos">Veículos</a></li>
-                    <li><a href="#blog">Blog/Notícias</a></li>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/pecas">Peças</a></li>
+                    <li><a href="/veiculos">Veículos</a></li>
                 </ul>
             </div>
 
             <div class="footer-section contact">
                 <h3>Contate-nos</h3>
-                <p><i class="fas fa-envelope"></i> email@kaidohouse.com</p>
-                <p><i class="fas fa-phone"></i> +55 (XX) XXXX-XXXX</p>
+                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
+                <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
             </div>
         </div>
 
         <div class="footer-bottom">
-            &copy; 2025 Kaido-House | Todos os direitos reservados.
+            &copy; 2026 Kaido-House | Todos os direitos reservados.
         </div>
     </footer>
-    <script src="/static/js/nav_bar.js"></script>
+
+    <script>
+        document.getElementById('recoveryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('emailID').value;
+            const submitBtn = document.getElementById('submit-btn');
+            const alertContainer = document.getElementById('alert-container');
+            
+            // Limpar alertas anteriores
+            alertContainer.innerHTML = '';
+            
+            // Validar e-mail
+            if (!email) {
+                showAlert('Por favor, insira seu e-mail', 'danger');
+                return;
+            }
+            
+            // Validar formato de e-mail
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showAlert('Por favor, insira um e-mail válido', 'danger');
+                return;
+            }
+            
+            // Desabilitar botão e mostrar loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'ENVIANDO...';
+            
+            console.log('📧 Solicitando recuperação de senha para:', email);
+            
+            try {
+                const response = await fetch('/solicitar-recuperacao-senha', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await response.json();
+                console.log('📦 Resposta recebida:', data);
+                
+                if (data.success) {
+                    // Sucesso
+                    showAlert(data.message, 'success');
+                    
+                    // Limpar formulário
+                    document.getElementById('emailID').value = '';
+                    
+                    // Mostrar mensagem adicional
+                    setTimeout(() => {
+                        showAlert('Verifique sua caixa de entrada e também a pasta de spam/lixo eletrônico.', 'success');
+                    }, 1000);
+                    
+                } else {
+                    // Erro
+                    showAlert(data.error || 'Erro ao processar solicitação', 'danger');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                showAlert('Erro de conexão com o servidor. Tente novamente.', 'danger');
+            } finally {
+                // Reabilitar botão
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'ENVIAR CÓDIGO';
+            }
+        });
+        
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alert-container');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `<strong>${type === 'success' ? '✅' : '❌'}</strong> ${message}`;
+            alertContainer.appendChild(alertDiv);
+            
+            // Auto-remover alertas de erro após 5 segundos
+            if (type === 'danger') {
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 5000);
+            }
+        }
+    </script>
 </body>
 
 </html>
