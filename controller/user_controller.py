@@ -688,8 +688,8 @@ def detalhes_peca(peca_id):
         
         # Renderizar template unificado passando tipo='peca'
         return render_template('detalhes_produto.html', 
-                             produto=peca, 
-                             tipo='peca')
+                            produto=peca, 
+                            tipo='peca')
         
     except Exception as e:
         print(f"❌ Erro ao buscar peça: {e}")
