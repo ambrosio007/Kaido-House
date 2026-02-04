@@ -21,22 +21,43 @@ class UserRepository:
     def adicionar_user(dados):
         """
         Adiciona um novo usuário
-        ✅ VERSÃO FINAL - Commit garantido antes de devolver conexão
+        ✅ VERSÃO CORRIGIDA com logs detalhados e tratamento de erros
         """
         conn = None
-        cursor = None
-        
         try:
-            print(f"\n{'='*60}")
-            print(f"📝 INSERINDO USUÁRIO NO BANCO")
-            print(f"{'='*60}")
+            print(f"\n========== USER REPOSITORY - ADICIONAR ==========")
+            print(f"1. Dados recebidos no repository:")
+            for key, value in dados.items():
+                if key == 'senha_hash':
+                    print(f"   {key}: {value[:20]}... (hash)")
+                else:
+                    print(f"   {key}: {value}")
             
-            # Obter conexão
+            # Validar campos obrigatórios
+            campos_obrigatorios = ['id', 'nome', 'cpf', 'email', 'idade', 'senha_hash']
+            for campo in campos_obrigatorios:
+                if campo not in dados or dados[campo] is None:
+                    raise ValueError(f"Campo obrigatório '{campo}' está faltando ou vazio")
+            
+            # Validar tipo da idade
+            idade = dados.get('idade')
+            if not isinstance(idade, int):
+                try:
+                    idade = int(idade)
+                    print(f"⚠️  Idade convertida de {type(dados['idade'])} para int: {idade}")
+                except (ValueError, TypeError):
+                    raise ValueError(f"Campo 'idade' deve ser um número inteiro, recebido: {type(idade)} = {idade}")
+            
             conn = get_connection()
+            print(f"\n2. ✅ Conexão obtida com sucesso")
+            
             cursor = conn.cursor()
             
-            # Executar INSERT
-            print(f"💾 Executando INSERT...")
+            # Log da query SQL
+            print(f"\n3. Executando INSERT...")
+            print(f"   Tabela: usuarios")
+            print(f"   Campos: id, nome, cpf, cep, email, idade, senha, perfil, foto_perfil")
+            
             cursor.execute("""
                 INSERT INTO usuarios (id, nome, cpf, cep, email, idade, senha, perfil, foto_perfil)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -46,64 +67,59 @@ class UserRepository:
                 dados['cpf'], 
                 dados['cep'], 
                 dados['email'], 
-                dados['idade'],
+                idade,  # Usar a variável idade validada
                 dados['senha_hash'],
                 dados.get('perfil', 'cliente'),
                 dados.get('foto_perfil', None)
             ))
             
-            print(f"✅ INSERT executado (rowcount: {cursor.rowcount})")
+            print(f"   ✅ Query executada sem erros")
             
-            # ⭐ COMMIT IMEDIATAMENTE
-            print(f"💿 Executando COMMIT...")
             conn.commit()
-            print(f"✅ COMMIT concluído!")
+            print(f"\n4. ✅ COMMIT realizado com sucesso")
+            print(f"   Usuário '{dados['nome']}' inserido no banco!")
             
-            # Verificar se foi inserido
-            cursor.execute("SELECT COUNT(*) FROM usuarios WHERE id = %s", (dados['id'],))
-            count = cursor.fetchone()[0]
-            print(f"🔍 Verificação: {count} registro(s) encontrado(s)")
-            
-            if count == 0:
-                print(f"❌ ERRO: Registro não foi persistido!")
-                raise Exception("Falha ao persistir no banco")
-            
-            print(f"✅ Usuário '{dados['nome']}' inserido com sucesso!")
-            print(f"{'='*60}\n")
+            cursor.close()
+            print(f"=================================================\n")
             
             return True
             
         except psycopg2.IntegrityError as e:
             if conn:
                 conn.rollback()
+                print(f"\n❌ ERRO DE INTEGRIDADE (rollback realizado)")
             
             erro_str = str(e)
-            if 'email' in erro_str.lower():
-                raise Exception(f"Email '{dados.get('email')}' já está cadastrado")
-            elif 'cpf' in erro_str.lower():
-                raise Exception(f"CPF '{dados.get('cpf')}' já está cadastrado")
+            print(f"   Detalhes: {erro_str}")
+            
+            # Identificar qual constraint foi violada
+            if 'usuarios_email_key' in erro_str or 'email' in erro_str.lower():
+                raise Exception(f"Email '{dados.get('email')}' já está cadastrado no sistema")
+            elif 'usuarios_cpf_key' in erro_str or 'cpf' in erro_str.lower():
+                raise Exception(f"CPF '{dados.get('cpf')}' já está cadastrado no sistema")
             else:
                 raise Exception(f"Erro de integridade: {erro_str}")
                 
+        except psycopg2.DataError as e:
+            if conn:
+                conn.rollback()
+            print(f"\n❌ ERRO DE TIPO DE DADOS (rollback realizado)")
+            print(f"   Detalhes: {str(e)}")
+            raise Exception(f"Dados inválidos: {str(e)}")
+            
         except Exception as e:
             if conn:
-                print(f"❌ Erro: {str(e)}")
                 conn.rollback()
+                print(f"\n❌ ERRO GERAL (rollback realizado)")
+            print(f"   Tipo: {type(e).__name__}")
+            print(f"   Mensagem: {str(e)}")
+            print(f"=================================================\n")
             raise
             
         finally:
-            if cursor:
-                cursor.close()
             if conn:
-                # ⭐ GARANTIR que não há transação pendente antes de devolver
-                try:
-                    if conn.info.transaction_status != psycopg2.extensions.TRANSACTION_STATUS_IDLE:
-                        print(f"⚠️ Transação ainda ativa, forçando commit...")
-                        conn.commit()
-                except:
-                    pass
-                
                 release_connection(conn)
+                print(f"5. Conexão devolvida ao pool")
 
     @staticmethod
     def buscar_por_email_e_senha(email, senha):
@@ -138,10 +154,7 @@ class UserRepository:
         try:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM usuarios WHERE id = %s", (user_id,))
-            
-            # ⭐ COMMIT IMEDIATAMENTE
             conn.commit()
-            
             deleted = cursor.rowcount
             cursor.close()
             return deleted > 0
@@ -170,10 +183,7 @@ class UserRepository:
                 dados['email'], 
                 user_id
             ))
-            
-            # ⭐ COMMIT IMEDIATAMENTE
             conn.commit()
-            
             updated = cursor.rowcount
             cursor.close()
             return updated > 0
@@ -195,10 +205,7 @@ class UserRepository:
                 SET senha = %s
                 WHERE id = %s
             """, (senha_hash, user_id))
-            
-            # ⭐ COMMIT IMEDIATAMENTE
             conn.commit()
-            
             updated = cursor.rowcount
             cursor.close()
             return updated > 0
@@ -220,10 +227,7 @@ class UserRepository:
                 SET foto_perfil = %s
                 WHERE id = %s
             """, (foto_url, user_id))
-            
-            # ⭐ COMMIT IMEDIATAMENTE
             conn.commit()
-            
             updated = cursor.rowcount
             cursor.close()
             return updated > 0
