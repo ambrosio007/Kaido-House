@@ -1,5 +1,6 @@
 /**
  * ✅ VEICULOS.JS - Carregamento dinâmico de veículos da API
+ * CORRIGIDO: Removido /api das URLs
  */
 
 // ==========================================
@@ -25,7 +26,8 @@ async function carregarVeiculos() {
     `;
     
     try {
-        const response = await fetch('/api/veiculos');
+        // ✅ CORRIGIDO: Removido /api
+        const response = await fetch('/veiculos');
         
         if (!response.ok) {
             throw new Error(`Erro HTTP: ${response.status}`);

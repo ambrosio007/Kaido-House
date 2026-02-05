@@ -70,23 +70,29 @@ def listar_veiculos():
     veiculos = VeiculoService.listar_todos()
     return jsonify(veiculos), 200
 
-# --- ROTA PÚBLICA: Página HTML de Detalhes ---
+# --- ROTA PÚBLICA: Detalhes do Veículo (HTML ou JSON) ---
 @veiculo_bp.route('/veiculo/<veiculo_id>', methods=['GET'])
-def detalhes_veiculo_pagina(veiculo_id):
-    """Renderiza a página HTML de detalhes do veículo"""
+def detalhes_veiculo(veiculo_id):
+    """
+    Retorna detalhes de um veículo
+    - HTML quando acessado pelo navegador
+    - JSON quando chamado por fetch/API
+    """
     veiculo = VeiculoService.buscar_por_id(veiculo_id)
-    if veiculo:
+    
+    if not veiculo:
+        # Se for requisição JSON, retorna erro em JSON
+        if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
+            return jsonify({"error": "Veículo não encontrado"}), 404
+        # Senão, renderiza página de erro
+        return render_template('erro_404.html'), 404
+    
+    # Se aceita HTML (navegador direto), renderiza template
+    if request.accept_mimetypes.accept_html:
         return render_template('detalhes_veiculo.html', veiculo=veiculo)
-    return render_template('erro_404.html'), 404
-
-# --- ROTA PÚBLICA API: Detalhes (JSON) ---
-@veiculo_bp.route('/api/veiculo/<veiculo_id>', methods=['GET'])
-def detalhes_veiculo_api(veiculo_id):
-    """Retorna detalhes de um veículo específico em JSON"""
-    veiculo = VeiculoService.buscar_por_id(veiculo_id)
-    if veiculo:
-        return jsonify(veiculo), 200
-    return jsonify({"error": "Veículo não encontrado"}), 404
+    
+    # Caso contrário, retorna JSON (chamada via fetch)
+    return jsonify(veiculo), 200
 
 # --- ROTA PROTEGIDA: Deletar ---
 @veiculo_bp.route('/veiculo/<veiculo_id>', methods=['DELETE'])
@@ -107,6 +113,7 @@ def deletar_veiculo(veiculo_id):
         return jsonify({"message": "Veículo deletado com sucesso"}), 200
     return jsonify({"error": "Erro ao deletar veículo"}), 400
 
+# --- ROTA PROTEGIDA: Atualizar ---
 @veiculo_bp.route('/veiculo/<veiculo_id>', methods=['PUT'])
 @jwt_required()
 def atualizar_veiculo(veiculo_id):
