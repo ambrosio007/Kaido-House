@@ -1010,7 +1010,7 @@ def meus_veiculos():
     return render_template('meus_veiculos.html')
 
 
-@user_bp.route('/api/meus-veiculos', methods=['GET'])
+@user_bp.route('/meus-veiculos', methods=['GET'])
 @jwt_required()
 def listar_meus_veiculos():
     """
