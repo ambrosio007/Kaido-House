@@ -88,6 +88,9 @@ function renderizarVeiculos(veiculos) {
     const veiculosHTML = veiculos.map(veiculo => criarVeiculoCard(veiculo)).join('');
     container.innerHTML = veiculosHTML;
     
+    // ✅ ADICIONADO: Event listeners para adicionar ao carrinho
+    adicionarEventListenersCarrinho();
+    
     console.log(`✅ ${veiculos.length} veículos renderizados`);
 }
 
@@ -116,16 +119,36 @@ function criarVeiculoCard(veiculo) {
     // Determinar status
     let statusTag = '';
     let statusStyle = '';
+    let botoesAcao = '';
     
     if (veiculo.disponivel === false || veiculo.status === 'vendido') {
         statusTag = 'Vendido';
         statusStyle = 'background: #95a5a6; color: #fff;';
+        botoesAcao = `<a href="/veiculo/${veiculo.id}" class="btn-view">Ver Detalhes</a>`;
     } else if (veiculo.status === 'reservado') {
         statusTag = 'Reservado';
         statusStyle = 'background: #ffcc00; color: #000;';
+        botoesAcao = `<a href="/veiculo/${veiculo.id}" class="btn-view">Ver Detalhes</a>`;
     } else {
         statusTag = 'Disponível';
         statusStyle = 'background: #27ae60; color: #fff;';
+        // ✅ ADICIONADO: Botões para veículos disponíveis
+        botoesAcao = `
+            <div style="display: flex; gap: 8px; width: 100%;">
+                <button class="add-to-cart-vehicle" 
+                        data-id="${veiculo.id}" 
+                        data-nome="${veiculo.marca} ${veiculo.modelo}"
+                        data-preco="${veiculo.preco}"
+                        style="flex: 1; padding: 12px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: transform 0.2s;">
+                    <i class="fas fa-cart-plus"></i> Adicionar
+                </button>
+                <a href="/veiculo/${veiculo.id}" 
+                   class="btn-view" 
+                   style="flex: 1; text-align: center;">
+                    Ver Detalhes
+                </a>
+            </div>
+        `;
     }
     
     // Nome completo do veículo
@@ -153,7 +176,7 @@ function criarVeiculoCard(veiculo) {
                     <span><i class="fas fa-tachometer-alt"></i> ${km}km</span>
                 </div>
                 <p class="price">R$ ${preco}</p>
-                <a href="/veiculo/${veiculo.id}" class="btn-view">Ver Detalhes</a>
+                ${botoesAcao}
             </div>
         </div>
     `;
@@ -196,6 +219,177 @@ function mostrarErroCarregamento() {
             </div>
         `;
     }
+}
+
+// ==========================================
+// ADICIONAR AO CARRINHO
+// ==========================================
+
+function adicionarEventListenersCarrinho() {
+    const botoes = document.querySelectorAll('.add-to-cart-vehicle');
+    
+    botoes.forEach(botao => {
+        // Adicionar efeito hover
+        botao.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+        });
+        botao.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+        
+        // Click para adicionar
+        botao.addEventListener('click', async function() {
+            const veiculoId = this.getAttribute('data-id');
+            const veiculoNome = this.getAttribute('data-nome');
+            
+            // ✅ CORREÇÃO: Verificar autenticação antes de adicionar
+            // Tentar ambos os nomes de token para compatibilidade
+            const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+            
+            if (!token) {
+                mostrarNotificacao('Você precisa estar logado para adicionar ao carrinho', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=/veiculos_pg';
+                }, 1500);
+                return;
+            }
+            
+            await adicionarAoCarrinho(veiculoId, veiculoNome);
+        });
+    });
+}
+
+async function adicionarAoCarrinho(veiculoId, veiculoNome) {
+    console.log(`🛒 Adicionando veículo ${veiculoId} ao carrinho`);
+    
+    // ✅ CORREÇÃO: Buscar token com ambos os nomes
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+    
+    if (!token) {
+        console.error('❌ Token não encontrado');
+        mostrarNotificacao('Você precisa estar logado', 'warning');
+        setTimeout(() => {
+            window.location.href = '/login?redirect=/veiculos_pg';
+        }, 1500);
+        return;
+    }
+    
+    console.log('🔑 Token encontrado:', token.substring(0, 20) + '...');
+    
+    try {
+        const response = await fetch('/api/carrinho/adicionar', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                tipo_item: 'veiculo',
+                item_id: parseInt(veiculoId),
+                quantidade: 1
+            })
+        });
+        
+        console.log('📊 Status da resposta:', response.status);
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.error('❌ Token inválido ou expirado');
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('token');
+                mostrarNotificacao('Sua sessão expirou. Faça login novamente.', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=/veiculos_pg';
+                }, 1500);
+                return;
+            }
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Veículo adicionado ao carrinho:', result);
+        
+        // Atualizar badge do carrinho
+        if (result.total_itens !== undefined) {
+            const badge = document.querySelector('.cart-badge');
+            if (badge) {
+                badge.textContent = result.total_itens;
+                // Animar badge
+                badge.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    badge.style.transform = 'scale(1)';
+                }, 300);
+            }
+        }
+        
+        mostrarNotificacao(`${veiculoNome} adicionado ao carrinho!`, 'success');
+        
+    } catch (error) {
+        console.error('❌ Erro ao adicionar ao carrinho:', error);
+        mostrarNotificacao('Erro ao adicionar ao carrinho', 'error');
+    }
+}
+
+// ==========================================
+// FUNÇÃO PARA MOSTRAR NOTIFICAÇÕES
+// ==========================================
+
+function mostrarNotificacao(mensagem, tipo = 'info') {
+    // Remover notificação anterior se existir
+    const notifAnterior = document.querySelector('.notificacao-toast');
+    if (notifAnterior) {
+        notifAnterior.remove();
+    }
+    
+    // Criar nova notificação
+    const notificacao = document.createElement('div');
+    notificacao.className = `notificacao-toast notificacao-${tipo}`;
+    
+    const icone = tipo === 'success' ? 'check-circle' : 
+                  tipo === 'error' ? 'times-circle' :
+                  tipo === 'warning' ? 'exclamation-triangle' : 'info-circle';
+    
+    notificacao.innerHTML = `
+        <i class="fas fa-${icone}"></i>
+        <span>${mensagem}</span>
+    `;
+    
+    // Estilos inline
+    notificacao.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${tipo === 'success' ? '#4CAF50' : 
+                     tipo === 'error' ? '#f44336' :
+                     tipo === 'warning' ? '#ff9800' : '#2196F3'};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    `;
+    
+    document.body.appendChild(notificacao);
+    
+    // Animar entrada
+    setTimeout(() => {
+        notificacao.style.opacity = '1';
+        notificacao.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        notificacao.style.opacity = '0';
+        notificacao.style.transform = 'translateX(100%)';
+        setTimeout(() => notificacao.remove(), 300);
+    }, 3000);
 }
 
 // ==========================================

@@ -1,5 +1,6 @@
 /**
  * ✅ CARRINHO.JS - Gerenciamento completo do carrinho de compras
+ * 🔧 VERSÃO CORRIGIDA - Com autenticação consistente
  */
 
 // ==========================================
@@ -9,13 +10,16 @@
 async function carregarCarrinho() {
     console.log('🛒 Carregando itens do carrinho...');
     
-    const token = localStorage.getItem('access_token');
+    // ✅ CORREÇÃO: Buscar token com ambos os nomes
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     
     if (!token) {
         console.warn('⚠️ Usuário não autenticado');
         mostrarCarrinhoVazio();
         return;
     }
+    
+    console.log('🔑 Token encontrado:', token.substring(0, 20) + '...');
     
     try {
         const response = await fetch('/api/carrinho', {
@@ -26,11 +30,17 @@ async function carregarCarrinho() {
             }
         });
         
+        console.log('📊 Status da resposta:', response.status);
+        
         if (!response.ok) {
             if (response.status === 401) {
                 console.error('❌ Token inválido ou expirado');
                 localStorage.removeItem('access_token');
-                window.location.href = '/login?redirect=/carrinho';
+                localStorage.removeItem('token');
+                mostrarNotificacao('Sua sessão expirou. Faça login novamente.', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=/carrinho';
+                }, 1500);
                 return;
             }
             throw new Error(`Erro HTTP: ${response.status}`);
@@ -249,10 +259,14 @@ function adicionarEventListeners() {
 async function atualizarQuantidade(itemId, novaQuantidade) {
     console.log(`🔄 Atualizando quantidade do item ${itemId} para ${novaQuantidade}`);
     
-    const token = localStorage.getItem('access_token');
+    // ✅ CORREÇÃO: Buscar token com ambos os nomes
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     
     if (!token) {
-        window.location.href = '/login?redirect=/carrinho';
+        mostrarNotificacao('Você precisa estar logado', 'warning');
+        setTimeout(() => {
+            window.location.href = '/login?redirect=/carrinho';
+        }, 1500);
         return;
     }
     
@@ -267,6 +281,15 @@ async function atualizarQuantidade(itemId, novaQuantidade) {
         });
         
         if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('token');
+                mostrarNotificacao('Sua sessão expirou', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=/carrinho';
+                }, 1500);
+                return;
+            }
             throw new Error('Erro ao atualizar quantidade');
         }
         
@@ -291,10 +314,14 @@ async function atualizarQuantidade(itemId, novaQuantidade) {
 async function removerItem(itemId) {
     console.log(`🗑️ Removendo item ${itemId}`);
     
-    const token = localStorage.getItem('access_token');
+    // ✅ CORREÇÃO: Buscar token com ambos os nomes
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     
     if (!token) {
-        window.location.href = '/login?redirect=/carrinho';
+        mostrarNotificacao('Você precisa estar logado', 'warning');
+        setTimeout(() => {
+            window.location.href = '/login?redirect=/carrinho';
+        }, 1500);
         return;
     }
     
@@ -308,6 +335,15 @@ async function removerItem(itemId) {
         });
         
         if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('token');
+                mostrarNotificacao('Sua sessão expirou', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=/carrinho';
+                }, 1500);
+                return;
+            }
             throw new Error('Erro ao remover item');
         }
         
@@ -388,7 +424,7 @@ function mostrarCarrinhoVazio() {
                 <i class="fas fa-shopping-cart" style="font-size: 80px; color: #ddd; margin-bottom: 20px;"></i>
                 <h3 style="color: #666; margin-bottom: 10px;">Seu carrinho está vazio</h3>
                 <p style="color: #999; margin-bottom: 30px;">Adicione produtos para começar suas compras!</p>
-                <a href="/pecas" class="btn" style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; text-decoration: none; border-radius: 8px;">
+                <a href="/pecas_pg" class="btn" style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; text-decoration: none; border-radius: 8px;">
                     <i class="fas fa-shopping-bag"></i> Ver Produtos
                 </a>
             </div>
@@ -489,8 +525,8 @@ function mostrarNotificacao(mensagem, tipo = 'info') {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 Página do carrinho carregada');
     
-    // Verificar se usuário está logado
-    const token = localStorage.getItem('access_token');
+    // ✅ CORREÇÃO: Verificar token com ambos os nomes
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     
     if (!token) {
         console.warn('⚠️ Usuário não autenticado - redirecionando...');

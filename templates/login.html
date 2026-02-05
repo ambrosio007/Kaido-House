@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/login.css">
-    <title>Login</title>
+    <title>Login | Kaido-House</title>
 </head>
 
 <body>
@@ -35,16 +35,14 @@
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function (e) {
-            e.preventDefault(); // Impede o recarregamento da página
+            e.preventDefault();
 
-            // Pega os dados dos inputs
             const email = document.getElementById('emailID').value;
             const senha = document.getElementById('senhaID').value;
 
             console.log('🔐 Tentando fazer login...', { email });
 
             try {
-                // Envia para o seu Back-end
                 const response = await fetch('/login-user', {
                     method: 'POST',
                     headers: {
@@ -59,23 +57,32 @@
                 console.log('📦 Dados recebidos:', data);
 
                 if (response.ok) {
-                    // ✅ CORRIGIDO: usar 'access_token' ao invés de 'token'
+                    // ✅ CORREÇÃO CRÍTICA: Salvar com o nome correto
                     if (data.access_token) {
-                        // 1. Salva o token no navegador
-                        localStorage.setItem('token', data.access_token);
+                        // 1. Salvar token com AMBOS os nomes para compatibilidade
+                        localStorage.setItem('access_token', data.access_token);
+                        localStorage.setItem('token', data.access_token); // Fallback
                         console.log('✅ Token salvo com sucesso!');
 
-                        // 2. Opcional: Salvar dados do usuário para mostrar "Olá, Fulano"
+                        // 2. Salvar dados do usuário
                         if (data.user) {
                             localStorage.setItem('user_name', data.user.nome);
                             localStorage.setItem('user_id', data.user.id);
+                            localStorage.setItem('user_email', data.user.email);
                             console.log('✅ Dados do usuário salvos!');
                         }
 
-                        console.log('🚀 Redirecionando para a home...');
+                        // 3. Verificar se há redirect na URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirect = urlParams.get('redirect') || '/';
 
-                        // 3. Redireciona para a Home ou Dashboard
-                        window.location.href = '/';
+                        console.log('🚀 Redirecionando para:', redirect);
+
+                        // 4. Pequeno delay para garantir que o localStorage foi salvo
+                        setTimeout(() => {
+                            window.location.href = redirect;
+                        }, 100);
+
                     } else {
                         console.error('❌ Token não encontrado na resposta!');
                         alert('Erro: Token de autenticação não recebido');

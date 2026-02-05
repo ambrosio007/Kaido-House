@@ -164,13 +164,14 @@ function adicionarEventListenersCarrinho() {
             const pecaId = this.getAttribute('data-id');
             const pecaNome = this.getAttribute('data-nome');
             
-            // Verificar se usuário está logado
-            const token = localStorage.getItem('access_token');
+            // ✅ CORREÇÃO: Verificar autenticação antes de adicionar
+            // Tentar ambos os nomes de token para compatibilidade
+            const token = localStorage.getItem('access_token') || localStorage.getItem('token');
             
             if (!token) {
                 mostrarNotificacao('Você precisa estar logado para adicionar ao carrinho', 'warning');
                 setTimeout(() => {
-                    window.location.href = '/login?redirect=/pecas';
+                    window.location.href = '/login?redirect=/pecas_pg';
                 }, 1500);
                 return;
             }
@@ -183,7 +184,19 @@ function adicionarEventListenersCarrinho() {
 async function adicionarAoCarrinho(pecaId, pecaNome) {
     console.log(`🛒 Adicionando peça ${pecaId} ao carrinho`);
     
-    const token = localStorage.getItem('access_token');
+    // ✅ CORREÇÃO: Buscar token com ambos os nomes
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+    
+    if (!token) {
+        console.error('❌ Token não encontrado');
+        mostrarNotificacao('Você precisa estar logado', 'warning');
+        setTimeout(() => {
+            window.location.href = '/login?redirect=/pecas_pg';
+        }, 1500);
+        return;
+    }
+    
+    console.log('🔑 Token encontrado:', token.substring(0, 20) + '...');
     
     try {
         const response = await fetch('/api/carrinho/adicionar', {
@@ -199,10 +212,17 @@ async function adicionarAoCarrinho(pecaId, pecaNome) {
             })
         });
         
+        console.log('📊 Status da resposta:', response.status);
+        
         if (!response.ok) {
             if (response.status === 401) {
+                console.error('❌ Token inválido ou expirado');
                 localStorage.removeItem('access_token');
-                window.location.href = '/login?redirect=/pecas';
+                localStorage.removeItem('token');
+                mostrarNotificacao('Sua sessão expirou. Faça login novamente.', 'warning');
+                setTimeout(() => {
+                    window.location.href = '/login?redirect=/pecas_pg';
+                }, 1500);
                 return;
             }
             throw new Error(`Erro HTTP: ${response.status}`);
@@ -216,6 +236,11 @@ async function adicionarAoCarrinho(pecaId, pecaNome) {
             const badge = document.querySelector('.cart-badge');
             if (badge) {
                 badge.textContent = result.total_itens;
+                // Animar badge
+                badge.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    badge.style.transform = 'scale(1)';
+                }, 300);
             }
         }
         
