@@ -43,11 +43,11 @@ def perfil():
 def ver_carrinho():
     return render_template('carrinho.html') 
 
-@user_bp.route('/pecas')
+@user_bp.route('/pecas_pag')
 def pag_pecas():
     return render_template('pecas_pg.html')
 
-@user_bp.route('/veiculos')
+@user_bp.route('/veiculos_pag')
 def pag_veiculos():
     return render_template('carros_pg.html')
 

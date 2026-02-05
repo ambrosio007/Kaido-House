@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="/static/home.css">
     <link rel="stylesheet" href="/static/pagamento.css">
 </head>
+
 <body>
 
         <footer>
@@ -17,9 +19,9 @@
                 <p>A maior autoridade em cultura JDM e performance de Joinville Sul. Transformando sonhos em projetos
                     reais.</p>
                 <div class="social-links">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="/"><i class="fab fa-instagram"></i></a>
+                    <a href="/pecas_pag">Peças</a>
+                    <a href="/veiculos_pag">Veículos</a>
                     <a href="#"><i class="fab fa-tiktok"></i></a>
                 </div>
             </div>
@@ -53,10 +55,10 @@
 
     <main class="checkout-container">
         <div class="checkout-grid">
-            
+
             <section class="payment-methods">
                 <h2><i class="fas fa-shield-alt"></i> Finalizar <span>Pagamento</span></h2>
-                
+
                 <div class="method-selector">
                     <button class="method-btn active" onclick="switchMethod('card')">
                         <i class="fas fa-credit-card"></i> Cartão
@@ -163,10 +165,11 @@
             document.getElementById('boleto-panel').classList.add('hidden');
 
             // Mostra o selecionado
-            if(method === 'card') document.getElementById('card-form').classList.remove('hidden');
-            if(method === 'pix') document.getElementById('pix-panel').classList.remove('hidden');
-            if(method === 'boleto') document.getElementById('boleto-panel').classList.remove('hidden');
+            if (method === 'card') document.getElementById('card-form').classList.remove('hidden');
+            if (method === 'pix') document.getElementById('pix-panel').classList.remove('hidden');
+            if (method === 'boleto') document.getElementById('boleto-panel').classList.remove('hidden');
         }
     </script>
 </body>
+
 </html>
