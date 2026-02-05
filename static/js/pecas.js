@@ -37,8 +37,20 @@ async function carregarPecas() {
         // ✅ Endpoint correto
         const response = await fetch('/pecas');
         
+        // ✅ Verificar Content-Type antes de parsear
+        const contentType = response.headers.get('content-type');
+        
         if (!response.ok) {
+            console.error(`❌ Erro HTTP ${response.status}`);
             throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        // ✅ Verificar se é JSON
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('❌ Resposta não é JSON:', contentType);
+            const htmlText = await response.text();
+            console.error('Conteúdo recebido (primeiros 200 chars):', htmlText.substring(0, 200));
+            throw new Error('Resposta do servidor não é JSON - verifique se o endpoint /pecas está retornando JSON');
         }
         
         const pecas = await response.json();
@@ -221,7 +233,7 @@ async function adicionarAoCarrinho(pecaId, pecaNome) {
 
 // ✅ CORREÇÃO: Adicionar parâmetro event
 function filterCondition(tipo, event) {
-    console.log('🔍 Filtro aplicado:', tipo);
+    console.log('🔎 Filtro aplicado:', tipo);
     filtroAtual = tipo;
     
     // Atualizar botões ativos

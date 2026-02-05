@@ -35,8 +35,20 @@ async function carregarVeiculos() {
         // ✅ Endpoint correto
         const response = await fetch('/veiculos');
         
+        // ✅ Verificar Content-Type antes de parsear
+        const contentType = response.headers.get('content-type');
+        
         if (!response.ok) {
+            console.error(`❌ Erro HTTP ${response.status}`);
             throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        // ✅ Verificar se é JSON
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('❌ Resposta não é JSON:', contentType);
+            const htmlText = await response.text();
+            console.error('Conteúdo recebido (primeiros 200 chars):', htmlText.substring(0, 200));
+            throw new Error('Resposta do servidor não é JSON - verifique se o endpoint /veiculos está retornando JSON');
         }
         
         const veiculos = await response.json();
@@ -209,27 +221,6 @@ function buscarVeiculos(termo) {
     console.log(`🔍 ${veiculosFiltrados.length} veículos encontrados`);
 }
 
-// ✅ Adicionar event listeners
-document.addEventListener('DOMContentLoaded', function() {
-    // Busca
-    const searchInput = document.querySelector('.search-box input');
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            buscarVeiculos(this.value);
-        });
-    }
-    
-    // Selects de filtro
-    const selects = document.querySelectorAll('.filter-options select');
-    selects.forEach(select => {
-        select.addEventListener('change', function() {
-            console.log('Filtro alterado:', this.value);
-            aplicarFiltros();
-        });
-    });
-});
-
 // ✅ Aplicar filtros (ano, ordenação, etc)
 function aplicarFiltros() {
     const selects = document.querySelectorAll('.filter-options select');
@@ -270,6 +261,26 @@ function aplicarFiltros() {
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 Página de veículos carregada');
+    
+    // Busca
+    const searchInput = document.querySelector('.search-box input');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            buscarVeiculos(this.value);
+        });
+    }
+    
+    // Selects de filtro
+    const selects = document.querySelectorAll('.filter-options select');
+    selects.forEach(select => {
+        select.addEventListener('change', function() {
+            console.log('Filtro alterado:', this.value);
+            aplicarFiltros();
+        });
+    });
+    
+    // Carregar veículos da API
     carregarVeiculos();
 });
 
