@@ -183,7 +183,7 @@ def after_request(response):
 if __name__ == '__main__':
     # Criar pastas necessárias
     folders = ['static/uploads', 'static/uploads/profile_photos', 
-               'static/uploads/veiculos', 'static/uploads/pecas']
+            'static/uploads/veiculos', 'static/uploads/pecas']
     for folder in folders:
         os.makedirs(folder, exist_ok=True)
     

@@ -342,7 +342,7 @@
             console.log('🔑 Token encontrado:', token.substring(0, 20) + '...');
 
             try {
-                const response = await fetch('https://kaido-house.onrender.com/api/meus-veiculos', {
+                const response = await fetch('https://kaido-house.onrender.com/meus-veiculos', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -464,7 +464,7 @@
             }
             
             try {
-                const response = await fetch(`https://kaido-house.onrender.com/api/deletar-veiculo/${id}`, {
+                const response = await fetch(`https://kaido-house.onrender.com/deletar-veiculo/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`,

@@ -663,8 +663,8 @@ def detalhes_veiculo(veiculo_id):
         
         # Renderizar template unificado passando tipo='veiculo'
         return render_template('detalhes_produto.html', 
-                             produto=veiculo, 
-                             tipo='veiculo')
+                            produto=veiculo, 
+                            tipo='veiculo')
         
     except Exception as e:
         print(f"❌ Erro ao buscar veículo: {e}")
