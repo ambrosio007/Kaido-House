@@ -1,193 +1,261 @@
-/* Container Geral */
-.container-veiculos {
-    padding: 120px 5% 60px; /* Espaço para o header fixo */
-    max-width: 1300px;
-    margin: 0 auto;
+/* ========================================
+   RESET E CONFIGURAÇÕES GLOBAIS
+   ======================================== */
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-/* Título da Página */
-.page-title {
-    text-align: center;
-    margin-bottom: 50px;
-}
-
-.page-title h1 {
-    font-size: 2.5rem;
-    color: #fff;
-    text-transform: uppercase;
-}
-
-.page-title h1 span {
-    color: #ff0000;
-}
-
-.page-title p {
-    color: #888;
-    margin-top: 10px;
-}
-
-/* Barra de Filtros */
-.filter-bar {
+body {
+    background: linear-gradient(135deg, #0a0a0a, #1a1a1a, #000000);
+    min-height: 100vh;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    background: #1a1a1a;
+    color: white;
     padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 40px;
-    border: 1px solid #333;
-    flex-wrap: wrap;
-    gap: 20px;
 }
 
-.search-box {
-    position: relative;
-    flex: 1;
-    min-width: 250px;
-}
-
-.search-box input {
+/* ========================================
+   CONTAINER PRINCIPAL
+   ======================================== */
+.container {
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 12px;
     width: 100%;
-    padding: 12px 40px 12px 15px;
-    background: #0d0d0d;
-    border: 1px solid #444;
-    color: white;
-    border-radius: 5px;
+    max-width: 450px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.search-box i {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
+/* ========================================
+   FIELDSET E LEGEND
+   ======================================== */
+fieldset {
+    border: none;
+    padding: 0;
+}
+
+legend {
+    background: linear-gradient(135deg, #ff0000, #cc0000);
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.5em;
+    padding: 12px 24px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+}
+
+/* ========================================
+   INPUT BOXES
+   ======================================== */
+.inputBox {
+    position: relative;
+    margin-bottom: 35px;
+}
+
+/* ========================================
+   INPUTS DE TEXTO
+   ======================================== */
+.inputUser {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #444;
+    outline: none;
+    color: white;
+    font-size: 16px;
+    width: 100%;
+    padding: 12px 0 8px 0;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.inputUser:focus {
+    border-bottom-color: #ff0000;
+}
+
+.inputUser:focus ~ .labelInput,
+.inputUser:valid ~ .labelInput {
+    top: -20px;
+    font-size: 12px;
     color: #ff0000;
+    font-weight: 500;
 }
 
-.filter-options select {
-    padding: 12px;
-    background: #0d0d0d;
-    color: white;
+/* ========================================
+   LABELS FLUTUANTES
+   ======================================== */
+.labelInput {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    color: #999;
+    font-size: 15px;
+}
+
+/* ========================================
+   CAMPO DE DATA - CORRIGIDO
+   ======================================== */
+.inputBox label[for="idadeID"] {
+    /* Label fixo para o campo de data */
+    position: static;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #999;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#idadeID {
+    background: rgba(30, 30, 30, 0.6);
     border: 1px solid #444;
-    border-radius: 5px;
-    margin-left: 10px;
+    border-radius: 6px;
+    padding: 12px;
+    outline: none;
+    font-size: 15px;
+    color: white;
+    width: 100%;
+    transition: all 0.3s ease;
     cursor: pointer;
 }
 
-/* Grid de Veículos */
-.vehicles-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
-}
-
-/* Card de Veículo Estilizado */
-.vehicle-card {
-    background: #1a1a1a;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid #333;
-    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.vehicle-card:hover {
-    transform: translateY(-10px);
+#idadeID:focus {
     border-color: #ff0000;
-    box-shadow: 0 10px 30px rgba(255, 0, 0, 0.1);
+    background: rgba(40, 40, 40, 0.8);
+    box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
 }
 
-.card-image {
-    position: relative;
-    height: 220px;
+#idadeID::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
 }
 
-.card-image img {
+#idadeID::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* ========================================
+   BOTÃO SUBMIT
+   ======================================== */
+#submit {
+    background: linear-gradient(135deg, #ff0000, #cc0000);
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.status-tag {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: #ff0000;
+    border: none;
+    padding: 16px;
     color: white;
-    padding: 5px 12px;
-    border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: 17px;
     font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-top: 20px;
     text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
 }
 
-.card-content {
-    padding: 20px;
+#submit:hover {
+    background: linear-gradient(135deg, #cc0000, #990000);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
 }
 
-.category {
-    color: #ff0000;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 1px;
+#submit:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
 }
 
-.card-content h3 {
-    margin: 10px 0;
-    font-size: 1.2rem;
-    color: #fff;
-    min-height: 50px;
-}
-
-.specs {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-    color: #aaa;
-    font-size: 0.85rem;
-}
-
-.specs i {
-    color: #ff0000;
-    margin-right: 5px;
-}
-
-.price {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #fff;
-    margin-bottom: 20px;
-}
-
-.btn-view {
+/* ========================================
+   LINK DE LOGIN
+   ======================================== */
+.container a {
     display: block;
     text-align: center;
-    background: transparent;
-    border: 1px solid #ff0000;
-    color: #fff;
-    padding: 12px;
+    margin-top: 20px;
+    color: #ff0000;
     text-decoration: none;
-    border-radius: 5px;
-    transition: 0.3s;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    padding: 8px;
 }
 
-.btn-view:hover {
-    background: #ff0000;
+.container a:hover {
+    color: #ff3333;
+    text-decoration: underline;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-    .filter-bar {
-        flex-direction: column;
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+@media (max-width: 480px) {
+    .container {
+        padding: 30px 20px;
     }
     
-    .filter-options {
-        width: 100%;
-        display: flex;
-        gap: 10px;
+    legend {
+        font-size: 1.3em;
+        padding: 10px 20px;
     }
     
-    .filter-options select {
-        flex: 1;
-        margin-left: 0;
+    #submit {
+        padding: 14px;
+        font-size: 16px;
     }
+}
+
+/* ========================================
+   ANIMAÇÃO DE ENTRADA
+   ======================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.container {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* ========================================
+   ESTADOS DE VALIDAÇÃO
+   ======================================== */
+.inputUser:invalid:not(:placeholder-shown) {
+    border-bottom-color: #ff6b6b;
+}
+
+.inputUser:valid:not(:placeholder-shown) {
+    border-bottom-color: #51cf66;
+}
+
+/* ========================================
+   MELHORIAS DE ACESSIBILIDADE
+   ======================================== */
+.inputUser:focus,
+#idadeID:focus,
+#submit:focus {
+    outline: 2px solid rgba(255, 0, 0, 0.3);
+    outline-offset: 2px;
 }
