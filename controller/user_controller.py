@@ -843,3 +843,227 @@ def validar_token_recuperacao_api():  # ✅ Nome único
             'valido': False,
             'mensagem': 'Erro ao validar token'
         }), 500
+
+# ============= ROTAS DE GERENCIAMENTO DE USUÁRIO =============
+
+@user_bp.route('/atualizar-user', methods=['PUT'])
+@jwt_required()
+def atualizar_usuario():
+    """
+    Atualiza dados do usuário autenticado
+    """
+    try:
+        user_id = get_jwt_identity()
+        
+        if not user_id:
+            return jsonify({'error': 'Usuário não autenticado'}), 401
+        
+        data = request.get_json()
+        
+        print(f"\n{'='*60}")
+        print(f"📝 ATUALIZAÇÃO DE USUÁRIO")
+        print(f"{'='*60}")
+        print(f"User ID: {user_id}")
+        print(f"Dados recebidos: {data}")
+        
+        # Validar campos obrigatórios
+        campos_obrigatorios = ['nome', 'email', 'cpf', 'idade', 'cep']
+        for campo in campos_obrigatorios:
+            if campo not in data:
+                return jsonify({'error': f'Campo {campo} é obrigatório'}), 400
+        
+        # Atualizar usuário
+        sucesso = UserService.atualizar_usuario(user_id, data)
+        
+        if sucesso:
+            print(f"✅ Usuário atualizado com sucesso!")
+            print(f"{'='*60}\n")
+            return jsonify({'message': 'Usuário atualizado com sucesso'}), 200
+        else:
+            print(f"❌ Erro ao atualizar usuário")
+            print(f"{'='*60}\n")
+            return jsonify({'error': 'Erro ao atualizar usuário'}), 400
+            
+    except Exception as e:
+        print(f"❌ ERRO CRÍTICO:")
+        print(f"   Tipo: {type(e).__name__}")
+        print(f"   Mensagem: {str(e)}")
+        traceback.print_exc()
+        print(f"{'='*60}\n")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+
+
+@user_bp.route('/alterar-senha', methods=['POST'])
+@jwt_required()
+def alterar_senha_usuario():
+    """
+    Altera a senha do usuário autenticado
+    """
+    try:
+        user_id = get_jwt_identity()
+        
+        if not user_id:
+            return jsonify({'error': 'Usuário não autenticado'}), 401
+        
+        data = request.get_json()
+        senha_atual = data.get('senha_atual')
+        nova_senha = data.get('nova_senha')
+        
+        print(f"\n{'='*60}")
+        print(f"🔑 ALTERAÇÃO DE SENHA")
+        print(f"{'='*60}")
+        print(f"User ID: {user_id}")
+        
+        if not senha_atual or not nova_senha:
+            return jsonify({'error': 'Senha atual e nova senha são obrigatórias'}), 400
+        
+        if len(nova_senha) < 6:
+            return jsonify({'error': 'A nova senha deve ter no mínimo 6 caracteres'}), 400
+        
+        # Buscar usuário
+        user = UserService.buscar_por_id(user_id)
+        
+        if not user:
+            return jsonify({'error': 'Usuário não encontrado'}), 404
+        
+        # Verificar senha atual
+        import bcrypt
+        senha_hash_banco = user.get('senha')
+        
+        if not senha_hash_banco:
+            return jsonify({'error': 'Erro ao verificar senha'}), 500
+        
+        if not bcrypt.checkpw(senha_atual.encode('utf-8'), senha_hash_banco.encode('utf-8')):
+            print(f"❌ Senha atual incorreta")
+            print(f"{'='*60}\n")
+            return jsonify({'error': 'Senha atual incorreta'}), 401
+        
+        # Gerar hash da nova senha
+        nova_senha_hash = bcrypt.hashpw(nova_senha.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        # Atualizar senha
+        from repository.user_repository import UserRepository
+        sucesso = UserRepository.atualizar_senha(user_id, nova_senha_hash)
+        
+        if sucesso:
+            print(f"✅ Senha alterada com sucesso!")
+            print(f"{'='*60}\n")
+            return jsonify({'message': 'Senha alterada com sucesso'}), 200
+        else:
+            print(f"❌ Erro ao atualizar senha")
+            print(f"{'='*60}\n")
+            return jsonify({'error': 'Erro ao atualizar senha'}), 400
+            
+    except Exception as e:
+        print(f"❌ ERRO CRÍTICO:")
+        print(f"   Tipo: {type(e).__name__}")
+        print(f"   Mensagem: {str(e)}")
+        traceback.print_exc()
+        print(f"{'='*60}\n")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+
+
+@user_bp.route('/deletar-user', methods=['DELETE'])
+@jwt_required()
+def deletar_usuario():
+    """
+    Deleta a conta do usuário autenticado
+    """
+    try:
+        user_id = get_jwt_identity()
+        
+        if not user_id:
+            return jsonify({'error': 'Usuário não autenticado'}), 401
+        
+        print(f"\n{'='*60}")
+        print(f"🗑️ DELEÇÃO DE CONTA")
+        print(f"{'='*60}")
+        print(f"User ID: {user_id}")
+        
+        # Deletar usuário
+        sucesso = UserService.deletar_usuario(user_id)
+        
+        if sucesso:
+            print(f"✅ Conta deletada com sucesso!")
+            print(f"{'='*60}\n")
+            return jsonify({'message': 'Conta deletada com sucesso'}), 200
+        else:
+            print(f"❌ Erro ao deletar conta")
+            print(f"{'='*60}\n")
+            return jsonify({'error': 'Erro ao deletar conta'}), 400
+            
+    except Exception as e:
+        print(f"❌ ERRO CRÍTICO:")
+        print(f"   Tipo: {type(e).__name__}")
+        print(f"   Mensagem: {str(e)}")
+        traceback.print_exc()
+        print(f"{'='*60}\n")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
+
+
+@user_bp.route('/meus-veiculos')
+@jwt_required()
+def meus_veiculos():
+    """
+    Renderiza página com os veículos do usuário
+    """
+    return render_template('meus_veiculos.html')
+
+
+@user_bp.route('/api/meus-veiculos', methods=['GET'])
+@jwt_required()
+def listar_meus_veiculos():
+    """
+    Retorna lista de veículos do usuário autenticado
+    """
+    try:
+        user_id = get_jwt_identity()
+        
+        if not user_id:
+            return jsonify({'error': 'Usuário não autenticado'}), 401
+        
+        veiculos = VeiculoService.buscar_por_usuario(user_id)
+        
+        return jsonify({
+            'veiculos': veiculos
+        }), 200
+        
+    except Exception as e:
+        print(f"Erro ao listar veículos: {str(e)}")
+        traceback.print_exc()
+        return jsonify({'error': 'Erro ao listar veículos'}), 500
+
+
+@user_bp.route('/api/deletar-veiculo/<veiculo_id>', methods=['DELETE'])
+@jwt_required()
+def deletar_veiculo(veiculo_id):
+    """
+    Deleta um veículo do usuário autenticado
+    """
+    try:
+        user_id = get_jwt_identity()
+        
+        if not user_id:
+            return jsonify({'error': 'Usuário não autenticado'}), 401
+        
+        # Verificar se o veículo pertence ao usuário
+        veiculo = VeiculoRepository.buscar_por_id(veiculo_id)
+        
+        if not veiculo:
+            return jsonify({'error': 'Veículo não encontrado'}), 404
+        
+        if veiculo.get('user_id') != user_id:
+            return jsonify({'error': 'Você não tem permissão para deletar este veículo'}), 403
+        
+        # Deletar veículo
+        sucesso = VeiculoRepository.deletar(veiculo_id)
+        
+        if sucesso:
+            return jsonify({'message': 'Veículo deletado com sucesso'}), 200
+        else:
+            return jsonify({'error': 'Erro ao deletar veículo'}), 400
+            
+    except Exception as e:
+        print(f"Erro ao deletar veículo: {str(e)}")
+        traceback.print_exc()
+        return jsonify({'error': 'Erro ao deletar veículo'}), 500

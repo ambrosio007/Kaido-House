@@ -11,6 +11,154 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <title>Perfil do Usuário</title>
+    <style>
+        /* Estilos para os modais */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-save {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #45a049;
+        }
+
+        .btn-cancel {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #da190b;
+        }
+
+        .btn-delete {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #e68900;
+        }
+
+        .danger-zone {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ff9800;
+        }
+
+        .danger-zone h3 {
+            color: #f44336;
+            margin-bottom: 15px;
+        }
+
+        .danger-zone p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 
 <body>
@@ -92,20 +240,118 @@
             </div>
 
             <div class="action-buttons">
-                <button class="btn btn-primary">Editar Perfil</button>
-                <button class="btn btn-secondary">Alterar Senha</button>
+                <button class="btn btn-primary" id="btnEditarPerfil">
+                    <i class="fas fa-edit"></i> Editar Perfil
+                </button>
+                <button class="btn btn-secondary" id="btnMeusVeiculos">
+                    <i class="fas fa-car"></i> Meus Veículos
+                </button>
                 <button class="btn btn-success" id="btnCadastrarVenda">
                     <i class="fas fa-plus-circle"></i> Cadastrar para Vender
                 </button>
-                <button class="btn btn-danger">Sair</button>
+                <button class="btn btn-danger" id="btnSair">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
             </div>
         </div>
     </main>
 
+    <!-- Modal de Edição de Perfil -->
+    <div id="modalEditarPerfil" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal="modalEditarPerfil">&times;</span>
+            <h2><i class="fas fa-edit"></i> Editar Perfil</h2>
+            
+            <form id="formEditarPerfil">
+                <div class="form-group">
+                    <label for="editNome">Nome Completo*</label>
+                    <input type="text" id="editNome" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editEmail">Email*</label>
+                    <input type="email" id="editEmail" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editCPF">CPF*</label>
+                    <input type="text" id="editCPF" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editIdade">Idade*</label>
+                    <input type="number" id="editIdade" min="0" max="150" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editCEP">CEP*</label>
+                    <input type="text" id="editCEP" required>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                    <button type="button" class="btn-cancel" data-modal="modalEditarPerfil">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+
+                <!-- Zona de Perigo -->
+                <div class="danger-zone">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Zona de Perigo</h3>
+                    <p>Ações irreversíveis que afetam permanentemente sua conta.</p>
+                    
+                    <button type="button" class="btn-delete" id="btnAlterarSenha" style="margin-bottom: 10px; width: 100%;">
+                        <i class="fas fa-key"></i> Alterar Senha
+                    </button>
+                    
+                    <button type="button" class="btn-delete" id="btnDeletarConta" style="width: 100%;">
+                        <i class="fas fa-trash"></i> Deletar Conta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Alteração de Senha -->
+    <div id="modalAlterarSenha" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal="modalAlterarSenha">&times;</span>
+            <h2><i class="fas fa-key"></i> Alterar Senha</h2>
+            
+            <form id="formAlterarSenha">
+                <div class="form-group">
+                    <label for="senhaAtual">Senha Atual*</label>
+                    <input type="password" id="senhaAtual" required minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label for="novaSenha">Nova Senha*</label>
+                    <input type="password" id="novaSenha" required minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmarNovaSenha">Confirmar Nova Senha*</label>
+                    <input type="password" id="confirmarNovaSenha" required minlength="6">
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-check"></i> Alterar Senha
+                    </button>
+                    <button type="button" class="btn-cancel" data-modal="modalAlterarSenha">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal de Cadastro de Venda -->
     <div id="modalCadastro" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close" data-modal="modalCadastro">&times;</span>
             <h2>O que você deseja vender?</h2>
 
             <div class="tipo-venda">
@@ -284,7 +530,7 @@
 
             <div class="footer-contact">
                 <h3>Contato</h3>
-                <p><i class="fas fa-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="42212d2c3623362d022f2737312b36276c212d2f">[email&#160;protected]</a></p>
+                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com</p>
                 <p><i class="fas fa-phone"></i> (82) 1234-5678</p>
                 <p><i class="fas fa-map-marker-alt"></i> Maceió, Alagoas, BR</p>
                 <div class="payment-methods">
@@ -297,10 +543,10 @@
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2025 MeuSite. Todos os direitos reservados.</p>
+            <p>&copy; 2025 Kaido-House. Todos os direitos reservados.</p>
         </div>
     </footer>
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudfla
+
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="/static/js/nav_bar.js"></script>
     <script src="/static/js/perfil.js"></script>

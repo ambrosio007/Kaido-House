@@ -1,15 +1,18 @@
 // ==================== CARREGAMENTO DE DADOS DO USUÁRIO ====================
 
+let dadosUsuario = null; // Variável global para armazenar dados do usuário
+
 document.addEventListener('DOMContentLoaded', function() {
     carregarDadosUsuario();
     configurarBotoes();
     configurarUploadFoto();
+    configurarModais();
 });
 
 // Função para carregar dados do usuário
 async function carregarDadosUsuario() {
     try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || localStorage.getItem('access_token');
         
         if (!token) {
             alert('Você precisa estar logado para acessar esta página');
@@ -28,6 +31,7 @@ async function carregarDadosUsuario() {
         if (!response.ok) {
             if (response.status === 401) {
                 localStorage.removeItem('token');
+                localStorage.removeItem('access_token');
                 alert('Sessão expirada. Faça login novamente.');
                 window.location.href = '/login';
                 return;
@@ -35,8 +39,8 @@ async function carregarDadosUsuario() {
             throw new Error('Erro ao carregar dados do usuário');
         }
 
-        const userData = await response.json();
-        preencherDadosUsuario(userData);
+        dadosUsuario = await response.json();
+        preencherDadosUsuario(dadosUsuario);
 
     } catch (error) {
         console.error('Erro ao carregar perfil:', error);
@@ -50,10 +54,8 @@ function preencherDadosUsuario(user) {
     const profilePhoto = document.querySelector('.profile-photo');
     if (profilePhoto && user.nome) {
         if (user.foto_perfil) {
-            // Se tem foto, exibir a imagem
             profilePhoto.innerHTML = `<img src="${user.foto_perfil}" alt="Foto de perfil" class="profile-image">`;
         } else {
-            // Se não tem foto, exibir iniciais
             const iniciais = obterIniciais(user.nome);
             profilePhoto.textContent = iniciais;
             profilePhoto.classList.add('sem-foto');
@@ -86,7 +88,6 @@ function preencherDadosUsuario(user) {
         else if (labelText.includes('CPF') && user.cpf) {
             valueDiv.textContent = formatarCPF(user.cpf);
         }
-        // ✅ CORRIGIDO: Agora exibe idade ao invés de data de nascimento
         else if (labelText.includes('Data de Nascimento') && user.idade) {
             valueDiv.textContent = `${user.idade} anos`;
         }
@@ -124,55 +125,274 @@ function preencherDadosUsuario(user) {
     }
 }
 
-// Configurar upload de foto
+// ==================== CONFIGURAÇÃO DOS MODAIS ====================
+
+function configurarModais() {
+    // Fechar modais com X
+    document.querySelectorAll('.close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal');
+            fecharModal(modalId);
+        });
+    });
+
+    // Fechar modais com botão cancelar
+    document.querySelectorAll('.btn-cancel').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal');
+            fecharModal(modalId);
+        });
+    });
+
+    // Fechar modal ao clicar fora
+    window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal')) {
+            fecharModal(event.target.id);
+        }
+    });
+
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal.show').forEach(modal => {
+                fecharModal(modal.id);
+            });
+        }
+    });
+
+    // Configurar formulário de edição
+    document.getElementById('formEditarPerfil').addEventListener('submit', salvarEdicaoPerfil);
+    
+    // Configurar formulário de alteração de senha
+    document.getElementById('formAlterarSenha').addEventListener('submit', alterarSenha);
+}
+
+function abrirModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function fecharModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// ==================== EDIÇÃO DE PERFIL ====================
+
+function abrirModalEdicao() {
+    if (!dadosUsuario) {
+        alert('Dados do usuário não carregados');
+        return;
+    }
+
+    // Preencher formulário com dados atuais
+    document.getElementById('editNome').value = dadosUsuario.nome || '';
+    document.getElementById('editEmail').value = dadosUsuario.email || '';
+    document.getElementById('editCPF').value = dadosUsuario.cpf || '';
+    document.getElementById('editIdade').value = dadosUsuario.idade || '';
+    document.getElementById('editCEP').value = dadosUsuario.cep || '';
+
+    abrirModal('modalEditarPerfil');
+}
+
+async function salvarEdicaoPerfil(e) {
+    e.preventDefault();
+
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    
+    if (!token) {
+        alert('Você precisa estar logado');
+        return;
+    }
+
+    const dadosEditados = {
+        nome: document.getElementById('editNome').value,
+        email: document.getElementById('editEmail').value,
+        cpf: document.getElementById('editCPF').value,
+        idade: parseInt(document.getElementById('editIdade').value),
+        cep: document.getElementById('editCEP').value
+    };
+
+    try {
+        const response = await fetch('https://kaido-house.onrender.com/atualizar-user', {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dadosEditados)
+        });
+
+        if (response.ok) {
+            alert('Perfil atualizado com sucesso!');
+            fecharModal('modalEditarPerfil');
+            await carregarDadosUsuario(); // Recarregar dados
+        } else {
+            const error = await response.json();
+            alert(`Erro: ${error.error || 'Erro ao atualizar perfil'}`);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao atualizar perfil. Tente novamente.');
+    }
+}
+
+// ==================== ALTERAÇÃO DE SENHA ====================
+
+async function alterarSenha(e) {
+    e.preventDefault();
+
+    const senhaAtual = document.getElementById('senhaAtual').value;
+    const novaSenha = document.getElementById('novaSenha').value;
+    const confirmarNovaSenha = document.getElementById('confirmarNovaSenha').value;
+
+    // Validar senhas
+    if (novaSenha !== confirmarNovaSenha) {
+        alert('As senhas não coincidem!');
+        return;
+    }
+
+    if (novaSenha.length < 6) {
+        alert('A nova senha deve ter no mínimo 6 caracteres!');
+        return;
+    }
+
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    
+    if (!token) {
+        alert('Você precisa estar logado');
+        return;
+    }
+
+    try {
+        const response = await fetch('https://kaido-house.onrender.com/alterar-senha', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                senha_atual: senhaAtual,
+                nova_senha: novaSenha
+            })
+        });
+
+        if (response.ok) {
+            alert('Senha alterada com sucesso!');
+            fecharModal('modalAlterarSenha');
+            document.getElementById('formAlterarSenha').reset();
+        } else {
+            const error = await response.json();
+            alert(`Erro: ${error.error || 'Senha atual incorreta'}`);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao alterar senha. Tente novamente.');
+    }
+}
+
+// ==================== DELETAR CONTA ====================
+
+async function deletarConta() {
+    const confirmacao = confirm(
+        '⚠️ ATENÇÃO!\n\n' +
+        'Esta ação é IRREVERSÍVEL!\n\n' +
+        'Ao deletar sua conta:\n' +
+        '• Todos os seus dados serão permanentemente apagados\n' +
+        '• Seus veículos e peças cadastrados serão removidos\n' +
+        '• Você não poderá recuperar esta conta\n\n' +
+        'Tem certeza que deseja continuar?'
+    );
+
+    if (!confirmacao) return;
+
+    const confirmaFinal = prompt(
+        'Para confirmar, digite "DELETAR" (em maiúsculas):'
+    );
+
+    if (confirmaFinal !== 'DELETAR') {
+        alert('Operação cancelada.');
+        return;
+    }
+
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    
+    if (!token) {
+        alert('Você precisa estar logado');
+        return;
+    }
+
+    try {
+        const response = await fetch('https://kaido-house.onrender.com/deletar-user', {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            alert('Conta deletada com sucesso. Você será redirecionado.');
+            localStorage.clear();
+            window.location.href = '/';
+        } else {
+            const error = await response.json();
+            alert(`Erro: ${error.error || 'Erro ao deletar conta'}`);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao deletar conta. Tente novamente.');
+    }
+}
+
+// ==================== UPLOAD DE FOTO ====================
+
 function configurarUploadFoto() {
     const profilePhoto = document.querySelector('.profile-photo');
     
     if (profilePhoto) {
-        // Criar input de arquivo (oculto)
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = 'image/*';
         fileInput.style.display = 'none';
         document.body.appendChild(fileInput);
         
-        // Adicionar cursor pointer e título
         profilePhoto.style.cursor = 'pointer';
         profilePhoto.title = 'Clique para alterar a foto de perfil';
         
-        // Evento de clique na foto
         profilePhoto.addEventListener('click', () => {
             fileInput.click();
         });
         
-        // Evento quando selecionar arquivo
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             
             if (!file) return;
             
-            // Validar tipo de arquivo
             if (!file.type.startsWith('image/')) {
                 alert('Por favor, selecione uma imagem válida');
                 return;
             }
             
-            // Validar tamanho (máx 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 alert('A imagem deve ter no máximo 5MB');
                 return;
             }
             
-            // Fazer upload
             await uploadFotoPerfil(file);
         });
     }
 }
 
-// Função para fazer upload da foto
 async function uploadFotoPerfil(file) {
     try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || localStorage.getItem('access_token');
         
         if (!token) {
             alert('Você precisa estar logado');
@@ -193,7 +413,6 @@ async function uploadFotoPerfil(file) {
         if (response.ok) {
             const data = await response.json();
             
-            // Atualizar a foto na tela
             const profilePhoto = document.querySelector('.profile-photo');
             if (profilePhoto) {
                 profilePhoto.innerHTML = `<img src="${data.foto_url}" alt="Foto de perfil" class="profile-image">`;
@@ -212,73 +431,76 @@ async function uploadFotoPerfil(file) {
     }
 }
 
-// Função auxiliar para obter iniciais do nome
-function obterIniciais(nome) {
-    const palavras = nome.trim().split(' ');
-    if (palavras.length === 1) {
-        return palavras[0].substring(0, 2).toUpperCase();
+// ==================== CONFIGURAÇÃO DOS BOTÕES ====================
+
+function configurarBotoes() {
+    // Botão Editar Perfil
+    const btnEditarPerfil = document.getElementById('btnEditarPerfil');
+    if (btnEditarPerfil) {
+        btnEditarPerfil.addEventListener('click', abrirModalEdicao);
     }
-    return (palavras[0][0] + palavras[palavras.length - 1][0]).toUpperCase();
+
+    // Botão Meus Veículos
+    const btnMeusVeiculos = document.getElementById('btnMeusVeiculos');
+    if (btnMeusVeiculos) {
+        btnMeusVeiculos.addEventListener('click', function() {
+            window.location.href = '/meus-veiculos';
+        });
+    }
+
+    // Botão Alterar Senha (dentro do modal de edição)
+    const btnAlterarSenha = document.getElementById('btnAlterarSenha');
+    if (btnAlterarSenha) {
+        btnAlterarSenha.addEventListener('click', function() {
+            fecharModal('modalEditarPerfil');
+            abrirModal('modalAlterarSenha');
+        });
+    }
+
+    // Botão Deletar Conta (dentro do modal de edição)
+    const btnDeletarConta = document.getElementById('btnDeletarConta');
+    if (btnDeletarConta) {
+        btnDeletarConta.addEventListener('click', deletarConta);
+    }
+
+    // Botão Sair
+    const btnSair = document.getElementById('btnSair');
+    if (btnSair) {
+        btnSair.addEventListener('click', function() {
+            if (confirm('Deseja realmente sair?')) {
+                localStorage.clear();
+                window.location.href = '/';
+            }
+        });
+    }
 }
 
-// Função para formatar CPF
+// ==================== FUNÇÕES AUXILIARES ====================
+
+function obterIniciais(nome) {
+    const palavras = nome.trim().split(' ');
+    if (palavras.length >= 2) {
+        return (palavras[0][0] + palavras[palavras.length - 1][0]).toUpperCase();
+    }
+    return nome.substring(0, 2).toUpperCase();
+}
+
 function formatarCPF(cpf) {
+    if (!cpf) return '';
     cpf = cpf.replace(/\D/g, '');
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 }
 
-// Função para formatar data
-function formatarData(data) {
-    const date = new Date(data);
-    const dia = String(date.getDate()).padStart(2, '0');
-    const mes = String(date.getMonth() + 1).padStart(2, '0');
-    const ano = date.getFullYear();
-    return `${dia}/${mes}/${ano}`;
-}
-
-// Função para formatar CEP
 function formatarCEP(cep) {
+    if (!cep) return '';
     cep = cep.replace(/\D/g, '');
     return cep.replace(/(\d{5})(\d{3})/, '$1-$2');
 }
 
-// Configurar botões
-function configurarBotoes() {
-    // Botão de Sair
-    const btnSair = document.querySelector('.btn-danger');
-    if (btnSair) {
-        btnSair.addEventListener('click', function() {
-            if (confirm('Tem certeza que deseja sair?')) {
-                localStorage.removeItem('token');
-                window.location.href = '/login';
-            }
-        });
-    }
+// ==================== MODAL DE CADASTRO DE VENDA ====================
 
-    // Botão Editar Perfil
-    const btnEditar = document.querySelector('.btn-primary');
-    if (btnEditar) {
-        btnEditar.addEventListener('click', function() {
-            alert('Funcionalidade de edição em desenvolvimento');
-        });
-    }
-
-    // Botão Alterar Senha
-    const btnSenha = document.querySelector('.btn-secondary');
-    if (btnSenha) {
-        btnSenha.addEventListener('click', function() {
-            alert('Funcionalidade de alteração de senha em desenvolvimento');
-        });
-    }
-}
-
-
-// ==================== CONTROLE DE MODAL E FORMULÁRIOS ====================
-
-// Elementos do DOM
 const btnCadastrarVenda = document.getElementById('btnCadastrarVenda');
 const modal = document.getElementById('modalCadastro');
-const closeModal = document.querySelector('.close');
 const btnsTipo = document.querySelectorAll('.btn-tipo');
 const formVeiculo = document.getElementById('formVeiculo');
 const formPeca = document.getElementById('formPeca');
@@ -286,26 +508,9 @@ const formPeca = document.getElementById('formPeca');
 // Abrir modal
 if (btnCadastrarVenda) {
     btnCadastrarVenda.onclick = () => {
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        abrirModal('modalCadastro');
     };
 }
-
-// Fechar modal
-if (closeModal) {
-    closeModal.onclick = () => {
-        modal.classList.remove('show');
-        document.body.style.overflow = 'auto';
-    };
-}
-
-// Fechar modal ao clicar fora
-window.onclick = (event) => {
-    if (event.target === modal) {
-        modal.classList.remove('show');
-        document.body.style.overflow = 'auto';
-    }
-};
 
 // Trocar entre Veículo e Peça
 btnsTipo.forEach(btn => {
@@ -330,14 +535,13 @@ if (formVeiculo) {
     formVeiculo.onsubmit = async (e) => {
         e.preventDefault();
         
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || localStorage.getItem('access_token');
         if (!token) {
             alert('Você precisa estar logado');
             window.location.href = '/login';
             return;
         }
         
-        // Usar FormData para enviar dados + arquivos juntos
         const formData = new FormData();
         formData.append('marca',     document.getElementById('veiculoMarca').value);
         formData.append('modelo',    document.getElementById('veiculoModelo').value);
@@ -348,7 +552,6 @@ if (formVeiculo) {
         formData.append('preco',     document.getElementById('veiculoPreco').value);
         formData.append('descricao', document.getElementById('veiculoDescricao').value);
 
-        // ✅ CORREÇÃO: Converter FileList para Array antes de usar forEach
         const fotosVeiculo = document.getElementById('veiculoFotos');
         if (fotosVeiculo && fotosVeiculo.files) {
             Array.from(fotosVeiculo.files).forEach(file => {
@@ -357,7 +560,6 @@ if (formVeiculo) {
         }
         
         try {
-            // Não define Content-Type: o navegador define automaticamente com o boundary do FormData
             const response = await fetch('https://kaido-house.onrender.com/cadastro-veiculo', {
                 method: 'POST',
                 headers: {
@@ -366,22 +568,18 @@ if (formVeiculo) {
                 body: formData
             });
             
-            // ✅ VERIFICAR SE A RESPOSTA É JSON ANTES DE PARSEAR
             const contentType = response.headers.get('content-type');
             
             if (response.ok) {
-                // Se sucesso, tentar parsear JSON
                 if (contentType && contentType.includes('application/json')) {
                     const data = await response.json();
                     alert('Veículo cadastrado com sucesso!');
                 } else {
                     alert('Veículo cadastrado com sucesso!');
                 }
-                modal.classList.remove('show');
-                document.body.style.overflow = 'auto';
+                fecharModal('modalCadastro');
                 formVeiculo.reset();
             } else {
-                // Se erro, tentar obter mensagem de erro
                 let errorMessage = 'Erro ao cadastrar veículo';
                 
                 if (contentType && contentType.includes('application/json')) {
@@ -408,14 +606,13 @@ if (formPeca) {
     formPeca.onsubmit = async (e) => {
         e.preventDefault();
         
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || localStorage.getItem('access_token');
         if (!token) {
             alert('Você precisa estar logado');
             window.location.href = '/login';
             return;
         }
         
-        // Usar FormData para enviar dados + arquivos juntos
         const formData = new FormData();
         formData.append('nome',      document.getElementById('pecaNome').value);
         formData.append('categoria', document.getElementById('pecaCategoria').value);
@@ -425,7 +622,6 @@ if (formPeca) {
         formData.append('preco',     document.getElementById('pecaPreco').value);
         formData.append('descricao', document.getElementById('pecaDescricao').value);
 
-        // ✅ CORREÇÃO: Converter FileList para Array antes de usar forEach
         const fotos = document.getElementById('pecaFotos');
         if (fotos && fotos.files) {
             Array.from(fotos.files).forEach(file => {
@@ -434,7 +630,6 @@ if (formPeca) {
         }
         
         try {
-            // Não define Content-Type: o navegador define automaticamente com o boundary do FormData
             const response = await fetch('https://kaido-house.onrender.com/cadastro-peca', {
                 method: 'POST',
                 headers: {
@@ -443,22 +638,18 @@ if (formPeca) {
                 body: formData
             });
             
-            // ✅ VERIFICAR SE A RESPOSTA É JSON ANTES DE PARSEAR
             const contentType = response.headers.get('content-type');
             
             if (response.ok) {
-                // Se sucesso, tentar parsear JSON
                 if (contentType && contentType.includes('application/json')) {
                     const data = await response.json();
                     alert('Peça cadastrada com sucesso!');
                 } else {
                     alert('Peça cadastrada com sucesso!');
                 }
-                modal.classList.remove('show');
-                document.body.style.overflow = 'auto';
+                fecharModal('modalCadastro');
                 formPeca.reset();
             } else {
-                // Se erro, tentar obter mensagem de erro
                 let errorMessage = 'Erro ao cadastrar peça';
                 
                 if (contentType && contentType.includes('application/json')) {
@@ -479,11 +670,3 @@ if (formPeca) {
         }
     };
 }
-
-// Fechar modal com tecla ESC
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal && modal.classList.contains('show')) {
-        modal.classList.remove('show');
-        document.body.style.overflow = 'auto';
-    }
-});
