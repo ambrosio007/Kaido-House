@@ -4,6 +4,7 @@ from psycopg2.extras import RealDictCursor
 class CarrinhoRepository:
     """
     Repository para operações de carrinho no banco de dados
+    ✅ VERSÃO CORRIGIDA - Com busca completa de informações
     """
     
     @staticmethod
@@ -70,25 +71,88 @@ class CarrinhoRepository:
     def listar_por_usuario(user_id):
         """
         Lista todos os itens do carrinho de um usuário
+        ✅ VERSÃO CORRIGIDA - Busca dados completos com JOINs
         
         Args:
             user_id (str): ID do usuário
             
         Returns:
-            list: Lista de itens do carrinho
+            list: Lista de itens do carrinho com todas as informações
         """
         conn = get_connection()
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
+            
+            # Query unificada que busca peças E veículos em uma só consulta
             cursor.execute("""
-                SELECT * FROM vw_carrinho_completo
-                WHERE user_id = %s
-                ORDER BY data_adicao DESC
+                SELECT 
+                    ci.id,
+                    ci.user_id,
+                    ci.tipo_item,
+                    ci.item_id,
+                    ci.quantidade,
+                    ci.preco_unitario,
+                    (ci.quantidade * ci.preco_unitario) as subtotal,
+                    ci.data_adicao,
+                    
+                    -- Campos de PEÇAS (NULL se for veículo)
+                    p.nome,
+                    p.categoria,
+                    p.marca as peca_marca,
+                    p.modelo as peca_modelo,
+                    p.ano_compativel,
+                    p.fotos as peca_fotos,
+                    p.status as peca_status,
+                    
+                    -- Campos de VEÍCULOS (NULL se for peça)
+                    v.marca,
+                    v.modelo,
+                    v.ano,
+                    v.km,
+                    v.estado,
+                    v.fotos as veiculo_fotos,
+                    v.status as veiculo_status
+                    
+                FROM carrinho_itens ci
+                LEFT JOIN pecas p ON (ci.tipo_item = 'peca' AND ci.item_id = p.id)
+                LEFT JOIN veiculos v ON (ci.tipo_item = 'veiculo' AND ci.item_id = v.id)
+                WHERE ci.user_id = %s
+                ORDER BY ci.data_adicao DESC
             """, (user_id,))
             
-            itens = cursor.fetchall()
+            itens_raw = cursor.fetchall()
             cursor.close()
-            return [dict(item) for item in itens]
+            
+            # Processar e normalizar os dados
+            itens_processados = []
+            for item in itens_raw:
+                item_dict = dict(item)
+                
+                # Determinar qual fonte de fotos usar
+                if item_dict['tipo_item'] == 'peca':
+                    item_dict['fotos'] = item_dict['peca_fotos']
+                    item_dict['status'] = item_dict['peca_status']
+                else:  # veiculo
+                    item_dict['fotos'] = item_dict['veiculo_fotos']
+                    item_dict['status'] = item_dict['veiculo_status']
+                
+                # Limpar campos desnecessários
+                item_dict.pop('peca_fotos', None)
+                item_dict.pop('veiculo_fotos', None)
+                item_dict.pop('peca_status', None)
+                item_dict.pop('veiculo_status', None)
+                item_dict.pop('peca_marca', None)
+                item_dict.pop('peca_modelo', None)
+                
+                itens_processados.append(item_dict)
+            
+            return itens_processados
+            
+        except Exception as e:
+            print(f"❌ Erro ao listar carrinho: {e}")
+            import traceback
+            traceback.print_exc()
+            return []
         finally:
             release_connection(conn)
     
@@ -131,11 +195,23 @@ class CarrinhoRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor()
-            cursor.execute("SELECT calcular_total_carrinho(%s)", (user_id,))
+            
+            # ✅ OPÇÃO 1: Se você tem a função calcular_total_carrinho no banco
+            # cursor.execute("SELECT calcular_total_carrinho(%s)", (user_id,))
+            
+            # ✅ OPÇÃO 2: Calcular direto na query (mais seguro)
+            cursor.execute("""
+                SELECT COALESCE(SUM(quantidade * preco_unitario), 0)
+                FROM carrinho_itens
+                WHERE user_id = %s
+            """, (user_id,))
             
             total = cursor.fetchone()[0]
             cursor.close()
             return float(total) if total else 0.0
+        except Exception as e:
+            print(f"❌ Erro ao calcular total: {e}")
+            return 0.0
         finally:
             release_connection(conn)
     
@@ -216,9 +292,18 @@ class CarrinhoRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor()
-            cursor.execute("SELECT limpar_carrinho(%s)", (user_id,))
             
-            count = cursor.fetchone()[0]
+            # ✅ OPÇÃO 1: Se você tem a função limpar_carrinho no banco
+            # cursor.execute("SELECT limpar_carrinho(%s)", (user_id,))
+            # count = cursor.fetchone()[0]
+            
+            # ✅ OPÇÃO 2: Executar DELETE direto (mais seguro)
+            cursor.execute("""
+                DELETE FROM carrinho_itens
+                WHERE user_id = %s
+            """, (user_id,))
+            
+            count = cursor.rowcount
             conn.commit()
             cursor.close()
             return count

@@ -1,6 +1,6 @@
 /**
  * ✅ CARRINHO.JS - Gerenciamento completo do carrinho de compras
- * 🔧 VERSÃO CORRIGIDA - Com autenticação consistente
+ * 🔧 VERSÃO CORRIGIDA - Com proteção contra undefined
  */
 
 // ==========================================
@@ -10,7 +10,6 @@
 async function carregarCarrinho() {
     console.log('🛒 Carregando itens do carrinho...');
     
-    // ✅ CORREÇÃO: Buscar token com ambos os nomes
     const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     
     if (!token) {
@@ -19,7 +18,7 @@ async function carregarCarrinho() {
         return;
     }
     
-    console.log('🔑 Token encontrado:', token.substring(0, 20) + '...');
+    console.log('🔑 Token encontrado');
     
     try {
         const response = await fetch('/api/carrinho', {
@@ -90,10 +89,12 @@ function renderizarItens(itens) {
 }
 
 // ==========================================
-// CRIAR HTML DE UM ITEM
+// CRIAR HTML DE UM ITEM - VERSÃO CORRIGIDA
 // ==========================================
 
 function criarItemHTML(item) {
+    console.log('🔍 Processando item:', item);
+    
     // Processar imagem
     let imagemSrc = '/static/img/default-placeholder.jpg';
     
@@ -104,23 +105,31 @@ function criarItemHTML(item) {
         }
     }
     
-    // Nome do item
-    const nome = item.tipo_item === 'peca' 
-        ? item.nome 
-        : `${item.marca} ${item.modelo} ${item.ano || ''}`;
+    // ✅ CORREÇÃO: Nome do item com proteção contra undefined
+    let nome = 'Produto';
+    if (item.tipo_item === 'peca') {
+        nome = item.nome || 'Peça sem nome';
+    } else if (item.tipo_item === 'veiculo') {
+        const marca = item.marca || '';
+        const modelo = item.modelo || '';
+        const ano = item.ano || '';
+        nome = `${marca} ${modelo} ${ano}`.trim() || 'Veículo';
+    }
+    
+    console.log('✅ Nome processado:', nome);
     
     // Categoria/Estado
     const categoria = item.tipo_item === 'peca'
         ? item.categoria || 'Novo'
         : `${item.estado || 'Novo'} - ${item.km ? item.km.toLocaleString('pt-BR') : '0'} km`;
     
-    // Preço formatado
-    const precoUnitario = parseFloat(item.preco_unitario).toLocaleString('pt-BR', {
+    // ✅ CORREÇÃO: Preço formatado com proteção
+    const precoUnitario = parseFloat(item.preco_unitario || 0).toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
     
-    const subtotal = parseFloat(item.subtotal).toLocaleString('pt-BR', {
+    const subtotal = parseFloat(item.subtotal || 0).toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
@@ -139,11 +148,11 @@ function criarItemHTML(item) {
            </div>`;
     
     return `
-        <div class="cart-item" data-id="${item.id}" data-price="${item.preco_unitario}">
+        <div class="cart-item" data-id="${item.id}" data-price="${item.preco_unitario || 0}">
             <div class="item-img">
                 <img src="${imagemSrc}" 
                      alt="${nome}"
-                     onerror="this.src='/static/img/default-placeholder.jpg'">
+                     onerror="this.onerror=null; this.src='/static/img/default-placeholder.jpg';">
             </div>
             <div class="item-details">
                 <span class="item-category">${categoria}</span>
@@ -189,7 +198,6 @@ function adicionarEventListeners() {
             const novaQuantidade = parseInt(input.value) - 1;
             
             if (novaQuantidade < 1) {
-                // Confirmar remoção
                 if (confirm('Deseja remover este item do carrinho?')) {
                     await removerItem(itemId);
                 }
@@ -199,7 +207,7 @@ function adicionarEventListeners() {
         });
     });
     
-    // Inputs de quantidade (mudança manual)
+    // Inputs de quantidade
     document.querySelectorAll('.item-quantity input[type="number"]').forEach(input => {
         input.addEventListener('change', async function() {
             if (this.disabled) return;
@@ -231,17 +239,16 @@ function adicionarEventListeners() {
     const btnCheckout = document.querySelector('.btn-checkout');
     if (btnCheckout) {
         btnCheckout.addEventListener('click', function() {
-            // Aqui você pode redirecionar para página de checkout
-            alert('Funcionalidade de checkout em desenvolvimento');
+            window.location.href = '/checkout';
         });
     }
     
-    // Aplicar cupom
-    const btnCupom = document.querySelector('.coupon button');
-    if (btnCupom) {
-        btnCupom.addEventListener('click', function() {
-            const inputCupom = document.querySelector('.coupon input');
-            const cupom = inputCupom.value.trim();
+    // Botão de aplicar cupom
+    const btnAplicarCupom = document.querySelector('.coupon button');
+    if (btnAplicarCupom) {
+        btnAplicarCupom.addEventListener('click', function() {
+            const cupomInput = document.getElementById('cupom-input');
+            const cupom = cupomInput ? cupomInput.value.trim() : '';
             
             if (cupom) {
                 aplicarCupom(cupom);
@@ -253,13 +260,12 @@ function adicionarEventListeners() {
 }
 
 // ==========================================
-// ATUALIZAR QUANTIDADE
+// ATUALIZAR QUANTIDADE DE UM ITEM
 // ==========================================
 
 async function atualizarQuantidade(itemId, novaQuantidade) {
     console.log(`🔄 Atualizando quantidade do item ${itemId} para ${novaQuantidade}`);
     
-    // ✅ CORREÇÃO: Buscar token com ambos os nomes
     const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     
     if (!token) {
@@ -296,7 +302,7 @@ async function atualizarQuantidade(itemId, novaQuantidade) {
         const result = await response.json();
         console.log('✅ Quantidade atualizada:', result);
         
-        // Recarregar carrinho para atualizar valores
+        // Recarregar carrinho
         await carregarCarrinho();
         
         mostrarNotificacao('Quantidade atualizada!', 'success');
@@ -308,13 +314,12 @@ async function atualizarQuantidade(itemId, novaQuantidade) {
 }
 
 // ==========================================
-// REMOVER ITEM
+// REMOVER ITEM DO CARRINHO
 // ==========================================
 
 async function removerItem(itemId) {
-    console.log(`🗑️ Removendo item ${itemId}`);
+    console.log(`🗑️ Removendo item ${itemId}...`);
     
-    // ✅ CORREÇÃO: Buscar token com ambos os nomes
     const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     
     if (!token) {
@@ -350,7 +355,7 @@ async function removerItem(itemId) {
         const result = await response.json();
         console.log('✅ Item removido:', result);
         
-        // Atualizar badge do carrinho na navbar
+        // Atualizar badge do carrinho
         if (result.total_itens !== undefined) {
             const badge = document.querySelector('.cart-badge');
             if (badge) {
@@ -406,8 +411,6 @@ function atualizarResumo(data) {
 
 async function aplicarCupom(cupom) {
     console.log(`🎟️ Aplicando cupom: ${cupom}`);
-    
-    // TODO: Implementar lógica de cupom no backend
     mostrarNotificacao('Funcionalidade de cupom em desenvolvimento', 'info');
 }
 
@@ -424,14 +427,13 @@ function mostrarCarrinhoVazio() {
                 <i class="fas fa-shopping-cart" style="font-size: 80px; color: #ddd; margin-bottom: 20px;"></i>
                 <h3 style="color: #666; margin-bottom: 10px;">Seu carrinho está vazio</h3>
                 <p style="color: #999; margin-bottom: 30px;">Adicione produtos para começar suas compras!</p>
-                <a href="/pecas_pg" class="btn" style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; text-decoration: none; border-radius: 8px;">
+                <a href="/pecas_pag" class="btn" style="display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; text-decoration: none; border-radius: 8px;">
                     <i class="fas fa-shopping-bag"></i> Ver Produtos
                 </a>
             </div>
         `;
     }
     
-    // Atualizar resumo
     atualizarResumo({ total_valor: 0, total_itens: 0 });
 }
 
@@ -461,13 +463,11 @@ function mostrarErroCarregamento() {
 // ==========================================
 
 function mostrarNotificacao(mensagem, tipo = 'info') {
-    // Remover notificação anterior se existir
     const notifAnterior = document.querySelector('.notificacao-toast');
     if (notifAnterior) {
         notifAnterior.remove();
     }
     
-    // Criar nova notificação
     const notificacao = document.createElement('div');
     notificacao.className = `notificacao-toast notificacao-${tipo}`;
     
@@ -480,7 +480,6 @@ function mostrarNotificacao(mensagem, tipo = 'info') {
         <span>${mensagem}</span>
     `;
     
-    // Estilos inline
     notificacao.style.cssText = `
         position: fixed;
         top: 20px;
@@ -504,13 +503,11 @@ function mostrarNotificacao(mensagem, tipo = 'info') {
     
     document.body.appendChild(notificacao);
     
-    // Animar entrada
     setTimeout(() => {
         notificacao.style.opacity = '1';
         notificacao.style.transform = 'translateX(0)';
     }, 10);
     
-    // Remover após 3 segundos
     setTimeout(() => {
         notificacao.style.opacity = '0';
         notificacao.style.transform = 'translateX(100%)';
@@ -525,7 +522,6 @@ function mostrarNotificacao(mensagem, tipo = 'info') {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 Página do carrinho carregada');
     
-    // ✅ CORREÇÃO: Verificar token com ambos os nomes
     const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     
     if (!token) {
@@ -537,7 +533,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // Carregar carrinho
     carregarCarrinho();
 });
 
