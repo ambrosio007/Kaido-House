@@ -1,7 +1,13 @@
 /**
  * ✅ VEICULOS.JS - Carregamento dinâmico de veículos da API
- * CORRIGIDO: Removido /api das URLs
+ * 🔧 VERSÃO CORRIGIDA - Carrega veículos do banco de dados
  */
+
+// ==========================================
+// VARIÁVEIS GLOBAIS
+// ==========================================
+
+let todosVeiculos = []; // Armazena todos os veículos carregados
 
 // ==========================================
 // CARREGAR VEÍCULOS DA API
@@ -26,7 +32,7 @@ async function carregarVeiculos() {
     `;
     
     try {
-        // ✅ CORRIGIDO: Removido /api
+        // ✅ Endpoint correto
         const response = await fetch('/veiculos');
         
         if (!response.ok) {
@@ -40,6 +46,9 @@ async function carregarVeiculos() {
             mostrarMensagemVazia();
             return;
         }
+        
+        // Armazenar veículos globalmente
+        todosVeiculos = veiculos;
         
         // Renderizar veículos
         renderizarVeiculos(veiculos);
@@ -58,6 +67,11 @@ function renderizarVeiculos(veiculos) {
     const container = document.querySelector('.vehicles-grid');
     
     if (!container) return;
+    
+    if (!veiculos || veiculos.length === 0) {
+        mostrarMensagemVazia();
+        return;
+    }
     
     const veiculosHTML = veiculos.map(veiculo => criarVeiculoCard(veiculo)).join('');
     container.innerHTML = veiculosHTML;
@@ -80,8 +94,9 @@ function criarVeiculoCard(veiculo) {
         }
     }
     
-    // Formatar preço
-    const preco = parseFloat(veiculo.preco).toLocaleString('pt-BR', {
+    // ✅ Validar preço antes de formatar
+    const precoNumerico = parseFloat(veiculo.preco) || 0;
+    const preco = precoNumerico.toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
@@ -175,29 +190,33 @@ function mostrarErroCarregamento() {
 // FILTROS E BUSCA
 // ==========================================
 
-// Função de busca
+// ✅ Função de busca aprimorada
 function buscarVeiculos(termo) {
     console.log('🔍 Buscando:', termo);
-    // TODO: Implementar busca no backend
+    
+    if (!termo) {
+        renderizarVeiculos(todosVeiculos);
+        return;
+    }
+    
+    const termoLower = termo.toLowerCase();
+    const veiculosFiltrados = todosVeiculos.filter(veiculo => {
+        const nomeCompleto = `${veiculo.marca} ${veiculo.modelo} ${veiculo.versao}`.toLowerCase();
+        return nomeCompleto.includes(termoLower);
+    });
+    
+    renderizarVeiculos(veiculosFiltrados);
+    console.log(`🔍 ${veiculosFiltrados.length} veículos encontrados`);
 }
 
-// Adicionar event listener para busca
+// ✅ Adicionar event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Busca
     const searchInput = document.querySelector('.search-box input');
     
     if (searchInput) {
         searchInput.addEventListener('input', function() {
-            const termo = this.value.toLowerCase();
-            const cards = document.querySelectorAll('.vehicle-card');
-            
-            cards.forEach(card => {
-                const texto = card.textContent.toLowerCase();
-                if (texto.includes(termo)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+            buscarVeiculos(this.value);
         });
     }
     
@@ -206,10 +225,44 @@ document.addEventListener('DOMContentLoaded', function() {
     selects.forEach(select => {
         select.addEventListener('change', function() {
             console.log('Filtro alterado:', this.value);
-            // TODO: Implementar filtros no backend
+            aplicarFiltros();
         });
     });
 });
+
+// ✅ Aplicar filtros (ano, ordenação, etc)
+function aplicarFiltros() {
+    const selects = document.querySelectorAll('.filter-options select');
+    let veiculosFiltrados = [...todosVeiculos];
+    
+    selects.forEach(select => {
+        const valor = select.value;
+        
+        if (!valor) return;
+        
+        // Filtro por ano
+        if (valor === '90') {
+            veiculosFiltrados = veiculosFiltrados.filter(v => {
+                const ano = parseInt(v.ano);
+                return ano >= 1990 && ano < 2000;
+            });
+        } else if (valor === '00') {
+            veiculosFiltrados = veiculosFiltrados.filter(v => {
+                const ano = parseInt(v.ano);
+                return ano >= 2000 && ano < 2010;
+            });
+        }
+        
+        // Ordenação
+        if (valor === 'menor-preco') {
+            veiculosFiltrados.sort((a, b) => parseFloat(a.preco) - parseFloat(b.preco));
+        } else if (valor === 'maior-preco') {
+            veiculosFiltrados.sort((a, b) => parseFloat(b.preco) - parseFloat(a.preco));
+        }
+    });
+    
+    renderizarVeiculos(veiculosFiltrados);
+}
 
 // ==========================================
 // INICIALIZAR QUANDO A PÁGINA CARREGAR

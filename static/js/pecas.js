@@ -1,5 +1,6 @@
 /**
  * ✅ PECAS.JS - Carregamento dinâmico de peças da API
+ * 🔧 VERSÃO CORRIGIDA - Carrega peças do banco de dados
  */
 
 // ==========================================
@@ -8,6 +9,7 @@
 
 let todasPecas = []; // Armazena todas as peças carregadas
 let filtroAtual = 'all'; // 'all', 'new', 'used'
+let categoriaAtual = 'all'; // Categoria selecionada
 
 // ==========================================
 // CARREGAR PEÇAS DA API
@@ -32,7 +34,8 @@ async function carregarPecas() {
     `;
     
     try {
-        const response = await fetch('/api/pecas');
+        // ✅ Endpoint correto
+        const response = await fetch('/pecas');
         
         if (!response.ok) {
             throw new Error(`Erro HTTP: ${response.status}`);
@@ -67,6 +70,11 @@ function renderizarPecas(pecas) {
     
     if (!container) return;
     
+    if (!pecas || pecas.length === 0) {
+        mostrarMensagemVazia();
+        return;
+    }
+    
     const pecasHTML = pecas.map(peca => criarPecaCard(peca)).join('');
     container.innerHTML = pecasHTML;
     
@@ -91,8 +99,9 @@ function criarPecaCard(peca) {
         }
     }
     
-    // Formatar preço
-    const preco = parseFloat(peca.preco).toLocaleString('pt-BR', {
+    // ✅ Validar preço antes de formatar
+    const precoNumerico = parseFloat(peca.preco) || 0;
+    const preco = precoNumerico.toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
@@ -105,8 +114,14 @@ function criarPecaCard(peca) {
     // Marca/Fabricante
     const marca = peca.marca || peca.fabricante || 'Genérico';
     
+    // ✅ Adicionar data-categoria ao card
+    const categoria = peca.categoria || 'outros';
+    
     return `
-        <div class="part-card" data-condition="${condicao}" data-id="${peca.id}">
+        <div class="part-card" 
+             data-condition="${condicao}" 
+             data-id="${peca.id}"
+             data-categoria="${categoria}">
             <div class="part-image">
                 <img src="${imagemSrc}" 
                      alt="${peca.nome}"
@@ -204,7 +219,8 @@ async function adicionarAoCarrinho(pecaId, pecaNome) {
 // FILTROS DE CONDIÇÃO (NOVO/USADO)
 // ==========================================
 
-function filterCondition(tipo) {
+// ✅ CORREÇÃO: Adicionar parâmetro event
+function filterCondition(tipo, event) {
     console.log('🔍 Filtro aplicado:', tipo);
     filtroAtual = tipo;
     
@@ -213,24 +229,13 @@ function filterCondition(tipo) {
         btn.classList.remove('active');
     });
     
-    event.target.classList.add('active');
+    // ✅ CORREÇÃO: event agora é um parâmetro
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
     
-    // Filtrar cards
-    const cards = document.querySelectorAll('.part-card');
-    
-    cards.forEach(card => {
-        const condicao = card.getAttribute('data-condition');
-        
-        if (tipo === 'all') {
-            card.style.display = '';
-        } else if (tipo === 'new' && condicao === 'new') {
-            card.style.display = '';
-        } else if (tipo === 'used' && condicao === 'used') {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
+    // ✅ Usar todasPecas para filtrar
+    aplicarFiltros();
 }
 
 // Tornar função global
@@ -240,17 +245,58 @@ window.filterCondition = filterCondition;
 // FILTRO POR CATEGORIA
 // ==========================================
 
-function filtrarPorCategoria(categoria) {
+// ✅ CORREÇÃO: Implementação completa do filtro de categoria
+function filtrarPorCategoria(event) {
+    const categoriaElement = event.target.closest('[data-categoria]');
+    const categoria = categoriaElement ? categoriaElement.getAttribute('data-categoria') : 'all';
+    
     console.log('📂 Filtro de categoria:', categoria);
+    categoriaAtual = categoria;
     
-    // TODO: Implementar filtro por categoria
-    // Por enquanto, apenas destaca o botão ativo
-    
+    // Atualizar botões ativos
     document.querySelectorAll('.cat-link').forEach(btn => {
         btn.classList.remove('active');
     });
     
-    event.target.classList.add('active');
+    // ✅ CORREÇÃO: event agora é um parâmetro
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
+    
+    // ✅ Aplicar filtros combinados
+    aplicarFiltros();
+}
+
+// ==========================================
+// APLICAR FILTROS COMBINADOS
+// ==========================================
+
+// ✅ NOVA FUNÇÃO: Aplica filtros de condição e categoria juntos
+function aplicarFiltros() {
+    let pecasFiltradas = todasPecas;
+    
+    // Filtrar por condição (novo/usado)
+    if (filtroAtual === 'new') {
+        pecasFiltradas = pecasFiltradas.filter(p => 
+            !p.estado || p.estado.toLowerCase() !== 'usado'
+        );
+    } else if (filtroAtual === 'used') {
+        pecasFiltradas = pecasFiltradas.filter(p => 
+            p.estado && p.estado.toLowerCase() === 'usado'
+        );
+    }
+    
+    // Filtrar por categoria
+    if (categoriaAtual && categoriaAtual !== 'all') {
+        pecasFiltradas = pecasFiltradas.filter(p => 
+            p.categoria === categoriaAtual
+        );
+    }
+    
+    // Renderizar peças filtradas
+    renderizarPecas(pecasFiltradas);
+    
+    console.log(`🔍 Filtros aplicados: ${pecasFiltradas.length} peças encontradas`);
 }
 
 // ==========================================
@@ -355,27 +401,29 @@ function mostrarNotificacao(mensagem, tipo = 'info') {
 }
 
 // ==========================================
-// ADICIONAR EVENT LISTENERS PARA CATEGORIAS
-// ==========================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Links de categoria
-    const catLinks = document.querySelectorAll('.cat-link');
-    catLinks.forEach(link => {
-        link.addEventListener('click', filtrarPorCategoria);
-    });
-});
-
-// ==========================================
-// INICIALIZAR QUANDO A PÁGINA CARREGAR
+// ✅ INICIALIZAÇÃO - CONSOLIDADO EM UM ÚNICO LISTENER
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 Página de peças carregada');
+    
+    // Inicializar event listeners de categoria
+    const catLinks = document.querySelectorAll('.cat-link');
+    catLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            filtrarPorCategoria(e);
+        });
+    });
+    
+    // Carregar peças da API
     carregarPecas();
 });
 
-// Adicionar CSS para spinner
+// ==========================================
+// ADICIONAR CSS PARA SPINNER
+// ==========================================
+
 const style = document.createElement('style');
 style.textContent = `
     @keyframes spin {

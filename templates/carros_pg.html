@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veículos JDM | Kaido-House</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/home.css"> <link rel="stylesheet" href="/static/veiculos.css">
+    <link rel="stylesheet" href="/static/home.css">
+    <link rel="stylesheet" href="/static/veiculos.css">
 </head>
 <body>
 
-        <header>
+    <header>
         <a href="/" class="logo">
             <img src="/static/img/logo-removebg-preview.png" alt="Logo Kaido-House" class="logo-img">
         </a>
@@ -37,10 +38,7 @@
 
                 <!-- Estado LOGADO - Mostra avatar/inicial + dropdown -->
                 <a href="/perfil" class="auth-icon-container profile-state hidden" id="profile-target-logged">
-                    <!-- A inicial ou foto será inserida aqui pelo JavaScript -->
                     <img src="/static/images/default-avatar.jpg" alt="Perfil" class="profile-avatar">
-
-                    <!-- Dropdown será criado dinamicamente pelo JavaScript -->
                 </a>
             </div>
 
@@ -67,88 +65,20 @@
                     <option value="00">Anos 2000</option>
                 </select>
                 <select>
-                    <option value="">Ordenar por: Menor Preço</option>
-                    <option value="">Maior Preço</option>
-                    <option value="">Recém Chegados</option>
+                    <option value="">Ordenar por</option>
+                    <option value="menor-preco">Menor Preço</option>
+                    <option value="maior-preco">Maior Preço</option>
                 </select>
             </div>
         </div>
 
+        <!-- ✅ Container vazio - será preenchido dinamicamente pelo JavaScript -->
         <div class="vehicles-grid">
-            
-            <div class="vehicle-card">
-                <div class="card-image">
-                    <img src="/static/images/vehicle-rx7.jpg" alt="Mazda RX-7">
-                    <span class="status-tag">Disponível</span>
-                </div>
-                <div class="card-content">
-                    <span class="category">Coupe / Rotary</span>
-                    <h3>Mazda RX-7 FD3S Spirit R</h3>
-                    <div class="specs">
-                        <span><i class="fas fa-calendar-alt"></i> 2002</span>
-                        <span><i class="fas fa-tachometer-alt"></i> 45.000km</span>
-                    </div>
-                    <p class="price">R$ 480.000,00</p>
-                    <a href="#" class="btn-view">Ver Detalhes</a>
-                </div>
-            </div>
-
-            <div class="vehicle-card">
-                <div class="card-image">
-                    <img src="/static/images/skyline-r34.jpg" alt="Skyline R34">
-                    <span class="status-tag" style="background: #ffcc00; color: #000;">Reservado</span>
-                </div>
-                <div class="card-content">
-                    <span class="category">Coupe / AWD</span>
-                    <h3>Nissan Skyline GT-R R34 V-Spec II</h3>
-                    <div class="specs">
-                        <span><i class="fas fa-calendar-alt"></i> 1999</span>
-                        <span><i class="fas fa-tachometer-alt"></i> 62.000km</span>
-                    </div>
-                    <p class="price">R$ 1.200.000,00</p>
-                    <a href="#" class="btn-view">Ver Detalhes</a>
-                </div>
-            </div>
-
-            <div class="vehicle-card">
-                <div class="card-image">
-                    <img src="/static/images/supra-mk4.jpg" alt="Toyota Supra">
-                    <span class="status-tag">Disponível</span>
-                </div>
-                <div class="card-content">
-                    <span class="category">Coupe / Turbo</span>
-                    <h3>Toyota Supra MK4 2JZ-GTE</h3>
-                    <div class="specs">
-                        <span><i class="fas fa-calendar-alt"></i> 1994</span>
-                        <span><i class="fas fa-tachometer-alt"></i> 88.000km</span>
-                    </div>
-                    <p class="price">R$ 550.000,00</p>
-                    <a href="#" class="btn-view">Ver Detalhes</a>
-                </div>
-            </div>
-
-            <div class="vehicle-card">
-                <div class="card-image">
-                    <img src="/static/images/ae86.jpg" alt="Toyota AE86">
-                    <span class="status-tag">Disponível</span>
-                </div>
-                <div class="card-content">
-                    <span class="category">Hatch / Drift Classic</span>
-                    <h3>Toyota AE86 Trueno</h3>
-                    <div class="specs">
-                        <span><i class="fas fa-calendar-alt"></i> 1985</span>
-                        <span><i class="fas fa-tachometer-alt"></i> 110.000km</span>
-                    </div>
-                    <p class="price">R$ 220.000,00</p>
-                    <a href="#" class="btn-view">Ver Detalhes</a>
-                </div>
-            </div>
-
+            <!-- Os cards serão carregados aqui pelo veiculos.js -->
         </div>
     </main>
 
-
-        <footer>
+    <footer>
         <div class="footer-container">
             <div class="footer-brand">
                 <img src="/static/img/logo-removebg-preview.png" alt="Logo" class="footer-logo">
@@ -165,8 +95,8 @@
             <div class="footer-nav">
                 <h3>Navegação</h3>
                 <ul>
-                    <li><a href="#">Catálogo de Peças</a></li>
-                    <li><a href="#">Estoque de Veículos</a></li>
+                    <li><a href="/pecas">Catálogo de Peças</a></li>
+                    <li><a href="/veiculos">Estoque de Veículos</a></li>
                     <li><a href="#">Oficina de Customização</a></li>
                     <li><a href="#">Blog Kaido</a></li>
                 </ul>
@@ -176,7 +106,7 @@
                 <h3>Atendimento</h3>
                 <p><i class="fas fa-map-marker-alt"></i> Joinville, SC - Unidade Sul</p>
                 <p><i class="fas fa-phone"></i> (47) 9999-9999</p>
-                <p><i class="fas fa-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bdded2d3c9dcc9d2fdd6dcd4d9d2d5d2c8ced893ded2d0">[email&#160;protected]</a></p>
+                <p><i class="fas fa-envelope"></i> contato@kaidohouse.com.br</p>
                 <div class="payment-methods">
                     <i class="fab fa-cc-visa"></i>
                     <i class="fab fa-cc-mastercard"></i>
@@ -188,6 +118,8 @@
             <p>&copy; 2026 Kaido-House. Desenvolvido para SENAI/SC.</p>
         </div>
     </footer>
+
+    <!-- Scripts -->
     <script src="/static/js/nav_bar.js"></script>
     <script src="/static/js/veiculos.js"></script>
 </body>
